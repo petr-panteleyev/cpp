@@ -1,0 +1,40 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "DebugConfigure",
+            "displayName": "Отладка (конфигурация)",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            },
+            "environment": {}
+        },
+        {
+            "name": "ReleaseConfigure",
+            "displayName": "Выпуск (конфигурация)",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            },
+            "environment": {}
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "DebugConfigure"
+        },
+        {
+            "name": "Release",
+            "configurePreset": "ReleaseConfigure"
+        }
+    ]
+}

@@ -1,0 +1,91 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(password_manager VERSION 24.12.1 LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(NOT CMAKE_CXX_EXTENSIONS)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Xml)
+
+set(TS_FILES src/ui/password_manager_ru_RU.ts)
+
+set(PROJECT_SOURCES
+    src/main.cpp
+    src/ui/mainwindow.cpp
+    src/ui/mainwindow.h
+    src/ui/mainwindow.ui
+    src/ui/cardtableitemmodel.h
+    src/ui/cardtableitemmodel.cpp
+    src/ui/cardtablesortfiltermodel.h
+    src/ui/cardtablesortfiltermodel.cpp
+    src/model/card.h
+    src/model/card.cpp
+    src/model/field.h
+    src/model/fieldtype.h
+    src/model/fieldtype.cpp
+    src/model/cardclass.h
+    src/model/cardclass.cpp
+    src/model/picture.h
+    src/model/picture.cpp
+    src/serializer.h
+    src/serializer.cpp
+    src/exceptions.h
+)
+
+set(RESOURCE_FILES
+    resources/icon.png
+    resources/favorites.png
+    resources/generic.png
+    resources/mobile.png
+    resources/note.png
+    resources/trash.png
+)
+
+qt_add_executable(password_manager
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+)
+
+target_compile_options(password_manager PRIVATE
+    -Werror
+    -Wall
+)
+
+qt_add_resources(password_manager "resources"
+    PREFIX "/images"
+    BASE "resources"
+    FILES ${RESOURCE_FILES}
+)
+
+qt_add_translations(password_manager
+    INCLUDE_DIRECTORIES
+        ${PROJECT_SOURCE_DIR}
+    TS_FILES
+        ${TS_FILES})
+add_dependencies(password_manager update_translations)
+
+target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml)
+
+set_target_properties(password_manager PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+install(TARGETS password_manager
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+qt_finalize_executable(password_manager)

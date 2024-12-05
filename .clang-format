@@ -9,10 +9,11 @@ AlignConsecutiveDeclarations:
   AcrossComments: false
 
 AlignConsecutiveAssignments:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: false
   AcrossComments: false
 
 AllowShortBlocksOnASingleLine: Never
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortCaseLabelsOnASingleLine: true
+AllowShortLambdasOnASingleLine: Inline
