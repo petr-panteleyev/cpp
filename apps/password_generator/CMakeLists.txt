@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(password_generator_app VERSION 24.11.1 LANGUAGES CXX)
+project(password_generator VERSION 24.11.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -35,8 +35,11 @@ qt_add_executable(password_generator
     ${PROJECT_SOURCES}
 )
 
-target_compile_options(password_generator PRIVATE -Werror)
-target_compile_options(password_generator PRIVATE -std=c++17)
+target_compile_options(password_generator PRIVATE
+    -Werror
+    -Wall
+    -Wpedantic
+)
 
 qt_add_resources(password_generator "resources"
     PREFIX "/images"

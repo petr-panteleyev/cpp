@@ -4,5 +4,5 @@ Monorepo with C++ sources.
 
 ## Applications
 
-+ [Password Generator](./password_generator_app)
++ [Password Generator](./apps/password_generator)
 + [Password Manager](./apps/password_manager)
