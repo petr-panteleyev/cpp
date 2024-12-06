@@ -10,7 +10,8 @@
 
 class CardTableSortFilterModel : public QSortFilterProxyModel {
   public:
-    CardTableSortFilterModel() : show_deleted_{false} {};
+    explicit CardTableSortFilterModel(QObject *parent = nullptr)
+        : QSortFilterProxyModel{parent}, show_deleted_{false} {};
 
     void set_show_deleted(bool show_deleted) {
         show_deleted_ = show_deleted;

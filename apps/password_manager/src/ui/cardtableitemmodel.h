@@ -6,7 +6,7 @@
 #ifndef CARDTABLEITEMMODEL_H
 #define CARDTABLEITEMMODEL_H
 
-#include "../model/card.h"
+#include "card.h"
 #include <QAbstractItemModel>
 #include <vector>
 
@@ -20,19 +20,16 @@ class CardTableItemModel : public QAbstractItemModel {
         endResetModel();
     }
 
-    virtual int columnCount(const QModelIndex &parent) const override { return 3; }
-
+    virtual int         columnCount(const QModelIndex &parent) const override { return 3; }
     virtual QModelIndex parent(const QModelIndex &parent) const override { return parent_index; }
-
-    virtual int rowCount(const QModelIndex &parent) const override { return data_.size(); }
+    virtual int         rowCount(const QModelIndex &parent) const override { return data_.size(); }
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override {
         return createIndex(row, column);
     }
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    const CardPtr cardAtIndex(int index) const { return data_.at(index); }
+    const CardPtr    cardAtIndex(int index) const { return data_.at(index); }
 
   private:
     static inline const QModelIndex parent_index = QModelIndex();

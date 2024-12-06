@@ -4,33 +4,70 @@
 */
 
 #include "mainwindow.h"
-#include "../model/card.h"
-#include "../serializer.h"
+#include "card.h"
+#include "serializer.h"
 #include <./ui_mainwindow.h>
+#include <QClipboard>
+#include <QDesktopServices>
 #include <QDomDocument>
 #include <QFile>
 #include <QFileDialog>
 #include <QTableWidgetItem>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+static constexpr int TAB_FIELDS = 0;
+static constexpr int TAB_NOTE = 1;
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), copyFieldAction_{this}, openLinkAction_{tr("Open Link"), this},
+      fieldContextMenu_{this} {
     ui->setupUi(this);
 
-    sort_filter_model_.setSourceModel(&model_);
-    ui->cardListView->setModel(&sort_filter_model_);
+    sortFilterModel_.setSourceModel(&model_);
+    ui->cardListView->setModel(&sortFilterModel_);
 
     auto header = ui->cardListView->horizontalHeader();
     assert(header != nullptr);
 
-    ui->cardListView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    ui->cardListView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->cardListView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(1, QHeaderView::Stretch);
+    header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+
     ui->cardListView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    //    auto selectionModel = ui->cardListView->selectionModel();
-    //    connect(selectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-    //            SLOT(on_item_selected(QItemSelection, QItemSelection)));
-    //    connect(selectionModel, SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,
-    //            SLOT(on_current_changed(QModelIndex, QModelIndex)));
+    // Field Table
+    fieldFilterModel_.setSourceModel(&fieldModel_);
+    ui->fieldTable->setModel(&fieldFilterModel_);
+
+    auto fieldTableHeader = ui->fieldTable->horizontalHeader();
+    assert(fieldTableHeader != nullptr);
+    fieldTableHeader->setSectionResizeMode(0, QHeaderView::Stretch);
+    fieldTableHeader->setSectionResizeMode(1, QHeaderView::Stretch);
+
+    ui->fieldTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    ui->fieldTable->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->fieldTable->setFocusPolicy(Qt::NoFocus);
+
+    // TabWidget
+    ui->tabWidget->setTabText(TAB_FIELDS, "");
+    ui->tabWidget->setTabIcon(TAB_FIELDS, Picture::GENERIC.icon());
+    ui->tabWidget->setTabText(TAB_NOTE, tr("Note"));
+    ui->tabWidget->setTabIcon(TAB_NOTE, Picture::NOTE.icon());
+
+    // Field context menu
+    fieldContextMenu_.addAction(&copyFieldAction_);
+    fieldContextMenu_.addAction(&openLinkAction_);
+
+    auto selectionModel = ui->cardListView->selectionModel();
+    connect(selectionModel, SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,
+            SLOT(onCurrentCardChanged(QModelIndex, QModelIndex)));
+
+    connect(ui->fieldTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onFieldTableDoubleClicked(QModelIndex)));
+    connect(ui->fieldTable, SIGNAL(customContextMenuRequested(QPoint)), this,
+            SLOT(fieldTableContextMenuRequested(QPoint)));
+
+    connect(&copyFieldAction_, SIGNAL(triggered(bool)), this, SLOT(onCopyField()));
+    connect(&openLinkAction_, SIGNAL(triggered(bool)), this, SLOT(onOpenLink()));
 }
 
 MainWindow::~MainWindow() {
@@ -54,22 +91,71 @@ void MainWindow::on_actionOpen_triggered() {
         std::vector<CardPtr> cards;
         Serializer::deserialize(doc, cards);
         model_.setItems(cards);
-        sort_filter_model_.sort(0);
+        sortFilterModel_.sort(0);
     }
 }
 
-void MainWindow::on_item_selected(const QItemSelection &selected, const QItemSelection &deselected) {
-}
+void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous) {
+    auto sourceIndex = sortFilterModel_.mapToSource(current);
+    auto currentCard = model_.cardAtIndex(sourceIndex.row());
+    fieldModel_.setItems(currentCard->fields());
 
-void MainWindow::on_current_changed(const QModelIndex &current, const QModelIndex &previous) {
+    if (currentCard->cardClass() == CardClass::NOTE) {
+        ui->tabWidget->setTabText(TAB_NOTE, currentCard->name());
+    } else {
+        ui->tabWidget->setTabText(TAB_FIELDS, currentCard->name());
+        ui->tabWidget->setTabIcon(TAB_FIELDS, currentCard->picture().icon());
+        ui->tabWidget->setTabText(TAB_NOTE, tr("Note"));
+    }
+
+    ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard->fields().empty());
+    ui->tabWidget->setTabVisible(TAB_NOTE, !currentCard->note().isEmpty());
+
+    ui->noteViewer->setText(currentCard->note());
 }
 
 void MainWindow::on_actionShow_Deleted_toggled(bool checked) {
-    sort_filter_model_.set_show_deleted(checked);
+    sortFilterModel_.set_show_deleted(checked);
+
+    auto selectionModel = ui->cardListView->selectionModel();
+    ui->cardListView->scrollTo(selectionModel->currentIndex());
 }
 
-void MainWindow::on_actionExit_triggered()
-{
+void MainWindow::on_actionExit_triggered() {
     close();
 }
 
+void MainWindow::onFieldTableDoubleClicked(const QModelIndex &index) {
+    auto sourceIndex = fieldFilterModel_.mapToSource(index);
+    auto field = fieldModel_.fieldAtIndex(sourceIndex.row());
+    fieldModel_.toggleMasking(sourceIndex, field);
+}
+
+void MainWindow::fieldTableContextMenuRequested(QPoint pos) {
+    auto index = ui->fieldTable->indexAt(pos);
+    if (!index.isValid()) {
+        return;
+    }
+    auto sourceIndex = fieldFilterModel_.mapToSource(index);
+    auto field = fieldModel_.fieldAtIndex(sourceIndex.row());
+
+    copyFieldAction_.setText(tr("Copy") + " \"" + field->name() + "\"");
+    copyFieldAction_.setData(field->getValueAsString());
+    openLinkAction_.setData(field->getValueAsString());
+    fieldContextMenu_.popup(ui->fieldTable->viewport()->mapToGlobal(pos));
+
+    openLinkAction_.setVisible(field->type() == FieldType::LINK);
+}
+
+void MainWindow::onCopyField() {
+    auto fieldText = copyFieldAction_.data().toString();
+    auto clipboard = QGuiApplication::clipboard();
+    if (clipboard != nullptr) {
+        clipboard->setText(fieldText);
+    }
+}
+
+void MainWindow::onOpenLink() {
+    auto urlText = openLinkAction_.data().toString();
+    QDesktopServices::openUrl(QUrl(urlText));
+}

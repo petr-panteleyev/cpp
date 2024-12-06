@@ -6,10 +6,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QItemSelection>
-#include <QMainWindow>
 #include "cardtableitemmodel.h"
 #include "cardtablesortfiltermodel.h"
+#include "fieldtableitemmodel.h"
+#include "fieldtablesortfiltermodel.h"
+#include <QAction>
+#include <QItemSelection>
+#include <QMainWindow>
+#include <QMenu>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,17 +30,25 @@ class MainWindow : public QMainWindow {
 
   private slots:
     void on_actionOpen_triggered();
-    void on_item_selected(const QItemSelection &selected, const QItemSelection &deselected);
-    void on_current_changed(const QModelIndex &current, const QModelIndex &previous);
-
+    void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onFieldTableDoubleClicked(const QModelIndex &index);
     void on_actionShow_Deleted_toggled(bool arg1);
-
     void on_actionExit_triggered();
+    void fieldTableContextMenuRequested(QPoint pos);
+    void onCopyField();
+    void onOpenLink();
 
-private:
+  private:
     Ui::MainWindow *ui;
 
-    CardTableItemModel model_;
-    CardTableSortFilterModel sort_filter_model_;
+    CardTableItemModel       model_;
+    CardTableSortFilterModel sortFilterModel_;
+
+    FieldTableItemModel       fieldModel_;
+    FieldTableSortFilterModel fieldFilterModel_;
+
+    QAction copyFieldAction_;
+    QAction openLinkAction_;
+    QMenu   fieldContextMenu_;
 };
 #endif // MAINWINDOW_H

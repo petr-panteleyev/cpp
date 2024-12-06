@@ -63,14 +63,6 @@ static bool getBoolAttribute(const QDomNamedNodeMap &attributes, const QString &
     }
 }
 
-static QDate parseLocalDate(const QString &stringValue) {
-    if (stringValue.isEmpty()) {
-        return QDate::currentDate();
-    }
-    auto date = QDate::fromString(stringValue, "yyyy-MM-dd");
-    return date.isValid() ? date : QDate::currentDate();
-}
-
 static FieldPtr deserializeField(const QDomElement &fieldElement) {
     auto attrs = fieldElement.attributes();
 
@@ -80,17 +72,7 @@ static FieldPtr deserializeField(const QDomElement &fieldElement) {
     auto name = getStringAttribute(attrs, ATTR_NAME, "");
 
     auto     stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
-    QVariant value;
-    switch (fieldType.ordinal()) {
-        case FieldTypeEnum::CARD_TYPE: {
-            value = "TBD";
-        }
-        case FieldTypeEnum::DATE:
-        case FieldTypeEnum::EXPIRATION_MONTH: {
-            value = parseLocalDate(stringValue);
-        }
-        default: value = stringValue;
-    }
+    QVariant value = Field::deserialize(stringValue, fieldType);
 
     return std::make_shared<Field>(fieldType, name, value);
 }
@@ -107,20 +89,27 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
         throw PasswordManagerException("Mandatory attribute name is missing");
     }
 
-    auto                  pictureStrValue = getStringAttribute(attrs, "picture", "GENERIC");
-    auto                 &picture = Picture::valueOf(pictureStrValue.toStdString());
-    auto                  modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
-    auto                  note{""};
-    bool                  favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
-    auto                  active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
-    std::vector<FieldPtr> fields;
+    auto  pictureStrValue = getStringAttribute(attrs, "picture", "GENERIC");
+    auto &picture = Picture::valueOf(pictureStrValue.toStdString());
+    auto  modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
+    bool  favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
+    auto  active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
 
     // Deserialize fields
+    std::vector<FieldPtr> fields;
+
     auto fieldNodes = cardElement.elementsByTagName("field");
     for (auto index = 0; index < fieldNodes.count(); ++index) {
         auto fieldElement = fieldNodes.at(index).toElement();
         auto field = deserializeField(fieldElement);
         fields.push_back(field);
+    }
+
+    // Deserialize note
+    QString note;
+    auto    noteNodes = cardElement.elementsByTagName("note");
+    if (!noteNodes.isEmpty()) {
+        note = noteNodes.at(0).toElement().text();
     }
 
     return std::make_shared<Card>(cardClass, uuid, picture, name, modified, note, favorite, active, fields);

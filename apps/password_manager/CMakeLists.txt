@@ -21,34 +21,29 @@ set(TS_FILES src/ui/password_manager_ru_RU.ts)
 
 set(PROJECT_SOURCES
     src/main.cpp
-    src/ui/mainwindow.cpp
-    src/ui/mainwindow.h
-    src/ui/mainwindow.ui
-    src/ui/cardtableitemmodel.h
-    src/ui/cardtableitemmodel.cpp
-    src/ui/cardtablesortfiltermodel.h
-    src/ui/cardtablesortfiltermodel.cpp
-    src/model/card.h
-    src/model/card.cpp
-    src/model/field.h
-    src/model/fieldtype.h
-    src/model/fieldtype.cpp
-    src/model/cardclass.h
-    src/model/cardclass.cpp
-    src/model/picture.h
-    src/model/picture.cpp
     src/serializer.h
     src/serializer.cpp
     src/exceptions.h
 )
 
+include(src/model/model.cmake)
+include(src/ui/ui.cmake)
+
 set(RESOURCE_FILES
+    resources/amex.png
+    resources/credit_card.png
+    resources/diners.png
     resources/icon.png
     resources/favorites.png
     resources/generic.png
+    resources/jcb.png
+    resources/mastercard.png
+    resources/mir.png
     resources/mobile.png
     resources/note.png
+    resources/paypal.png
     resources/trash.png
+    resources/visa.png
 )
 
 qt_add_executable(password_manager
@@ -59,6 +54,7 @@ qt_add_executable(password_manager
 target_compile_options(password_manager PRIVATE
     -Werror
     -Wall
+    -Wpedantic
 )
 
 qt_add_resources(password_manager "resources"
@@ -75,6 +71,11 @@ qt_add_translations(password_manager
 add_dependencies(password_manager update_translations)
 
 target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml)
+target_include_directories(password_manager PRIVATE
+  src
+  src/model
+  src/ui
+)
 
 set_target_properties(password_manager PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

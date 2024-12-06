@@ -6,24 +6,12 @@
 #ifndef FIELDTYPE_H
 #define FIELDTYPE_H
 
+#include <functional>
 #include <string>
+#include <vector>
 
 class FieldType;
-
-enum class FieldTypeEnum : unsigned {
-    STRING = 0,
-    HIDDEN,
-    EMAIL,
-    CREDIT_CARD_NUMBER,
-    LINK,
-    PIN,
-    UNIX_PASSWORD,
-    SHORT_PASSWORD,
-    LONG_PASSWORD,
-    CARD_TYPE,
-    DATE,
-    EXPIRATION_MONTH
-};
+using FieldTypeRef = std::reference_wrapper<const FieldType>;
 
 class FieldType final {
   public:
@@ -42,25 +30,27 @@ class FieldType final {
 
   public:
     static const FieldType &valueOf(const std::string &name);
-    static const FieldType &valueOf(FieldTypeEnum value);
 
   public:
     const std::string &name() const { return name_; }
-    FieldTypeEnum      ordinal() const { return ordinal_; }
+    unsigned           ordinal() const { return ordinal_; }
     bool               masked() const { return masked_; }
 
     friend bool operator==(const FieldType &x, const FieldType &y) { return x.ordinal_ == y.ordinal_; }
 
   private:
-    FieldType(FieldTypeEnum ordinal, std::string name) : ordinal_{ordinal}, name_{name}, masked_{false} {}
-    FieldType(FieldTypeEnum ordinal, std::string name, bool masked) : ordinal_{ordinal}, name_{name}, masked_{masked} {}
+    FieldType(unsigned ordinal, const std::string &name) : ordinal_{ordinal}, name_{name}, masked_{false} {}
+    FieldType(unsigned ordinal, const std::string &name, bool masked)
+        : ordinal_{ordinal}, name_{name}, masked_{masked} {}
     FieldType(const FieldType &) = delete;
     FieldType(const FieldType &&) = delete;
 
   private:
-    const FieldTypeEnum ordinal_;
-    const std::string   name_;
-    const bool          masked_;
+    const unsigned    ordinal_;
+    const std::string name_;
+    const bool        masked_;
+
+    static const std::vector<FieldTypeRef> values_;
 };
 
 #endif // FIELDTYPE_H
