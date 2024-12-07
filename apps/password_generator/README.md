@@ -2,6 +2,8 @@
 
 Simple password generator for desktop platforms like OS X, Linux or Windows.
 
+![Main Window](docs/password-generator.png)
+
 ## Presets
 
 There are several presets called by the corresponding menu item:
@@ -17,3 +19,23 @@ There are several presets called by the corresponding menu item:
 
 The following characters that may look confusing depending on font are excluded: 'I', 'l', 'O'.
 
+## Build
+
+Requirements:
+* Qt6
+
+**Debug**
+
+
+```sh
+cmake . --preset Debug
+cmake --build --preset Debug
+```
+
+**Release**
+
+
+```sh
+cmake . --preset Release
+cmake --build --preset Release
+```

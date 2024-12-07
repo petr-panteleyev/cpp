@@ -6,7 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause
 */
 
-#include "../generator/generator.h"
+#include "generator.h"
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE

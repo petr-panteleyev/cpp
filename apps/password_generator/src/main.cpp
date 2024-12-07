@@ -4,7 +4,7 @@
 */
 
 #include "generator/generator.h"
-#include "ui/mainwindow.h"
+#include "mainwindow.h"
 
 #include <QApplication>
 #include <QLocale>

@@ -13,18 +13,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
 
-set(TS_FILES src/ui/password_generator_ru.ts)
+set(TS_FILES src/password_generator_ru.ts)
 
 set(PROJECT_SOURCES
         src/main.cpp
-        src/ui/mainwindow.cpp
-        src/ui/mainwindow.h
-        src/ui/mainwindow.ui
-        src/generator/generator.cpp
-        src/generator/generator.h
-        src/generator/character_set.cpp
-        src/generator/character_set.h
+        src/mainwindow.h
+        src/mainwindow.cpp
+        src/mainwindow.ui
 )
+
+include(src/generator/generator.cmake)
 
 set(RESOURCE_FILES
     resources/icon.png
@@ -55,6 +53,10 @@ qt_add_translations(password_generator
 add_dependencies(password_generator update_translations)
 
 target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_include_directories(password_generator PRIVATE
+    src
+    src/generator
+)
 
 set_target_properties(password_generator PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
