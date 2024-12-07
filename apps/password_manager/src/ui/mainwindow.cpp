@@ -4,6 +4,7 @@
 */
 
 #include "mainwindow.h"
+#include "aes256.h"
 #include "card.h"
 #include "serializer.h"
 #include <./ui_mainwindow.h>
@@ -12,6 +13,7 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QTableWidgetItem>
 
 static constexpr int TAB_FIELDS = 0;
@@ -80,12 +82,25 @@ void MainWindow::on_actionOpen_triggered() {
         return;
     }
 
+    bool ok;
+    auto password = QInputDialog::getText(this, "Password", "Master Password", QLineEdit::Password, "", &ok);
+    if (!ok) {
+        return;
+    }
+
     QFile file{fileName};
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly)) {
         throw std::runtime_error("File cannot be opened!");
     } else {
         QDomDocument doc;
-        doc.setContent(&file);
+
+        if (password.isEmpty()) {
+            doc.setContent(&file);
+        } else {
+            auto data = file.readAll();
+            auto decrypted = aes256::decrypt(data, password.toStdString());
+            doc.setContent(QByteArray::fromRawData((const char *)decrypted.first.get(), decrypted.second));
+        }
         file.close();
 
         std::vector<CardPtr> cards;

@@ -16,6 +16,7 @@ if(NOT CMAKE_CXX_EXTENSIONS)
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Xml)
+find_package(OpenSSL REQUIRED)
 
 set(TS_FILES src/ui/password_manager_ru_RU.ts)
 
@@ -28,6 +29,7 @@ set(PROJECT_SOURCES
 
 include(src/model/model.cmake)
 include(src/ui/ui.cmake)
+include(src/crypto/crypto.cmake)
 
 set(RESOURCE_FILES
     resources/amex.png
@@ -70,11 +72,12 @@ qt_add_translations(password_manager
         ${TS_FILES})
 add_dependencies(password_manager update_translations)
 
-target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml)
+target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml OpenSSL::Crypto)
 target_include_directories(password_manager PRIVATE
   src
   src/model
   src/ui
+  src/crypto
 )
 
 set_target_properties(password_manager PROPERTIES

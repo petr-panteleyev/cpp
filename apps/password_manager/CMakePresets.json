@@ -7,7 +7,7 @@
     },
     "configurePresets": [
         {
-            "name": "DebugConfigure",
+            "name": "Debug",
             "displayName": "Отладка (конфигурация)",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/debug",
@@ -17,7 +17,7 @@
             "environment": {}
         },
         {
-            "name": "ReleaseConfigure",
+            "name": "Release",
             "displayName": "Выпуск (конфигурация)",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/release",
@@ -30,11 +30,11 @@
     "buildPresets": [
         {
             "name": "Debug",
-            "configurePreset": "DebugConfigure"
+            "configurePreset": "Debug"
         },
         {
             "name": "Release",
-            "configurePreset": "ReleaseConfigure"
+            "configurePreset": "Release"
         }
     ]
 }
