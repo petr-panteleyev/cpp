@@ -51,5 +51,14 @@ bool CardTableSortFilterModel::lessThan(const QModelIndex &left, const QModelInd
 bool CardTableSortFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
     auto model = (CardTableItemModel *)sourceModel();
     auto card = model->cardAtIndex(sourceRow);
-    return show_deleted_ || card->active();
+
+    if (!show_deleted_ && !card->active()) {
+        return false;
+    }
+
+    if (filterText_.isEmpty()) {
+        return true;
+    }
+
+    return card->name().toLower().contains(filterText_.toLower());
 }

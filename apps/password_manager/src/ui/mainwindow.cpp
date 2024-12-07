@@ -7,7 +7,7 @@
 #include "aes256.h"
 #include "card.h"
 #include "serializer.h"
-#include <./ui_mainwindow.h>
+#include "ui_mainwindow.h"
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QDomDocument>
@@ -15,6 +15,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QTableWidgetItem>
+#include "aboutdialog.h"
 
 static constexpr int TAB_FIELDS = 0;
 static constexpr int TAB_NOTE = 1;
@@ -174,3 +175,18 @@ void MainWindow::onOpenLink() {
     auto urlText = openLinkAction_.data().toString();
     QDesktopServices::openUrl(QUrl(urlText));
 }
+
+void MainWindow::on_actionFilter_triggered() {
+    ui->searchField->setFocus();
+}
+
+void MainWindow::on_searchField_textChanged(const QString &text) {
+    sortFilterModel_.setFilterText(text);
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutDialog aboutDialog{this};
+    aboutDialog.exec();
+}
+

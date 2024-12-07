@@ -31,22 +31,7 @@ include(src/model/model.cmake)
 include(src/ui/ui.cmake)
 include(src/crypto/crypto.cmake)
 
-set(RESOURCE_FILES
-    resources/amex.png
-    resources/credit_card.png
-    resources/diners.png
-    resources/icon.png
-    resources/favorites.png
-    resources/generic.png
-    resources/jcb.png
-    resources/mastercard.png
-    resources/mir.png
-    resources/mobile.png
-    resources/note.png
-    resources/paypal.png
-    resources/trash.png
-    resources/visa.png
-)
+file(GLOB RESOURCE_FILES "resources/*.png")
 
 qt_add_executable(password_manager
     MANUAL_FINALIZATION
@@ -58,6 +43,9 @@ target_compile_options(password_manager PRIVATE
     -Wall
     -Wpedantic
 )
+
+target_compile_definitions(password_manager
+                           PRIVATE "PROJECT_VERSION=${PROJECT_VERSION}")
 
 qt_add_resources(password_manager "resources"
     PREFIX "/images"

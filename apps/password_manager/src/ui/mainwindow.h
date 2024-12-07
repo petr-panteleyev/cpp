@@ -38,7 +38,13 @@ class MainWindow : public QMainWindow {
     void onCopyField();
     void onOpenLink();
 
-  private:
+    void on_actionFilter_triggered();
+
+    void on_searchField_textChanged(const QString &arg1);
+
+    void on_actionAbout_triggered();
+
+private:
     Ui::MainWindow *ui;
 
     CardTableItemModel       model_;

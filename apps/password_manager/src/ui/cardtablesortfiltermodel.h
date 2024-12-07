@@ -18,11 +18,17 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
         invalidateRowsFilter();
     }
 
+    void setFilterText(const QString &filterText) {
+        filterText_ = filterText;
+        invalidateRowsFilter();
+    }
+
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
   private:
     bool show_deleted_;
+    QString filterText_;
 };
 
 #endif // CARDTABLESORTFILTERMODEL_H
