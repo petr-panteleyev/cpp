@@ -30,6 +30,9 @@ class FieldType final {
 
   public:
     static const FieldType &valueOf(const std::string &name);
+    static const FieldType &valueOf(unsigned ordinal) { return values_.at(ordinal); }
+
+    static const std::vector<FieldTypeRef> &values() { return values_; }
 
   public:
     const std::string &name() const { return name_; }
@@ -37,6 +40,7 @@ class FieldType final {
     bool               masked() const { return masked_; }
 
     friend bool operator==(const FieldType &x, const FieldType &y) { return x.ordinal_ == y.ordinal_; }
+    friend bool operator!=(const FieldType &x, const FieldType &y) { return x.ordinal_ != y.ordinal_; }
 
   private:
     FieldType(unsigned ordinal, const std::string &name) : ordinal_{ordinal}, name_{name}, masked_{false} {}

@@ -27,13 +27,14 @@ class CreditCardType {
     static const CreditCardType OTHER;
 
   public:
-    static const CreditCardType &valueOf(const std::string &name);
-    static const CreditCardType &valueOf(unsigned ordinal) { return values_.at(ordinal); }
+    static const CreditCardType                 &valueOf(const std::string &name);
+    static const CreditCardType                 &valueOf(unsigned ordinal) { return values_.at(ordinal); }
+    static const std::vector<CreditCardTypeRef> &values() noexcept { return values_; }
 
-    unsigned           ordinal() const { return ordinal_; }
-    const std::string &name() const { return name_; }
-    const QString     &cardTypeName() const { return cardTypeName_; }
-    const Picture     &picture() const { return picture_; }
+    unsigned           ordinal() const noexcept { return ordinal_; }
+    const std::string &name() const noexcept { return name_; }
+    const QString     &cardTypeName() const noexcept { return cardTypeName_; }
+    const Picture     &picture() const noexcept { return picture_; }
 
   private:
     CreditCardType(unsigned ordinal, const std::string &name, const QString &cardTypeName, const Picture &picture)

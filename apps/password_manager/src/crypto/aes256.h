@@ -6,20 +6,23 @@
 #ifndef AES256_H
 #define AES256_H
 
-#include <exception>
-#include <memory>
-#include <string>
-#include <utility>
 #include <QByteArray>
+#include <QString>
+#include <exception>
 
 namespace aes256 {
 
-using BufferPtr = std::shared_ptr<unsigned char[]>;
-using DecryptionResult = std::pair<BufferPtr, int>;
+class DecryptionException : public std::exception {
+  public:
+    DecryptionException(const std::string &message) : message_{message} {}
 
-class DecryptionException : public std::exception {};
+    const std::string &message() const noexcept { return message_; }
 
-DecryptionResult decrypt(const QByteArray &encrypted, const std::string &passwd);
+  private:
+    const std::string message_;
+};
+
+void decrypt(const QByteArray &encrypted, const QString &passwd, QByteArray &decrypted);
 
 } // namespace aes256
 

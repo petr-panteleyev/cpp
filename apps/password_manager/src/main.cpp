@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include "translations.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -22,6 +23,7 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+    Translations::initialize();
     MainWindow w;
     w.show();
     return a.exec();

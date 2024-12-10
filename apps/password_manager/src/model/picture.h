@@ -86,8 +86,12 @@ class Picture final {
 
   public:
     static const Picture &valueOf(const std::string &name);
+    static const Picture &valueOf(unsigned ordinal) { return values_.at(ordinal); }
+
+    static const std::vector<PictureRef> values() { return values_; }
 
   public:
+    unsigned           ordinal() const { return ordinal_; }
     const std::string &name() const { return name_; }
     const QIcon       &icon() const;
 

@@ -20,12 +20,18 @@ class Field final {
     const QString   &name() const { return name_; }
     const QVariant  &value() const { return value_; }
 
+    void setType(const FieldType &type) { type_ = type; }
+    void setName(const QString &name) { name_ = name; }
+    void setValue(const QVariant &value) { value_ = value; }
+
     bool showContent() const { return showContent_; }
     void toggleShow() {
         if (type().masked()) {
             showContent_ = !showContent_;
         }
     }
+
+    [[nodiscard]] QVariant convertValue(const FieldType &newType) const noexcept;
 
     QString getValueAsString() const;
 
@@ -34,9 +40,9 @@ class Field final {
     static QVariant deserialize(const QString &str, const FieldType &type);
 
   private:
-    const FieldType &type_;
-    QString          name_;
-    QVariant         value_;
+    FieldTypeRef type_;
+    QString      name_;
+    QVariant     value_;
 
     bool showContent_;
 };

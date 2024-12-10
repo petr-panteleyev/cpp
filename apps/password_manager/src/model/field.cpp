@@ -37,6 +37,16 @@ QVariant Field::deserialize(const QString &str, const FieldType &type) {
     return value;
 }
 
+QVariant Field::convertValue(const FieldType &newType) const noexcept {
+    if (newType == FieldType::DATE || newType == FieldType::EXPIRATION_MONTH) {
+        return QDate::currentDate();
+    } else if (newType == FieldType::CARD_TYPE) {
+        return CreditCardType::MIR.ordinal();
+    } else {
+        return getValueAsString();
+    }
+}
+
 static QDate parseLocalDate(const QString &stringValue) {
     if (stringValue.isEmpty()) {
         return QDate::currentDate();

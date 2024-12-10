@@ -30,6 +30,7 @@ class CardTableItemModel : public QAbstractItemModel {
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     const CardPtr    cardAtIndex(int index) const { return data_.at(index); }
+    void             replace(const QModelIndex &index, const Card &card);
 
   private:
     static inline const QModelIndex parent_index = QModelIndex();

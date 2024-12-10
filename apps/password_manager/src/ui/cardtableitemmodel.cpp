@@ -4,6 +4,7 @@
 */
 
 #include "cardtableitemmodel.h"
+#include <memory>
 
 static QVariant build_aux_icon_value(const Card &card) {
     if (!card.active()) {
@@ -30,4 +31,9 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
         case 2: return role == Qt::DecorationRole ? build_aux_icon_value(*card) : QVariant();
         default: return QVariant();
     }
+}
+
+void CardTableItemModel::replace(const QModelIndex &index, const Card &card) {
+    *(data_.begin() + index.row()) = std::make_shared<Card>(card);
+    emit dataChanged(index, index);
 }

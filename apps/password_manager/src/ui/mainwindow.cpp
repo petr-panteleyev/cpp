@@ -4,8 +4,10 @@
 */
 
 #include "mainwindow.h"
+#include "aboutdialog.h"
 #include "aes256.h"
 #include "card.h"
+#include "cardeditdialog.h"
 #include "serializer.h"
 #include "ui_mainwindow.h"
 #include <QClipboard>
@@ -15,7 +17,6 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QTableWidgetItem>
-#include "aboutdialog.h"
 
 static constexpr int TAB_FIELDS = 0;
 static constexpr int TAB_NOTE = 1;
@@ -99,8 +100,10 @@ void MainWindow::on_actionOpen_triggered() {
             doc.setContent(&file);
         } else {
             auto data = file.readAll();
-            auto decrypted = aes256::decrypt(data, password.toStdString());
-            doc.setContent(QByteArray::fromRawData((const char *)decrypted.first.get(), decrypted.second));
+
+            QByteArray decrypted;
+            aes256::decrypt(data, password, decrypted);
+            doc.setContent(decrypted);
         }
         file.close();
 
@@ -184,9 +187,26 @@ void MainWindow::on_searchField_textChanged(const QString &text) {
     sortFilterModel_.setFilterText(text);
 }
 
-void MainWindow::on_actionAbout_triggered()
-{
+void MainWindow::on_actionAbout_triggered() {
     AboutDialog aboutDialog{this};
     aboutDialog.exec();
 }
 
+void MainWindow::on_actionEdit_triggered() {
+    auto selectionModel = ui->cardListView->selectionModel();
+    auto currentIndex = selectionModel->currentIndex();
+    if (!currentIndex.isValid()) {
+        return;
+    }
+
+    auto sourceIndex = sortFilterModel_.mapToSource(currentIndex);
+    auto currentCard = model_.cardAtIndex(sourceIndex.row());
+
+    CardEditDialog dialog{*currentCard, this};
+    auto           result = dialog.exec();
+    if (result == QDialog::Accepted) {
+        auto &updatedCard = dialog.card();
+        model_.replace(sourceIndex, updatedCard);
+        onCurrentCardChanged(currentIndex, currentIndex);
+    }
+}

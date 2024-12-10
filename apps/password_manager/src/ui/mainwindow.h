@@ -44,6 +44,8 @@ class MainWindow : public QMainWindow {
 
     void on_actionAbout_triggered();
 
+    void on_actionEdit_triggered();
+
 private:
     Ui::MainWindow *ui;
 
