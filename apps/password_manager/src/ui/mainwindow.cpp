@@ -9,6 +9,7 @@
 #include "card.h"
 #include "cardeditdialog.h"
 #include "serializer.h"
+#include "templates.h"
 #include "ui_mainwindow.h"
 #include <QClipboard>
 #include <QDesktopServices>
@@ -59,8 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabIcon(TAB_NOTE, Picture::NOTE.icon());
 
     // Field context menu
-    fieldContextMenu_.addAction(&copyFieldAction_);
-    fieldContextMenu_.addAction(&openLinkAction_);
+    ui::addMenuActions(&fieldContextMenu_, &copyFieldAction_, &openLinkAction_);
 
     auto selectionModel = ui->cardListView->selectionModel();
     connect(selectionModel, SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,

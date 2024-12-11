@@ -7,6 +7,7 @@
 #include "translations.h"
 #include <QComboBox>
 #include <QList>
+#include <algorithm>
 
 EditFieldListModel::EditFieldListModel(QObject *parent) : QAbstractItemModel(parent) {
 }
@@ -22,15 +23,6 @@ QVariant EditFieldListModel::headerData(int section, Qt::Orientation orientation
         case FIELD_TABLE_VALUE_COLUMN: return tr("Value");
         default: return QVariant();
     }
-}
-
-bool EditFieldListModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role) {
-    if (value != headerData(section, orientation, role)) {
-        // FIXME: Implement me!
-        emit headerDataChanged(orientation, section, section);
-        return true;
-    }
-    return false;
 }
 
 QVariant EditFieldListModel::data(const QModelIndex &index, int role) const {
@@ -85,4 +77,29 @@ Qt::ItemFlags EditFieldListModel::flags(const QModelIndex &index) const {
         return Qt::NoItemFlags;
     }
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+}
+
+void EditFieldListModel::addField() {
+    beginInsertRows(parentIndex, fields_.size(), fields_.size());
+    auto field = std::make_shared<Field>(FieldType::STRING, "Field", "");
+    fields_.push_back(field);
+    endInsertRows();
+}
+
+void EditFieldListModel::deleteField(int row) {
+    beginRemoveRows(parentIndex, row, row);
+    fields_.erase(std::next(fields_.begin(), row));
+    endRemoveRows();
+}
+
+void EditFieldListModel::moveUp(int row) {
+    beginMoveRows(parentIndex, row, row, parentIndex, row - 1);
+    std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row - 1));
+    endMoveRows();
+}
+
+void EditFieldListModel::moveDown(int row) {
+    beginMoveRows(parentIndex, row, row, parentIndex, row + 2);
+    std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row + 1));
+    endMoveRows();
 }

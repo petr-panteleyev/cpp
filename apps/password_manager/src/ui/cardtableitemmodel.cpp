@@ -34,6 +34,6 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
 }
 
 void CardTableItemModel::replace(const QModelIndex &index, const Card &card) {
-    *(data_.begin() + index.row()) = std::make_shared<Card>(card);
+    data_[index.row()] = std::make_shared<Card>(card);
     emit dataChanged(index, index);
 }

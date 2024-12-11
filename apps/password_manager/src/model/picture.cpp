@@ -4,20 +4,11 @@
 */
 
 #include "picture.h"
-#include <map>
+#include <unordered_map>
 
-static std::map<unsigned, QIcon> ICON_CACHE;
-
-const Picture &Picture::valueOf(const std::string &name) {
-    for (const Picture &picture : values_) {
-        if (picture.name() == name) {
-            return picture;
-        }
-    }
-    return Picture::GENERIC;
-}
+static std::unordered_map<unsigned, QIcon> ICON_CACHE;
 
 const QIcon &Picture::icon() const {
-    auto result = ICON_CACHE.find(ordinal_);
-    return result != ICON_CACHE.end() ? result->second : ICON_CACHE[ordinal_] = QIcon(":images/" + fileName_);
+    auto result = ICON_CACHE.find(ordinal());
+    return result != ICON_CACHE.end() ? result->second : ICON_CACHE[ordinal()] = QIcon(":images/" + fileName_);
 }

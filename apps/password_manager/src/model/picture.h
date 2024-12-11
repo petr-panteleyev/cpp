@@ -6,6 +6,7 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
+#include "enumclass.h"
 #include <QIcon>
 #include <functional>
 #include <string>
@@ -13,7 +14,7 @@
 class Picture;
 using PictureRef = std::reference_wrapper<const Picture>;
 
-class Picture final {
+class Picture final : public EnumClass<Picture> {
   public:
     static const Picture AIRPLANE;
     static const Picture AMAZON;
@@ -85,30 +86,13 @@ class Picture final {
     static const Picture YANDEX;
 
   public:
-    static const Picture &valueOf(const std::string &name);
-    static const Picture &valueOf(unsigned ordinal) { return values_.at(ordinal); }
-
-    static const std::vector<PictureRef> values() { return values_; }
-
-  public:
-    unsigned           ordinal() const { return ordinal_; }
-    const std::string &name() const { return name_; }
-    const QIcon       &icon() const;
-
-    friend bool operator==(const Picture &x, const Picture &y) { return x.ordinal_ == y.ordinal_; }
+    const QIcon &icon() const;
 
   private:
-    Picture(unsigned ordinal, const std::string &name, const QString &fileName)
-        : ordinal_{ordinal}, name_{name}, fileName_{fileName} {}
-    Picture(const Picture &) = delete;
-    Picture(const Picture &&) = delete;
+    Picture(const std::string &name, const QString &fileName) : EnumClass{name}, fileName_{fileName} {}
 
   private:
-    const unsigned    ordinal_;
-    const std::string name_;
-    const QString     fileName_;
-
-    static const std::vector<PictureRef> values_;
+    const QString fileName_;
 };
 
 #endif // PICTURE_H

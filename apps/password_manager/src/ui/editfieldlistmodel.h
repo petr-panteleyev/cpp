@@ -13,7 +13,7 @@
 class EditFieldListModel : public QAbstractItemModel {
     Q_OBJECT
 
-public:
+  public:
     static constexpr int FIELD_TABLE_NAME_COLUMN = 0;
     static constexpr int FIELD_TABLE_TYPE_COLUMN = 1;
     static constexpr int FIELD_TABLE_VALUE_COLUMN = 2;
@@ -22,9 +22,6 @@ public:
     explicit EditFieldListModel(QObject *parent = nullptr);
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value,
-                       int role = Qt::EditRole) override;
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
         return createIndex(row, column);
@@ -35,8 +32,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 3; }
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool     setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -45,6 +41,11 @@ public:
     const FieldPtr &at(int row) const { return fields_.at(row); };
 
     const std::vector<FieldPtr> &fields() const { return fields_; }
+
+    void addField();
+    void deleteField(int row);
+    void moveUp(int row);
+    void moveDown(int row);
 
   private:
     static inline const QModelIndex parentIndex = QModelIndex();

@@ -7,7 +7,9 @@
 #define CARDEDITDIALOG_H
 
 #include "editfieldlistmodel.h"
+#include <QAction>
 #include <QDialog>
+#include <QMenu>
 #include <card.h>
 
 namespace Ui {
@@ -27,12 +29,30 @@ class CardEditDialog : public QDialog {
 
   private:
     void initPictureComboBox();
+    void setupFieldTable();
+    void setupFieldTableContextMenu();
+
+  private slots:
+    void onAddField();
+    void onDeleteField();
+    void onFieldUp();
+    void onFieldDown();
+    void fieldTableContextMenuRequested(QPoint pos);
+    void fieldTableCurrentRowChanged(const QModelIndex &, const QModelIndex &);
 
   private:
     Ui::CardEditDialog *ui;
 
     Card               card_;
     EditFieldListModel fieldTableModel_;
+
+    // Field table actions
+    QAction fieldAddAction_;
+    QAction fieldDeleteAction_;
+    QAction fieldUpAction_;
+    QAction fieldDownAction_;
+    QAction fieldGenerateAction_;
+    QMenu   fieldTableContextMenu_;
 };
 
 #endif // CARDEDITDIALOG_H

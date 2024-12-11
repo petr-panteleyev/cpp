@@ -22,4 +22,5 @@ list(APPEND PROJECT_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/translations.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fieldvalueeditdelegate.h
     ${CMAKE_CURRENT_LIST_DIR}/fieldvalueeditdelegate.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/templates.h
 )

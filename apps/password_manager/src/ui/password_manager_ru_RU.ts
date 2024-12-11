@@ -48,40 +48,65 @@
         <translation>Поля</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.ui" line="43"/>
+        <location filename="cardeditdialog.ui" line="46"/>
         <source>Notes</source>
         <translation>Заметки</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.ui" line="53"/>
+        <location filename="cardeditdialog.ui" line="56"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.ui" line="71"/>
+        <location filename="cardeditdialog.ui" line="74"/>
         <source>Picture:</source>
         <translation>Значок:</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.ui" line="61"/>
+        <location filename="cardeditdialog.ui" line="64"/>
         <source>Title:</source>
         <translation>Заголовок:</translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="23"/>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="23"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="24"/>
+        <source>Generate</source>
+        <translation>Генерировать</translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="23"/>
+        <source>Up</source>
+        <translation>Вверх</translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="24"/>
+        <source>Down</source>
+        <translation>Вниз</translation>
     </message>
 </context>
 <context>
     <name>EditFieldListModel</name>
     <message>
-        <location filename="editfieldlistmodel.cpp" line="20"/>
+        <location filename="editfieldlistmodel.cpp" line="21"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="editfieldlistmodel.cpp" line="21"/>
+        <location filename="editfieldlistmodel.cpp" line="22"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="editfieldlistmodel.cpp" line="22"/>
+        <location filename="editfieldlistmodel.cpp" line="23"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
@@ -165,12 +190,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="25"/>
+        <location filename="mainwindow.cpp" line="26"/>
         <source>Open Link</source>
         <translation>Открыть ссылку</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="58"/>
+        <location filename="mainwindow.cpp" line="59"/>
         <location filename="mainwindow.cpp" line="127"/>
         <source>Note</source>
         <translation>Заметка</translation>

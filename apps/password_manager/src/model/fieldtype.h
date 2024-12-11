@@ -6,14 +6,14 @@
 #ifndef FIELDTYPE_H
 #define FIELDTYPE_H
 
+#include "enumclass.h"
 #include <functional>
 #include <string>
-#include <vector>
 
 class FieldType;
 using FieldTypeRef = std::reference_wrapper<const FieldType>;
 
-class FieldType final {
+class FieldType final : public EnumClass<FieldType> {
   public:
     static const FieldType STRING;
     static const FieldType HIDDEN;
@@ -29,32 +29,14 @@ class FieldType final {
     static const FieldType EXPIRATION_MONTH;
 
   public:
-    static const FieldType &valueOf(const std::string &name);
-    static const FieldType &valueOf(unsigned ordinal) { return values_.at(ordinal); }
-
-    static const std::vector<FieldTypeRef> &values() { return values_; }
-
-  public:
-    const std::string &name() const { return name_; }
-    unsigned           ordinal() const { return ordinal_; }
-    bool               masked() const { return masked_; }
-
-    friend bool operator==(const FieldType &x, const FieldType &y) { return x.ordinal_ == y.ordinal_; }
-    friend bool operator!=(const FieldType &x, const FieldType &y) { return x.ordinal_ != y.ordinal_; }
+    bool masked() const { return masked_; }
 
   private:
-    FieldType(unsigned ordinal, const std::string &name) : ordinal_{ordinal}, name_{name}, masked_{false} {}
-    FieldType(unsigned ordinal, const std::string &name, bool masked)
-        : ordinal_{ordinal}, name_{name}, masked_{masked} {}
-    FieldType(const FieldType &) = delete;
-    FieldType(const FieldType &&) = delete;
+    FieldType(const std::string &name) : EnumClass{name}, masked_{false} {}
+    FieldType(const std::string &name, bool masked) : EnumClass{name}, masked_{masked} {}
 
   private:
-    const unsigned    ordinal_;
-    const std::string name_;
-    const bool        masked_;
-
-    static const std::vector<FieldTypeRef> values_;
+    const bool masked_;
 };
 
 #endif // FIELDTYPE_H
