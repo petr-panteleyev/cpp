@@ -14,7 +14,7 @@
 class Picture;
 using PictureRef = std::reference_wrapper<const Picture>;
 
-class Picture final : public EnumClass<Picture> {
+class Picture final : public Common::EnumClass<Picture> {
   public:
     static const Picture AIRPLANE;
     static const Picture AMAZON;

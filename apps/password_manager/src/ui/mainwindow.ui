@@ -172,7 +172,14 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionNewCard"/>
+    <addaction name="actionNewNote"/>
+    <addaction name="separator"/>
     <addaction name="actionEdit"/>
+    <addaction name="actionFavorite"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete"/>
+    <addaction name="actionPurge"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -215,11 +222,60 @@
    </property>
   </action>
   <action name="actionEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Edit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionNewCard">
+   <property name="text">
+    <string>New Card...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionNewNote">
+   <property name="text">
+    <string>New Note...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionFavorite">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Favorite</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionPurge">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Purge</string>
    </property>
   </action>
  </widget>

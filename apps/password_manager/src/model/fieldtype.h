@@ -13,7 +13,7 @@
 class FieldType;
 using FieldTypeRef = std::reference_wrapper<const FieldType>;
 
-class FieldType final : public EnumClass<FieldType> {
+class FieldType final : public Common::EnumClass<FieldType> {
   public:
     static const FieldType STRING;
     static const FieldType HIDDEN;

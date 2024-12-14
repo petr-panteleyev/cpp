@@ -22,5 +22,13 @@ list(APPEND PROJECT_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/translations.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fieldvalueeditdelegate.h
     ${CMAKE_CURRENT_LIST_DIR}/fieldvalueeditdelegate.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/templates.h
+    ${CMAKE_CURRENT_LIST_DIR}/newcarddialog.h
+    ${CMAKE_CURRENT_LIST_DIR}/newcarddialog.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/newcarddialog.ui
+    ${CMAKE_CURRENT_LIST_DIR}/newnotedialog.h
+    ${CMAKE_CURRENT_LIST_DIR}/newnotedialog.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/newnotedialog.ui
+    ${CMAKE_CURRENT_LIST_DIR}/passworddialog.h
+    ${CMAKE_CURRENT_LIST_DIR}/passworddialog.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/passworddialog.ui
 )

@@ -30,6 +30,7 @@ set(PROJECT_SOURCES
 include(src/model/model.cmake)
 include(src/ui/ui.cmake)
 include(src/crypto/crypto.cmake)
+include(../../include/include.cmake)
 
 file(GLOB RESOURCE_FILES "resources/*.png")
 
@@ -66,6 +67,7 @@ target_include_directories(password_manager PRIVATE
   src/model
   src/ui
   src/crypto
+  ../../include
 )
 
 set_target_properties(password_manager PROPERTIES

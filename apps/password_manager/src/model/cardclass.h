@@ -13,7 +13,7 @@
 class CardClass;
 using CardClassRef = std::reference_wrapper<const CardClass>;
 
-class CardClass final : public EnumClass<CardClass> {
+class CardClass final : public Common::EnumClass<CardClass> {
   public:
     static const CardClass CARD;
     static const CardClass NOTE;

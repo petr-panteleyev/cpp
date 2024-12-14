@@ -1,9 +1,16 @@
+/*
+  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+*/
+
 #ifndef ENUMCLASS_H
 #define ENUMCLASS_H
 
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+namespace Common {
 
 template <typename T> class EnumClass {
   public:
@@ -21,7 +28,7 @@ template <typename T> class EnumClass {
     }
 
   public:
-    static const std::vector<std::reference_wrapper<const T>> values() { return values_; };
+    static const std::vector<std::reference_wrapper<const T>> &values() noexcept { return values_; };
 
     static const T &valueOf(const std::string &name) {
         for (const T &v : values()) {
@@ -49,5 +56,7 @@ template <typename T> class EnumClass {
 
     static const std::vector<std::reference_wrapper<const T>> values_;
 };
+
+} // namespace Common
 
 #endif // ENUMCLASS_H

@@ -7,6 +7,7 @@
 #define TRANSLATIONS_H
 
 #include "fieldtype.h"
+#include "recordtype.h"
 #include <QObject>
 #include <unordered_map>
 
@@ -18,10 +19,13 @@ class Translations final : public QObject {
 
   public:
     static const QString translate(const FieldType &type) { return fieldTypeTranslated_.at(type.ordinal()); }
-    static void          initialize();
+    static const QString translate(const RecordType &type) { return recordTypeTranslated_.at(type.ordinal()); }
+
+    static void initialize();
 
   private:
     static std::unordered_map<unsigned, QString> fieldTypeTranslated_;
+    static std::unordered_map<unsigned, QString> recordTypeTranslated_;
 };
 
 #endif // TRANSLATIONS_H

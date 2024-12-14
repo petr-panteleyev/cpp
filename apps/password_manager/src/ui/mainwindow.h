@@ -28,25 +28,28 @@ class MainWindow : public QMainWindow {
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+  private:
+    const QModelIndex currentIndex() const noexcept;
+
   private slots:
     void on_actionOpen_triggered();
     void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void onFieldTableDoubleClicked(const QModelIndex &index);
     void on_actionShow_Deleted_toggled(bool arg1);
     void on_actionExit_triggered();
     void fieldTableContextMenuRequested(QPoint pos);
     void onCopyField();
     void onOpenLink();
-
     void on_actionFilter_triggered();
-
     void on_searchField_textChanged(const QString &arg1);
-
     void on_actionAbout_triggered();
-
     void on_actionEdit_triggered();
+    void on_actionFavorite_triggered();
+    void on_actionNewCard_triggered();
+    void on_actionNewNote_triggered();
 
-private:
+  private:
     Ui::MainWindow *ui;
 
     CardTableItemModel       model_;
@@ -58,5 +61,7 @@ private:
     QAction copyFieldAction_;
     QAction openLinkAction_;
     QMenu   fieldContextMenu_;
+
+    QString currentFileName_;
 };
 #endif // MAINWINDOW_H

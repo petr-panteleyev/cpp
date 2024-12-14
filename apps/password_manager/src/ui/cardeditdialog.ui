@@ -69,7 +69,7 @@
             <widget class="QLineEdit" name="nameEditor"/>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="pictureLabel">
              <property name="text">
               <string>Picture:</string>
              </property>

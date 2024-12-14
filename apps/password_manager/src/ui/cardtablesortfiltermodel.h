@@ -27,7 +27,7 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
   private:
-    bool show_deleted_;
+    bool    show_deleted_;
     QString filterText_;
 };
 

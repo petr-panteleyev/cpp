@@ -14,7 +14,7 @@
 class CreditCardType;
 using CreditCardTypeRef = std::reference_wrapper<const CreditCardType>;
 
-class CreditCardType final : public EnumClass<CreditCardType> {
+class CreditCardType final : public Common::EnumClass<CreditCardType> {
   public:
     static const CreditCardType AMEX;
     static const CreditCardType DINERS;

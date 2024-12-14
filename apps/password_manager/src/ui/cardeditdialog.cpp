@@ -6,7 +6,7 @@
 #include "cardeditdialog.h"
 #include "fieldvalueeditdelegate.h"
 #include "picture.h"
-#include "templates.h"
+#include "qthelpers.h"
 #include "ui_cardeditdialog.h"
 #include <QAbstractScrollArea>
 #include <QValidator>
@@ -36,6 +36,12 @@ CardEditDialog::CardEditDialog(const Card &card, QWidget *parent)
     ui->nameEditor->setValidator(new NotEmptyValidator());
 
     initPictureComboBox();
+
+    // Fields and picture are editable for CARD only
+    bool isCard = card.isCard();
+    ui->tabWidget->setTabVisible(0, isCard);
+    ui->pictureComboBox->setVisible(isCard);
+    ui->pictureLabel->setVisible(isCard);
 }
 
 CardEditDialog::~CardEditDialog() {
@@ -45,7 +51,8 @@ CardEditDialog::~CardEditDialog() {
 void CardEditDialog::setupFieldTable() {
     QTableView *t = ui->fieldsTable;
 
-    ui::addActions(t, &fieldAddAction_, &fieldDeleteAction_, &fieldGenerateAction_, &fieldUpAction_, &fieldDownAction_);
+    QtHelpers::addActions(
+        t, {&fieldAddAction_, &fieldDeleteAction_, &fieldGenerateAction_, &fieldUpAction_, &fieldDownAction_});
 
     t->setModel(&fieldTableModel_);
     t->setEditTriggers(QAbstractItemView::DoubleClicked);
@@ -68,8 +75,9 @@ void CardEditDialog::setupFieldTableContextMenu() {
     fieldUpAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Up));
     fieldDownAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Down));
 
-    ui::addMenuActions(&fieldTableContextMenu_, &fieldAddAction_, &fieldDeleteAction_, ui::separator, &fieldGenerateAction_,
-                       ui::separator, &fieldUpAction_, &fieldDownAction_);
+    QtHelpers::addActions(&fieldTableContextMenu_,
+                          {&fieldAddAction_, &fieldDeleteAction_, nullptr, &fieldGenerateAction_, nullptr,
+                           &fieldUpAction_, &fieldDownAction_});
 
     connect(&fieldAddAction_, SIGNAL(triggered(bool)), this, SLOT(onAddField()));
     connect(&fieldDeleteAction_, SIGNAL(triggered(bool)), this, SLOT(onDeleteField()));

@@ -7,6 +7,9 @@
 #include "creditcardtype.h"
 #include "fieldtype.h"
 #include "picture.h"
+#include "recordtype.h"
+#include <QApplication>
+#include <QDate>
 #include <vector>
 
 using std::cref;
@@ -82,7 +85,7 @@ const Picture Picture::YAHOO{"YAHOO", "yahoo.png"};
 const Picture Picture::YANDEX{"YANDEX", "yandex.png"};
 
 template <>
-const std::vector<PictureRef> EnumClass<Picture>::values_{
+const std::vector<PictureRef> Common::EnumClass<Picture>::values_{
     cref(Picture::AIRPLANE),    cref(Picture::AMAZON),    cref(Picture::AMEX),      cref(Picture::APPLE),
     cref(Picture::AUTO),        cref(Picture::BANK),      cref(Picture::BITBUCKET), cref(Picture::CD),
     cref(Picture::CHESS),       cref(Picture::CHROME),    cref(Picture::CITI),      cref(Picture::COMPUTER),
@@ -107,7 +110,7 @@ const CardClass CardClass::CARD{"CARD"};
 const CardClass CardClass::NOTE{"NOTE"};
 
 template <>
-const std::vector<CardClassRef> EnumClass<CardClass>::values_{
+const std::vector<CardClassRef> Common::EnumClass<CardClass>::values_{
     cref(CardClass::CARD),
     cref(CardClass::NOTE),
 };
@@ -127,7 +130,7 @@ const FieldType FieldType::DATE{"DATE"};
 const FieldType FieldType::EXPIRATION_MONTH{"EXPIRATION_MONTH"};
 
 template <>
-const std::vector<FieldTypeRef> EnumClass<FieldType>::values_{
+const std::vector<FieldTypeRef> Common::EnumClass<FieldType>::values_{
     cref(FieldType::STRING),        cref(FieldType::HIDDEN),
     cref(FieldType::EMAIL),         cref(FieldType::CREDIT_CARD_NUMBER),
     cref(FieldType::LINK),          cref(FieldType::PIN),
@@ -148,8 +151,43 @@ const CreditCardType CreditCardType::VISA("VISA", "VISA", Picture::VISA);
 const CreditCardType CreditCardType::OTHER("OTHER", "Other", Picture::CREDIT_CARD);
 
 template <>
-const std::vector<CreditCardTypeRef> EnumClass<CreditCardType>::values_{
+const std::vector<CreditCardTypeRef> Common::EnumClass<CreditCardType>::values_{
     cref(CreditCardType::AMEX),       cref(CreditCardType::DINERS), cref(CreditCardType::JCB),
     cref(CreditCardType::MASTERCARD), cref(CreditCardType::MIR),    cref(CreditCardType::PAYPAL),
     cref(CreditCardType::UNION_PAY),  cref(CreditCardType::VISA),   cref(CreditCardType::OTHER),
+};
+
+// RecordType
+const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, {});
+const RecordType RecordType::CREDIT_CARD(
+    "CREDIT_CARD", Picture::CREDIT_CARD,
+    {
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Card Provider"), ""),
+        std::make_shared<Field>(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"),
+                                CreditCardType::MIR.ordinal()),
+        std::make_shared<Field>(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"),
+                                ""),
+        std::make_shared<Field>(FieldType::EXPIRATION_MONTH, QApplication::translate("RecordType", "Expiration Date"),
+                                QDate::currentDate()),
+        std::make_shared<Field>(FieldType::PIN, "PIN", ""),
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Name on Card"), ""),
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Phone Number"), ""),
+        std::make_shared<Field>(FieldType::HIDDEN, "CVC#", ""),
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
+        std::make_shared<Field>(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
+    });
+const RecordType RecordType::PASSWORD(
+    "PASSWORD", Picture::GENERIC,
+    {
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
+        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
+        std::make_shared<Field>(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
+        std::make_shared<Field>(FieldType::LINK, "URL", ""),
+    });
+
+template <>
+const std::vector<RecordTypeRef> Common::EnumClass<RecordType>::values_{
+    cref(RecordType::EMPTY),
+    cref(RecordType::CREDIT_CARD),
+    cref(RecordType::PASSWORD),
 };

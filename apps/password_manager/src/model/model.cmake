@@ -9,5 +9,5 @@ list(APPEND PROJECT_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/fieldtype.h
     ${CMAKE_CURRENT_LIST_DIR}/picture.h
     ${CMAKE_CURRENT_LIST_DIR}/picture.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/enumclass.h
+    ${CMAKE_CURRENT_LIST_DIR}/recordtype.h
 )

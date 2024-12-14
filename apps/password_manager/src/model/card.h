@@ -14,19 +14,28 @@
 
 class Card final {
   public:
-    Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name, long modified,
-         const QString &note, bool favorite, bool active, const std::vector<FieldPtr> &fields)
+    Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name,
+         unsigned long modified, const QString &note, bool favorite, bool active, const std::vector<FieldPtr> &fields)
         : cardClass_{cardClass}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
           favorite_{favorite}, active_{active}, fields_{fields} {}
 
-    Card(const QUuid &uuid, const Picture &picture, const QString &name, long modified, const QString &note,
+    Card(const QUuid &uuid, const Picture &picture, const QString &name, unsigned long modified, const QString &note,
          bool favorite, bool active, const std::vector<FieldPtr> &fields)
         : cardClass_{CardClass::CARD}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
           favorite_{favorite}, active_{active}, fields_{fields} {}
 
-    Card(const QUuid &uuid, const QString &name, long modified, const QString &note, bool favorite, bool active)
+    Card(const Picture &picture, const QString &name, unsigned long modified, const std::vector<FieldPtr> &fields)
+        : cardClass_{CardClass::CARD}, uuid_{QUuid::createUuid()}, picture_{picture}, name_{name}, modified_{modified},
+          note_{""}, favorite_{false}, active_{true}, fields_{fields} {}
+
+    Card(const QUuid &uuid, const QString &name, unsigned long modified, const QString &note, bool favorite,
+         bool active)
         : cardClass_{CardClass::NOTE}, uuid_{uuid}, picture_{Picture::NOTE}, name_{name}, modified_{modified},
-          note_{note}, favorite_{favorite}, active_{active}, fields_{{}} {}
+          note_{note}, favorite_{favorite}, active_{active}, fields_{} {}
+
+    Card(const QString &name, unsigned long modified)
+        : cardClass_{CardClass::NOTE}, uuid_{QUuid::createUuid()}, picture_{Picture::NOTE}, name_{name},
+          modified_{modified}, note_{""}, favorite_{false}, active_{true}, fields_{} {}
 
     explicit Card(const Card &card);
 
@@ -38,22 +47,26 @@ class Card final {
     const QString               &note() const { return note_; }
     bool                         favorite() const { return favorite_; }
     bool                         active() const { return active_; }
-    long                         modified() const { return modified_; }
+    unsigned long                modified() const { return modified_; }
     const std::vector<FieldPtr> &fields() const { return fields_; }
 
     void setPicture(const Picture &picture) { picture_ = picture; }
     void setName(const QString &name) { name_ = name; }
     void setNote(const QString &note) { note_ = note; }
-    void setFavorite(bool favorite) { favorite_ = favorite; }
     void setActive(bool active) { active_ = active; }
     void setFields(const std::vector<FieldPtr> &fields) { fields_ = fields; }
+    void toggleFavorite() noexcept { favorite_ = !favorite_; }
+    void toggleActive() noexcept { active_ = !active_; }
+
+    bool isCard() const noexcept { return cardClass_ == CardClass::CARD; }
+    bool isNote() const noexcept { return cardClass_ == CardClass::NOTE; }
 
   private:
     const CardClass      &cardClass_;
     QUuid                 uuid_;
     PictureRef            picture_;
     QString               name_;
-    long                  modified_;
+    unsigned long         modified_;
     QString               note_;
     bool                  favorite_;
     bool                  active_;

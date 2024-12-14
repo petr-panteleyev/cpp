@@ -37,3 +37,9 @@ void CardTableItemModel::replace(const QModelIndex &index, const Card &card) {
     data_[index.row()] = std::make_shared<Card>(card);
     emit dataChanged(index, index);
 }
+
+void CardTableItemModel::add(const CardPtr &card) {
+    beginInsertRows(parent_index, data_.size(), data_.size());
+    data_.push_back(card);
+    endInsertRows();
+}

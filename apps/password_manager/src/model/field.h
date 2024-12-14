@@ -16,6 +16,8 @@ class Field final {
         showContent_ = !type.masked();
     }
 
+    explicit Field(const Field &f) : type_{f.type()}, name_{f.name()}, value_{f.value()} {}
+
     const FieldType &type() const { return type_; }
     const QString   &name() const { return name_; }
     const QVariant  &value() const { return value_; }
