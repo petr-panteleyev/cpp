@@ -5,29 +5,16 @@
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
+#include "version.h"
 #include <QDate>
 
-#define str(s) #s
-#define xstr(s) str(s)
-
-#ifdef PROJECT_VERSION
-static const QString projectVersion{xstr(PROJECT_VERSION)};
-#else
-static const QString projectVersion{"NOT DEFINED"};
-#endif
-
-AboutDialog::AboutDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AboutDialog)
-{
+AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog) {
     ui->setupUi(this);
 
-    ui->versionLabel->setText(projectVersion);
-    // TODO: real date
+    ui->versionLabel->setText(QString::fromStdString(Version::projectVersion));
     ui->buildDateLabel->setText(QDate::currentDate().toString());
 }
 
-AboutDialog::~AboutDialog()
-{
+AboutDialog::~AboutDialog() {
     delete ui;
 }

@@ -43,3 +43,16 @@ void CardTableItemModel::add(const CardPtr &card) {
     data_.push_back(card);
     endInsertRows();
 }
+
+void CardTableItemModel::deleteCard(const QModelIndex &index) {
+    beginRemoveRows(parent_index, index.row(), index.row());
+    data_.erase(std::next(data_.begin(), index.row()));
+    endRemoveRows();
+}
+
+void CardTableItemModel::purgeInactive() {
+    beginResetModel();
+    data_.erase(std::remove_if(data_.begin(), data_.end(), [](auto const &card) { return !card->active(); }),
+                data_.end());
+    endResetModel();
+}

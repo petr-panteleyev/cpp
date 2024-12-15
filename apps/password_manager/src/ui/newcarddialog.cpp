@@ -49,10 +49,14 @@ CardPtr NewCardDialog::card() const {
     auto &picture = Picture::valueOf(pictureOrdinal);
 
     std::vector<FieldPtr> fields;
-    fields.reserve(type.fields().size());
+    fields.reserve(type.fields().size());   
+
+    [[maybe_unused]]
+    int fieldIndex = 0;
     for (auto &f : type.fields()) {
-        auto newField = new Field(*f);
-        fields.push_back(std::make_shared<Field>(*newField));
+        auto translatedName = QApplication::translate("RecordType", f->name().toStdString().c_str());
+        auto newField = std::make_shared<Field>(f->type(), translatedName, f->value());
+        fields.push_back(newField);
     }
 
     return std::make_shared<Card>(picture, ui->titleEdit->text(), TimeUtil::currentTimeMillis(), fields);

@@ -25,6 +25,7 @@ set(PROJECT_SOURCES
     src/serializer.h
     src/serializer.cpp
     src/exceptions.h
+    src/version.h
 )
 
 include(src/model/model.cmake)

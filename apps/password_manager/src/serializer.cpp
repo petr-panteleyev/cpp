@@ -4,24 +4,35 @@
 */
 
 #include "serializer.h"
+#include "creditcardtype.h"
 #include "exceptions.h"
 #include "model/cardclass.h"
 #include "model/picture.h"
+#include "version.h"
 #include <QDate>
 #include <QDomElement>
 #include <QDomNamedNodeMap>
 #include <QUuid>
+#include <QXmlStreamWriter>
 
 namespace Serializer {
 
-static const QString RECORD{"record"};
-static const QString RECORD_CLASS{"recordClass"};
+static const QString RECORDS{"records"};
 
+static const QString RECORD{"record"};
+
+static const QString ELEMENT_FIELDS{"fields"};
+static const QString ELEMENT_FIELD{"field"};
+static const QString ELEMENT_NOTE{"note"};
+
+static const QString ATTR_VERSION{"version"};
+static const QString ATTR_RECORD_CLASS{"recordClass"};
 static const QString ATTR_UUID{"uuid"};
 static const QString ATTR_NAME{"name"};
 static const QString ATTR_MODIFIED{"modified"};
 static const QString ATTR_FAVORITE{"favorite"};
 static const QString ATTR_ACTIVE{"active"};
+static const QString ATTR_PICTURE{"picture"};
 static const QString ATTR_TYPE{"type"};
 static const QString ATTR_VALUE{"value"};
 
@@ -80,7 +91,7 @@ static FieldPtr deserializeField(const QDomElement &fieldElement) {
 static CardPtr deserializeCard(const QDomElement &cardElement) {
     auto attrs = cardElement.attributes();
 
-    auto  cardClassAttr = getStringAttribute(attrs, RECORD_CLASS, "CARD");
+    auto  cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
     auto &cardClass = CardClass::valueOf(cardClassAttr.toStdString());
 
     QUuid   uuid = getUuidAttribute(attrs, ATTR_UUID);
@@ -89,7 +100,7 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
         throw PasswordManagerException("Mandatory attribute name is missing");
     }
 
-    auto  pictureStrValue = getStringAttribute(attrs, "picture", "GENERIC");
+    auto  pictureStrValue = getStringAttribute(attrs, ATTR_PICTURE, "GENERIC");
     auto &picture = Picture::valueOf(pictureStrValue.toStdString());
     auto  modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
     bool  favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
@@ -98,7 +109,7 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
     // Deserialize fields
     std::vector<FieldPtr> fields;
 
-    auto fieldNodes = cardElement.elementsByTagName("field");
+    auto fieldNodes = cardElement.elementsByTagName(ELEMENT_FIELD);
     for (auto index = 0; index < fieldNodes.count(); ++index) {
         auto fieldElement = fieldNodes.at(index).toElement();
         auto field = deserializeField(fieldElement);
@@ -107,7 +118,7 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
 
     // Deserialize note
     QString note;
-    auto    noteNodes = cardElement.elementsByTagName("note");
+    auto    noteNodes = cardElement.elementsByTagName(ELEMENT_NOTE);
     if (!noteNodes.isEmpty()) {
         note = noteNodes.at(0).toElement().text();
     }
@@ -122,6 +133,72 @@ void deserialize(const QDomDocument &doc, std::vector<CardPtr> &list) {
         auto card = deserializeCard(node.toElement());
         list.push_back(card);
     }
+}
+
+static QString fieldValueToString(const Field &field) {
+    auto  value = field.value();
+    auto &type = field.type();
+
+    if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
+        auto date = value.toDate();
+        return date.toString("yyyy-MM-dd");
+    } else if (type == FieldType::CARD_TYPE) {
+        auto  ordinal = value.toUInt();
+        auto &creditCardType = CreditCardType::valueOf(ordinal);
+        return QString::fromStdString(creditCardType.name());
+    } else {
+        return value.toString();
+    }
+}
+
+static void serializeField(QXmlStreamWriter &stream, const Field &field) {
+    stream.writeStartElement(ELEMENT_FIELD);
+    stream.writeAttribute(ATTR_NAME, field.name());
+    stream.writeAttribute(ATTR_TYPE, QString::fromStdString(field.type().name()));
+    stream.writeAttribute(ATTR_VALUE, fieldValueToString(field));
+    stream.writeEndElement();
+}
+
+static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
+    stream.writeStartElement(RECORD);
+
+    // Attributes
+    stream.writeAttribute(ATTR_RECORD_CLASS, QString::fromStdString(card.cardClass().name()));
+    stream.writeAttribute(ATTR_NAME, card.name());
+    stream.writeAttribute(ATTR_UUID, card.uuid().toString());
+    stream.writeAttribute(ATTR_MODIFIED, QString::number(card.modified()));
+    stream.writeAttribute(ATTR_PICTURE, QString::fromStdString(card.picture().name()));
+    stream.writeAttribute(ATTR_FAVORITE, card.favorite() ? "true" : "false");
+    stream.writeAttribute(ATTR_ACTIVE, card.active() ? "true" : "false");
+
+    // Fields
+    if (!card.fields().empty()) {
+        stream.writeStartElement(ELEMENT_FIELDS);
+        for (auto field : card.fields()) {
+            serializeField(stream, *field);
+        }
+        stream.writeEndElement(); // Fields
+    }
+
+    // Note
+    stream.writeTextElement(ELEMENT_NOTE, card.note());
+    stream.writeEndElement();
+}
+
+void serialize(const std::vector<CardPtr> &list, QByteArray &byteArray) {
+    QXmlStreamWriter stream{&byteArray};
+
+    stream.writeStartDocument();
+
+    stream.writeStartElement(RECORDS);
+    stream.writeAttribute(ATTR_VERSION, QString::fromStdString(Version::projectVersion));
+
+    for (auto card : list) {
+        serializeCard(stream, *card);
+    }
+
+    stream.writeEndElement();
+    stream.writeEndDocument();
 }
 
 } // namespace Serializer

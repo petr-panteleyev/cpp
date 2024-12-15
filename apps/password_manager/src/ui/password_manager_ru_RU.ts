@@ -68,29 +68,58 @@
         <translation>Заголовок:</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="23"/>
+        <location filename="cardeditdialog.cpp" line="24"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="23"/>
+        <location filename="cardeditdialog.cpp" line="24"/>
+        <location filename="cardeditdialog.cpp" line="133"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="24"/>
+        <location filename="cardeditdialog.cpp" line="25"/>
         <source>Generate</source>
         <translation>Генерировать</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="23"/>
+        <location filename="cardeditdialog.cpp" line="133"/>
+        <source>Are you sure to delete </source>
+        <translation>Уверены, что хотите удалить </translation>
+    </message>
+    <message>
+        <location filename="cardeditdialog.cpp" line="24"/>
         <source>Up</source>
         <translation>Вверх</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="24"/>
+        <location filename="cardeditdialog.cpp" line="25"/>
         <source>Down</source>
         <translation>Вниз</translation>
+    </message>
+</context>
+<context>
+    <name>ChangePasswordDialog</name>
+    <message>
+        <location filename="changepassworddialog.ui" line="14"/>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+    <message>
+        <location filename="changepassworddialog.ui" line="24"/>
+        <source>File:</source>
+        <translation>Файл:</translation>
+    </message>
+    <message>
+        <location filename="changepassworddialog.ui" line="38"/>
+        <source>Password:</source>
+        <translation>Пароль:</translation>
+    </message>
+    <message>
+        <location filename="changepassworddialog.ui" line="52"/>
+        <source>Repeat:</source>
+        <translation>Повтор:</translation>
     </message>
 </context>
 <context>
@@ -115,6 +144,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="26"/>
+        <location filename="mainwindow.cpp" line="373"/>
         <source>Password Manager</source>
         <translation>Менеджер паролей</translation>
     </message>
@@ -134,130 +164,176 @@
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="159"/>
+        <location filename="mainwindow.ui" line="160"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="167"/>
+        <location filename="mainwindow.ui" line="168"/>
         <source>Help</source>
         <translation>Справка</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="173"/>
-        <location filename="mainwindow.ui" line="229"/>
+        <location filename="mainwindow.ui" line="174"/>
+        <location filename="mainwindow.ui" line="245"/>
         <source>Edit</source>
         <translation>Правка</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="192"/>
+        <location filename="mainwindow.ui" line="187"/>
+        <source>Tools</source>
+        <translation>Инструменты</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="202"/>
         <source>Open...</source>
         <translation>Открыть...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="195"/>
+        <location filename="mainwindow.ui" line="205"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="200"/>
+        <location filename="mainwindow.ui" line="213"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="208"/>
+        <location filename="mainwindow.ui" line="221"/>
         <source>Show Deleted</source>
         <translation>Показывать удаленные</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="213"/>
+        <location filename="mainwindow.ui" line="226"/>
         <source>Filter</source>
         <translation>Фильтр</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="216"/>
+        <location filename="mainwindow.ui" line="229"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="221"/>
+        <location filename="mainwindow.ui" line="237"/>
         <source>About...</source>
         <translation>О программе...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="232"/>
-        <source>Ctrl+R</source>
-        <oldsource>Ctrl+E</oldsource>
+        <location filename="mainwindow.ui" line="248"/>
+        <source>Ctrl+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="237"/>
+        <location filename="mainwindow.ui" line="256"/>
         <source>New Card...</source>
         <translation>Новая карточка...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="240"/>
+        <location filename="mainwindow.ui" line="259"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="245"/>
+        <location filename="mainwindow.ui" line="267"/>
         <source>New Note...</source>
         <translation>Новая заметка...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="248"/>
+        <location filename="mainwindow.ui" line="270"/>
         <source>Ctrl+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="259"/>
+        <location filename="mainwindow.ui" line="284"/>
         <source>Favorite</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="262"/>
+        <location filename="mainwindow.ui" line="287"/>
         <source>Ctrl+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="270"/>
-        <location filename="mainwindow.cpp" line="160"/>
+        <location filename="mainwindow.ui" line="295"/>
+        <location filename="mainwindow.cpp" line="362"/>
+        <location filename="mainwindow.cpp" line="398"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="278"/>
-        <source>Purge</source>
-        <translation>Удалить окончательно</translation>
+        <location filename="mainwindow.ui" line="298"/>
+        <source>Shift+Del</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="160"/>
+        <location filename="mainwindow.ui" line="330"/>
+        <source>Purge...</source>
+        <translation>Очистить...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="441"/>
+        <source>Purge</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="317"/>
+        <source>New...</source>
+        <translation>Создать...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="325"/>
+        <source>Change Password...</source>
+        <translation>Изменить пароль...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="306"/>
         <source>Restore</source>
         <translation>Восстановить</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="30"/>
+        <location filename="mainwindow.cpp" line="33"/>
         <source>Open Link</source>
         <translation>Открыть ссылку</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
-        <location filename="mainwindow.cpp" line="149"/>
+        <location filename="mainwindow.cpp" line="67"/>
+        <location filename="mainwindow.cpp" line="153"/>
         <source>Note</source>
         <translation>Заметка</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="130"/>
-        <location filename="mainwindow.cpp" line="132"/>
+        <location filename="mainwindow.cpp" line="136"/>
+        <location filename="mainwindow.cpp" line="138"/>
         <source>Critical Error</source>
         <translation>Критическая ошибка</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="195"/>
+        <location filename="mainwindow.cpp" line="201"/>
         <source>Copy</source>
         <oldsource>Copy &quot;</oldsource>
         <translation>Копировать</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="398"/>
+        <source>Are you sure to delete </source>
+        <translation>Уверены, что хотите удалить </translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="441"/>
+        <source>Are you sure to purge all deleted items?</source>
+        <translation>Уверены, что хотите очистить все удалённые карточки?</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="362"/>
+        <location filename="mainwindow.cpp" line="405"/>
+        <source>Finally Delete</source>
+        <translation>Удалить окончательно</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="406"/>
+        <source>Are you sure to finally delete </source>
+        <translation>Уверены, что хотите окончательно удалить </translation>
     </message>
 </context>
 <context>

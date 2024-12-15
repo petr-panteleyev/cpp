@@ -3,12 +3,11 @@
   SPDX-License-Identifier: BSD-2-Clause
 */
 
+#include "translations.h"
 #include "ui/mainwindow.h"
-
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
-#include "translations.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);

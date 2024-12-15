@@ -10,6 +10,7 @@
 #include "ui_cardeditdialog.h"
 #include <QAbstractScrollArea>
 #include <QValidator>
+#include <QMessageBox>
 
 class NotEmptyValidator : public QValidator {
   public:
@@ -26,7 +27,7 @@ CardEditDialog::CardEditDialog(const Card &card, QWidget *parent)
 {
     ui->setupUi(this);
 
-    fieldTableModel_.setFields(card_.fields());
+    fieldTableModel_.setFields(card.fields());
 
     setupFieldTable();
     setupFieldTableContextMenu();
@@ -127,6 +128,13 @@ void CardEditDialog::onDeleteField() {
     if (!index.isValid()) {
         return;
     }
+    auto field = fieldTableModel_.at(index.row());
+
+    auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + field->name() + "?");
+    if (result != QMessageBox::Yes) {
+        return;
+    }
+
     fieldTableModel_.deleteField(index.row());
 }
 

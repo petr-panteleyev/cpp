@@ -8,6 +8,7 @@
 #include "aes256.h"
 #include "card.h"
 #include "cardeditdialog.h"
+#include "changepassworddialog.h"
 #include "exceptions.h"
 #include "newcarddialog.h"
 #include "newnotedialog.h"
@@ -23,12 +24,14 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 
+using namespace Crypto;
+
 static constexpr int TAB_FIELDS = 0;
 static constexpr int TAB_NOTE = 1;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), copyFieldAction_{this}, openLinkAction_{tr("Open Link"), this},
-      fieldContextMenu_{this} {
+      fieldContextMenu_{this}, changePasswordDialog_{this} {
     ui->setupUi(this);
 
     sortFilterModel_.setSourceModel(&model_);
@@ -79,6 +82,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&copyFieldAction_, SIGNAL(triggered(bool)), this, SLOT(onCopyField()));
     connect(&openLinkAction_, SIGNAL(triggered(bool)), this, SLOT(onOpenLink()));
+
+    connect(ui->menuEdit, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    connect(ui->menuTools, SIGNAL(aboutToShow()), this, SLOT(onToolsMenuAboutToShow()));
 }
 
 MainWindow::~MainWindow() {
@@ -86,7 +92,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::on_actionOpen_triggered() {
-    auto fileName = QFileDialog::getOpenFileName();
+    auto fileName = QFileDialog::getOpenFileName(this);
     if (fileName.isEmpty()) {
         return;
     }
@@ -109,10 +115,8 @@ void MainWindow::on_actionOpen_triggered() {
                 }
             } else {
                 auto data = file.readAll();
-
-                QByteArray decrypted;
-                aes256::decrypt(data, password, decrypted);
-                doc.setContent(decrypted);
+                auto decrypted = aes256::decrypt(data, password.toStdString());
+                doc.setContent(QByteArray::fromRawData(decrypted.data(), decrypted.size()));
             }
             file.close();
 
@@ -125,18 +129,18 @@ void MainWindow::on_actionOpen_triggered() {
             }
 
             currentFileName_ = fileName;
+            currentPassword_ = password;
+            updateWindowTitle();
         }
     } catch (const PasswordManagerException &ex) {
         QMessageBox::critical(this, tr("Critical Error"), ex.message());
-    } catch (const aes256::DecryptionException &ex) {
+    } catch (const CryptoException &ex) {
         QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
     }
 }
 
 void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous) {
-    if (!current.isValid()) {
-        QtHelpers::enableActions(false, {ui->actionFavorite, ui->actionEdit, ui->actionDelete, ui->actionPurge});
-    } else {
+    if (current.isValid()) {
         auto sourceIndex = sortFilterModel_.mapToSource(current);
         auto currentCard = model_.cardAtIndex(sourceIndex.row());
         fieldModel_.setItems(currentCard->fields());
@@ -150,28 +154,30 @@ void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIn
         }
 
         ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard->fields().empty());
-        ui->tabWidget->setTabVisible(TAB_NOTE, !currentCard->note().isEmpty());
+        ui->tabWidget->setTabVisible(TAB_NOTE, currentCard->isNote() || !currentCard->note().isEmpty());
 
         ui->noteViewer->setText(currentCard->note());
-
-        // Update actions
-        QtHelpers::enableActions(true, {ui->actionFavorite, ui->actionEdit, ui->actionDelete, ui->actionPurge});
-
-        ui->actionDelete->setText(currentCard->active() ? tr("Delete") : tr("Restore"));
-
-        ui->actionPurge->setVisible(!currentCard->active());
-        ui->actionFavorite->setChecked(currentCard->favorite());
+    } else {
+        fieldModel_.setItems({});
+        ui->noteViewer->setText("");
+        ui->tabWidget->setTabText(TAB_FIELDS, "");
+        ui->tabWidget->setTabIcon(TAB_FIELDS, Picture::GENERIC.icon());
+        ui->tabWidget->setTabVisible(TAB_FIELDS, true);
+        ui->tabWidget->setTabVisible(TAB_NOTE, false);
     }
+
+    onEditMenuAboutToShow();
 }
 
 void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    if (selected.indexes().isEmpty()) {
+        ui->cardListView->setCurrentIndex(QModelIndex());
+    }
 }
 
 void MainWindow::on_actionShow_Deleted_toggled(bool checked) {
     sortFilterModel_.set_show_deleted(checked);
-
-    auto selectionModel = ui->cardListView->selectionModel();
-    ui->cardListView->scrollTo(selectionModel->currentIndex());
+    scrollToCurrentCard();
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -227,8 +233,7 @@ void MainWindow::on_actionAbout_triggered() {
 }
 
 void MainWindow::on_actionEdit_triggered() {
-    auto selectionModel = ui->cardListView->selectionModel();
-    auto currentIndex = selectionModel->currentIndex();
+    auto currentIndex = ui->cardListView->selectionModel()->currentIndex();
     if (!currentIndex.isValid()) {
         return;
     }
@@ -242,6 +247,7 @@ void MainWindow::on_actionEdit_triggered() {
         auto &updatedCard = dialog.card();
         model_.replace(sourceIndex, updatedCard);
         onCurrentCardChanged(currentIndex, currentIndex);
+        writeFile();
     }
 }
 
@@ -250,20 +256,29 @@ void MainWindow::on_actionFavorite_triggered() {
     if (!index.isValid()) {
         return;
     }
-    auto card = model_.cardAtIndex(index.row());
+    auto card = this->model_.cardAtIndex(index.row());
     card->toggleFavorite();
-    model_.replace(index, *card);
-    sortFilterModel_.invalidate();
-    ui->cardListView->scrollTo(ui->cardListView->currentIndex());
+    this->model_.replace(index, *card);
+    this->sortFilterModel_.invalidate();
+    scrollToCurrentCard();
+    writeFile();
 }
 
 const QModelIndex MainWindow::currentIndex() const noexcept {
-    auto currentIndex = ui->cardListView->currentIndex();
+    auto currentIndex = ui->cardListView->selectionModel()->currentIndex();
     if (!currentIndex.isValid()) {
         return currentIndex;
     }
 
-    return sortFilterModel_.mapToSource(currentIndex);
+    return this->sortFilterModel_.mapToSource(currentIndex);
+}
+
+std::optional<CardPtr> MainWindow::currentCard() const noexcept {
+    auto index = currentIndex();
+    if (!index.isValid()) {
+        return std::nullopt;
+    }
+    return std::optional(this->model_.cardAtIndex(index.row()));
 }
 
 void MainWindow::on_actionNewCard_triggered() {
@@ -271,6 +286,7 @@ void MainWindow::on_actionNewCard_triggered() {
     auto          result = dialog.exec();
     if (result == QDialog::Accepted) {
         model_.add(dialog.card());
+        writeFile();
     }
 }
 
@@ -279,5 +295,155 @@ void MainWindow::on_actionNewNote_triggered() {
     auto          result = dialog.exec();
     if (result == QDialog::Accepted) {
         model_.add(dialog.note());
+        writeFile();
     }
+}
+
+void MainWindow::writeFile() const {
+    if (currentFileName_.isEmpty()) {
+        return;
+    }
+
+    QByteArray buffer;
+    Serializer::serialize(model_.data(), buffer);
+
+    QFile file{currentFileName_};
+    if (!file.open(QIODevice::WriteOnly)) {
+        throw PasswordManagerException("File cannot be saved!");
+    }
+
+    if (!currentPassword_.isEmpty()) {
+        auto encrypted = aes256::encrypt(buffer, currentPassword_.toStdString());
+        file.write(encrypted.data(), encrypted.size());
+    } else {
+        file.write(buffer);
+    }
+
+    file.close();
+}
+
+void MainWindow::on_actionNew_triggered() {
+    auto fileName = QFileDialog::getSaveFileName(this);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    changePasswordDialog_.reset(fileName);
+    if (changePasswordDialog_.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    auto password = changePasswordDialog_.password();
+
+    currentFileName_ = fileName;
+    currentPassword_ = password;
+
+    model_.setItems({});
+    writeFile();
+    updateWindowTitle();
+}
+
+void MainWindow::onEditMenuAboutToShow() {
+    bool fileOpened = !currentFileName_.isEmpty();
+    QtHelpers::enableActions(fileOpened, {ui->actionNewCard, ui->actionNewNote});
+
+    bool hasCurrentCard = false;
+    auto index = currentIndex();
+    if (index.isValid()) {
+        hasCurrentCard = true;
+    }
+
+    QtHelpers::enableActions(hasCurrentCard, {ui->actionEdit, ui->actionFavorite, ui->actionDelete});
+
+    if (hasCurrentCard) {
+        auto card = this->model_.cardAtIndex(index.row());
+        ui->actionRestore->setVisible(!card->active());
+        ui->actionRestore->setEnabled(!card->active());
+        ui->actionDelete->setText(card->active() ? tr("Delete") : tr("Finally Delete"));
+        ui->actionFavorite->setChecked(card->favorite());
+    }
+}
+
+void MainWindow::onToolsMenuAboutToShow() {
+    bool fileOpened = !currentFileName_.isEmpty();
+    QtHelpers::enableActions(fileOpened, {ui->actionChangePassword, ui->actionPurge});
+}
+
+void MainWindow::updateWindowTitle() {
+    auto title = tr("Password Manager");
+    if (currentFileName_.isEmpty()) {
+        setWindowTitle(title);
+    } else {
+        setWindowTitle(title + " - " + currentFileName_);
+    }
+}
+
+void MainWindow::on_actionChangePassword_triggered() {
+    changePasswordDialog_.reset(currentFileName_);
+    if (changePasswordDialog_.exec() != QDialog::Accepted) {
+        return;
+    }
+    currentPassword_ = changePasswordDialog_.password();
+    writeFile();
+}
+
+void MainWindow::on_actionDelete_triggered() {
+    auto index = currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    auto card = model_.cardAtIndex(index.row());
+
+    if (card->active()) {
+        auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + card->name() + "?");
+        if (result != QMessageBox::Yes) {
+            return;
+        }
+        card->toggleActive();
+        model_.replace(index, *card);
+    } else {
+        auto result = QMessageBox::question(this, tr("Finally Delete"),
+                                            tr("Are you sure to finally delete ") + card->name() + "?");
+        if (result != QMessageBox::Yes) {
+            return;
+        }
+        model_.deleteCard(index);
+    }
+
+    sortFilterModel_.invalidate();
+    scrollToCurrentCard();
+    writeFile();
+}
+
+void MainWindow::scrollToCurrentCard() {
+    ui->cardListView->scrollTo(ui->cardListView->currentIndex());
+}
+
+void MainWindow::on_actionRestore_triggered() {
+    auto index = currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    auto card = this->model_.cardAtIndex(index.row());
+
+    if (card->active()) {
+        return;
+    }
+
+    card->toggleActive();
+    model_.replace(index, *card);
+    sortFilterModel_.invalidate();
+    scrollToCurrentCard();
+    writeFile();
+}
+
+void MainWindow::on_actionPurge_triggered() {
+    auto result = QMessageBox::question(this, tr("Purge"), tr("Are you sure to purge all deleted items?"));
+    if (result != QMessageBox::Yes) {
+        return;
+    }
+    model_.purgeInactive();
+    sortFilterModel_.invalidate();
+    scrollToCurrentCard();
+    writeFile();
 }

@@ -8,13 +8,12 @@
 
 #include "field.h"
 #include <QAbstractItemModel>
-#include <vector>
 
 class FieldTableItemModel : public QAbstractItemModel {
   public:
     explicit FieldTableItemModel(QObject *parent = nullptr) : QAbstractItemModel{parent} {};
 
-    void setItems(const std::vector<FieldPtr> &items) {
+    void setItems(const FieldVec &items) {
         beginResetModel();
         items_ = items;
         endResetModel();
@@ -36,7 +35,7 @@ class FieldTableItemModel : public QAbstractItemModel {
   private:
     static inline const QModelIndex parent_index = QModelIndex();
 
-    std::vector<FieldPtr> items_;
+    FieldVec items_;
 };
 
 #endif // FIELDTABLEITEMMODEL_H

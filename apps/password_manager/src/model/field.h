@@ -50,5 +50,6 @@ class Field final {
 };
 
 using FieldPtr = std::shared_ptr<Field>;
+using FieldVec = std::vector<FieldPtr>;
 
 #endif // FIELD_H

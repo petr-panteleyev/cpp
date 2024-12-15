@@ -8,13 +8,12 @@
 
 #include "card.h"
 #include <QAbstractItemModel>
-#include <vector>
 
 class CardTableItemModel : public QAbstractItemModel {
   public:
     explicit CardTableItemModel(QObject *parent = nullptr) : QAbstractItemModel{parent} {};
 
-    void setItems(const std::vector<CardPtr> &items) {
+    void setItems(const CardVec &items) {
         beginResetModel();
         data_ = items;
         endResetModel();
@@ -34,11 +33,15 @@ class CardTableItemModel : public QAbstractItemModel {
 
     void replace(const QModelIndex &index, const Card &card);
     void add(const CardPtr &card);
+    void deleteCard(const QModelIndex &index);
+    void purgeInactive();
+
+    const CardVec &data() const noexcept { return data_; }
 
   private:
     static inline const QModelIndex parent_index = QModelIndex();
 
-    std::vector<CardPtr> data_;
+    CardVec data_;
 };
 
 #endif // CARDTABLEITEMMODEL_H

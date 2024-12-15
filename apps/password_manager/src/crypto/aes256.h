@@ -6,24 +6,16 @@
 #ifndef AES256_H
 #define AES256_H
 
-#include <QByteArray>
-#include <QString>
-#include <exception>
+#include "cryptoexception.h"
+#include <span>
+#include <string>
+#include <vector>
 
-namespace aes256 {
+namespace Crypto::aes256 {
 
-class DecryptionException : public std::exception {
-  public:
-    DecryptionException(const std::string &message) : message_{message} {}
+std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &passwd);
+std::vector<char> encrypt(const std::span<char> &decrypted, const std::string &passwd);
 
-    const std::string &message() const noexcept { return message_; }
-
-  private:
-    const std::string message_;
-};
-
-void decrypt(const QByteArray &encrypted, const QString &passwd, QByteArray &decrypted);
-
-} // namespace aes256
+} // namespace Crypto::aes256
 
 #endif // AES256_H

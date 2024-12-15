@@ -8,12 +8,14 @@
 
 #include "cardtableitemmodel.h"
 #include "cardtablesortfiltermodel.h"
+#include "changepassworddialog.h"
 #include "fieldtableitemmodel.h"
 #include "fieldtablesortfiltermodel.h"
 #include <QAction>
 #include <QItemSelection>
 #include <QMainWindow>
 #include <QMenu>
+#include <optional>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -29,27 +31,41 @@ class MainWindow : public QMainWindow {
     ~MainWindow();
 
   private:
-    const QModelIndex currentIndex() const noexcept;
+    const QModelIndex      currentIndex() const noexcept;
+    std::optional<CardPtr> currentCard() const noexcept;
+    void                   writeFile() const;
+
+    void updateWindowTitle();
+    void scrollToCurrentCard();
 
   private slots:
-    void on_actionOpen_triggered();
     void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void onFieldTableDoubleClicked(const QModelIndex &index);
-    void on_actionShow_Deleted_toggled(bool arg1);
-    void on_actionExit_triggered();
     void fieldTableContextMenuRequested(QPoint pos);
     void onCopyField();
     void onOpenLink();
+    void onEditMenuAboutToShow();
+    void onToolsMenuAboutToShow();
+
+    void on_actionOpen_triggered();
     void on_actionFilter_triggered();
-    void on_searchField_textChanged(const QString &arg1);
+    void on_searchField_textChanged(const QString &text);
     void on_actionAbout_triggered();
     void on_actionEdit_triggered();
     void on_actionFavorite_triggered();
     void on_actionNewCard_triggered();
     void on_actionNewNote_triggered();
+    void on_actionNew_triggered();
+    void on_actionChangePassword_triggered();
+    void on_actionShow_Deleted_toggled(bool checked);
+    void on_actionExit_triggered();
+    void on_actionDelete_triggered();
+    void on_actionRestore_triggered();
 
-  private:
+    void on_actionPurge_triggered();
+
+private:
     Ui::MainWindow *ui;
 
     CardTableItemModel       model_;
@@ -63,5 +79,9 @@ class MainWindow : public QMainWindow {
     QMenu   fieldContextMenu_;
 
     QString currentFileName_;
+    QString currentPassword_;
+
+    // Dialogs
+    ChangePasswordDialog changePasswordDialog_;
 };
 #endif // MAINWINDOW_H

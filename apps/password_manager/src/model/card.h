@@ -15,16 +15,16 @@
 class Card final {
   public:
     Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name,
-         unsigned long modified, const QString &note, bool favorite, bool active, const std::vector<FieldPtr> &fields)
+         unsigned long modified, const QString &note, bool favorite, bool active, const FieldVec &fields)
         : cardClass_{cardClass}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
           favorite_{favorite}, active_{active}, fields_{fields} {}
 
     Card(const QUuid &uuid, const Picture &picture, const QString &name, unsigned long modified, const QString &note,
-         bool favorite, bool active, const std::vector<FieldPtr> &fields)
+         bool favorite, bool active, const FieldVec &fields)
         : cardClass_{CardClass::CARD}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
           favorite_{favorite}, active_{active}, fields_{fields} {}
 
-    Card(const Picture &picture, const QString &name, unsigned long modified, const std::vector<FieldPtr> &fields)
+    Card(const Picture &picture, const QString &name, unsigned long modified, const FieldVec &fields)
         : cardClass_{CardClass::CARD}, uuid_{QUuid::createUuid()}, picture_{picture}, name_{name}, modified_{modified},
           note_{""}, favorite_{false}, active_{true}, fields_{fields} {}
 
@@ -40,15 +40,15 @@ class Card final {
     explicit Card(const Card &card);
 
   public:
-    const CardClass             &cardClass() const { return cardClass_; }
-    const QUuid                 &uuid() const { return uuid_; }
-    const Picture               &picture() const { return picture_; }
-    const QString               &name() const { return name_; }
-    const QString               &note() const { return note_; }
-    bool                         favorite() const { return favorite_; }
-    bool                         active() const { return active_; }
-    unsigned long                modified() const { return modified_; }
-    const std::vector<FieldPtr> &fields() const { return fields_; }
+    const CardClass &cardClass() const { return cardClass_; }
+    const QUuid     &uuid() const { return uuid_; }
+    const Picture   &picture() const { return picture_; }
+    const QString   &name() const { return name_; }
+    const QString   &note() const { return note_; }
+    bool             favorite() const { return favorite_; }
+    bool             active() const { return active_; }
+    unsigned long    modified() const { return modified_; }
+    const FieldVec  &fields() const { return fields_; }
 
     void setPicture(const Picture &picture) { picture_ = picture; }
     void setName(const QString &name) { name_ = name; }
@@ -62,17 +62,18 @@ class Card final {
     bool isNote() const noexcept { return cardClass_ == CardClass::NOTE; }
 
   private:
-    const CardClass      &cardClass_;
-    QUuid                 uuid_;
-    PictureRef            picture_;
-    QString               name_;
-    unsigned long         modified_;
-    QString               note_;
-    bool                  favorite_;
-    bool                  active_;
-    std::vector<FieldPtr> fields_;
+    const CardClass &cardClass_;
+    QUuid            uuid_;
+    PictureRef       picture_;
+    QString          name_;
+    unsigned long    modified_;
+    QString          note_;
+    bool             favorite_;
+    bool             active_;
+    FieldVec         fields_;
 };
 
 using CardPtr = std::shared_ptr<Card>;
+using CardVec = std::vector<CardPtr>;
 
 #endif // CARD_H

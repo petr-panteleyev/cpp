@@ -31,4 +31,7 @@ list(APPEND PROJECT_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/passworddialog.h
     ${CMAKE_CURRENT_LIST_DIR}/passworddialog.cpp
     ${CMAKE_CURRENT_LIST_DIR}/passworddialog.ui
+    ${CMAKE_CURRENT_LIST_DIR}/changepassworddialog.h
+    ${CMAKE_CURRENT_LIST_DIR}/changepassworddialog.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/changepassworddialog.ui
 )

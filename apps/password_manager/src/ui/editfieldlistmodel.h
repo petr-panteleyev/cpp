@@ -8,7 +8,6 @@
 
 #include "field.h"
 #include <QAbstractItemModel>
-#include <vector>
 
 class EditFieldListModel : public QAbstractItemModel {
     Q_OBJECT
@@ -36,11 +35,10 @@ class EditFieldListModel : public QAbstractItemModel {
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    void setFields(const std::vector<FieldPtr> &fields) { fields_ = fields; }
+    void               setFields(const FieldVec &fields) { fields_ = fields; }
+    const FieldVec &fields() const { return fields_; }
 
     const FieldPtr &at(int row) const { return fields_.at(row); };
-
-    const std::vector<FieldPtr> &fields() const { return fields_; }
 
     void addField();
     void deleteField(int row);
@@ -50,7 +48,7 @@ class EditFieldListModel : public QAbstractItemModel {
   private:
     static inline const QModelIndex parentIndex = QModelIndex();
 
-    std::vector<FieldPtr> fields_;
+    FieldVec fields_;
 };
 
 #endif // EDITFIELDLISTMODEL_H
