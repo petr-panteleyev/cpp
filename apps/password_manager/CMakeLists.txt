@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-
 project(password_manager VERSION 24.12.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -8,17 +6,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if(NOT CMAKE_CXX_EXTENSIONS)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
-
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Xml)
-find_package(OpenSSL REQUIRED)
+find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 
-set(TS_FILES src/ui/password_manager_ru_RU.ts)
+set(TS_FILES
+    src/ui/password_manager_ru_RU.ts
+)
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -31,9 +24,8 @@ set(PROJECT_SOURCES
 include(src/model/model.cmake)
 include(src/ui/ui.cmake)
 include(src/crypto/crypto.cmake)
-include(../../include/include.cmake)
 
-file(GLOB RESOURCE_FILES "resources/*.png")
+file(GLOB PASSWORD_MANAGER_RESOURCE_FILES "resources/*.png")
 
 qt_add_executable(password_manager
     MANUAL_FINALIZATION
@@ -52,15 +44,15 @@ target_compile_definitions(password_manager
 qt_add_resources(password_manager "resources"
     PREFIX "/images"
     BASE "resources"
-    FILES ${RESOURCE_FILES}
+    FILES ${PASSWORD_MANAGER_RESOURCE_FILES}
 )
 
 qt_add_translations(password_manager
     INCLUDE_DIRECTORIES
-        ${PROJECT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
     TS_FILES
         ${TS_FILES})
-add_dependencies(password_manager update_translations)
+add_dependencies(password_manager password_manager_lupdate)
 
 target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml OpenSSL::Crypto)
 target_include_directories(password_manager PRIVATE

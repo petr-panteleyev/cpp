@@ -1,10 +1,10 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 /*
   Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
 */
+
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include "generator.h"
 #include <QMainWindow>
@@ -19,29 +19,23 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
   private:
-    void generate(const password_generator::PasswordGeneratorOptions &options);
-    void visualize_options(const password_generator::PasswordGeneratorOptions &options);
+    void generate(const pwdgen::PasswordGeneratorOptions &options);
+    void visualizeOptions(const pwdgen::PasswordGeneratorOptions &options);
 
-  private slots:
-    void on_actionGenerate_triggered();
+    // actions
+    void onActionGenerate();
+    void onActionExit();
+    void onActionUnix();
+    void onActionPin();
+    void onActionMediumPassword();
+    void onActionLongPassword();
+    void onActionCopy();
 
-    void on_actionExit_triggered();
-
-    void on_actionUNIX_triggered();
-
-    void on_actionPIN_triggered();
-
-    void on_actionMedium_Password_triggered();
-
-    void on_actionLong_Password_triggered();
-
-    void on_actionCopy_triggered();
-
-private:
+  private:
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

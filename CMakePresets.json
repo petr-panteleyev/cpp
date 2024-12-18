@@ -8,7 +8,7 @@
     "configurePresets": [
         {
             "name": "Debug",
-            "displayName": "Отладка (конфигурация)",
+            "displayName": "Debug Configuration",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
@@ -18,7 +18,7 @@
         },
         {
             "name": "Release",
-            "displayName": "Выпуск (конфигурация)",
+            "displayName": "Release Configuration",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
@@ -30,11 +30,28 @@
     "buildPresets": [
         {
             "name": "Debug",
+            "displayName": "All - Debug",
             "configurePreset": "Debug"
         },
         {
             "name": "Release",
-            "configurePreset": "Release"
+            "displayName": "All - Release",
+            "configurePreset": "Release",
+            "cleanFirst": true
+        },
+        {
+            "name": "PasswordGenerator_Debug",
+            "displayName": "Password Generator - Debug",
+            "configurePreset": "Debug",
+            "targets":[
+                "password_generator"
+            ]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "Debug"
         }
     ]
 }

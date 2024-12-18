@@ -9,7 +9,7 @@
 #include <vector>
 
 static const std::vector<int> password_length_options = {4, 6, 8, 16, 24, 32, 40, 48, 56, 64};
-static const int              DEFAULT_LENGTH_INDEX    = 3;
+static const int              DEFAULT_LENGTH_INDEX = 3;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -22,66 +22,75 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
     ui->lengthComboBox->setCurrentIndex(DEFAULT_LENGTH_INDEX);
 
-    visualize_options(password_generator::MEDIUM_OPTIONS);
+    visualizeOptions(pwdgen::MEDIUM_OPTIONS);
+
+    // Connect actions
+    connect(ui->actionGenerate, &QAction::triggered, this, &MainWindow::onActionGenerate);
+    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::onActionExit);
+    connect(ui->actionUNIX, &QAction::triggered, this, &MainWindow::onActionUnix);
+    connect(ui->actionPIN, &QAction::triggered, this, &MainWindow::onActionPin);
+    connect(ui->actionMedium_Password, &QAction::triggered, this, &MainWindow::onActionMediumPassword);
+    connect(ui->actionLong_Password, &QAction::triggered, this, &MainWindow::onActionLongPassword);
+    connect(ui->actionCopy, &QAction::triggered, this, &MainWindow::onActionCopy);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_actionGenerate_triggered() {
-    auto options = password_generator::PasswordGeneratorOptions{
+void MainWindow::onActionGenerate() {
+    auto options = pwdgen::PasswordGeneratorOptions{
         ui->upperCaseCheck->isChecked(), ui->lowerCaseCheck->isChecked(),           ui->digitsCheck->isChecked(),
         ui->symbolsCheck->isChecked(),   ui->lengthComboBox->currentData().toInt(),
     };
     generate(options);
 }
 
-void MainWindow::on_actionExit_triggered() {
+void MainWindow::onActionExit() {
     close();
 }
 
-void MainWindow::on_actionUNIX_triggered() {
-    generate(password_generator::UNIX_OPTIONS);
+void MainWindow::onActionUnix() {
+    generate(pwdgen::UNIX_OPTIONS);
 }
 
-void MainWindow::on_actionPIN_triggered() {
-    generate(password_generator::PIN_OPTIONS);
+void MainWindow::onActionPin() {
+    generate(pwdgen::PIN_OPTIONS);
 }
 
-void MainWindow::on_actionMedium_Password_triggered() {
-    generate(password_generator::MEDIUM_OPTIONS);
+void MainWindow::onActionMediumPassword() {
+    generate(pwdgen::MEDIUM_OPTIONS);
 }
 
-void MainWindow::on_actionLong_Password_triggered() {
-    generate(password_generator::LONG_OPTIONS);
+void MainWindow::onActionLongPassword() {
+    generate(pwdgen::LONG_OPTIONS);
 }
 
-void MainWindow::generate(const password_generator::PasswordGeneratorOptions &options) {
-    visualize_options(options);
+void MainWindow::generate(const pwdgen::PasswordGeneratorOptions &options) {
+    visualizeOptions(options);
 
     try {
-        auto password = password_generator::generate(options);
+        auto password = pwdgen::generate(options);
         ui->passwordEdit->setText(password.c_str());
-    } catch (password_generator::PasswordGeneratorException &e) {
+    } catch (pwdgen::PasswordGeneratorException &e) {
         ui->passwordEdit->setText("Error");
     }
 }
 
-void MainWindow::visualize_options(const password_generator::PasswordGeneratorOptions &options) {
-    ui->upperCaseCheck->setChecked(options.use_upper_case);
-    ui->lowerCaseCheck->setChecked(options.use_lower_case);
-    ui->digitsCheck->setChecked(options.use_digits);
-    ui->symbolsCheck->setChecked(options.use_symbols);
+void MainWindow::visualizeOptions(const pwdgen::PasswordGeneratorOptions &options) {
+    ui->upperCaseCheck->setChecked(options.useUpperCase);
+    ui->lowerCaseCheck->setChecked(options.useLowerCase);
+    ui->digitsCheck->setChecked(options.useDigits);
+    ui->symbolsCheck->setChecked(options.useSymbols);
 
     auto index = ui->lengthComboBox->findData(QVariant(options.length));
     ui->lengthComboBox->setCurrentIndex(index);
 }
 
-void MainWindow::on_actionCopy_triggered() {
+void MainWindow::onActionCopy() {
     auto text = ui->passwordEdit->text();
 
-    QClipboard *clipboard = QGuiApplication::clipboard();
+    auto clipboard = QGuiApplication::clipboard();
     if (clipboard != nullptr && text.size() != 0) {
         clipboard->setText(text);
     }

@@ -21,7 +21,7 @@ Requirements:
 
 ```sh
 cmake . --preset Debug
-cmake --build --preset Debug
+cmake --build --preset Debug --target password_manager
 ```
 
 **Release**
@@ -29,5 +29,5 @@ cmake --build --preset Debug
 
 ```sh
 cmake . --preset Release
-cmake --build --preset Release
+cmake --build --preset Release --target password_manager
 ```

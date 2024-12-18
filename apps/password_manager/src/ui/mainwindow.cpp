@@ -180,7 +180,7 @@ void MainWindow::on_actionShow_Deleted_toggled(bool checked) {
     scrollToCurrentCard();
 }
 
-void MainWindow::on_actionExit_triggered() {
+void MainWindow::onActionExit() {
     close();
 }
 

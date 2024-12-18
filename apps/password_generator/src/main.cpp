@@ -3,7 +3,7 @@
   SPDX-License-Identifier: BSD-2-Clause
 */
 
-#include "generator/generator.h"
+#include "generator.h"
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -11,7 +11,7 @@
 #include <QTranslator>
 #include <iostream>
 
-using namespace password_generator;
+using namespace pwdgen;
 
 static const int DEFAULT_PASSWORD_LENGTH = 16;
 
@@ -40,14 +40,14 @@ static std::map<PasswordGeneratorError, std::string> ERROR_MESSAGES{
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    QStringList arguments = QCoreApplication::arguments();
+    auto arguments = QCoreApplication::arguments();
     if (arguments.size() == 1) {
         a.setWindowIcon(QIcon(":images/icon.png"));
 
         QTranslator       translator;
-        const QStringList uiLanguages = QLocale::system().uiLanguages();
-        for (const QString &locale : uiLanguages) {
-            const QString baseName = "password_generator_" + QLocale(locale).name();
+        const auto uiLanguages = QLocale::system().uiLanguages();
+        for (const auto &locale : uiLanguages) {
+            const auto baseName = "password_generator_" + QLocale(locale).name();
             if (translator.load(":/i18n/" + baseName)) {
                 a.installTranslator(&translator);
                 break;
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
         try {
             auto options = build_options(arguments);
             std::cout << generate(options) << std::endl;
-        } catch (password_generator::PasswordGeneratorException &ex) {
-            std::cerr << ERROR_MESSAGES[ex.error_code()] << std::endl;
+        } catch (const PasswordGeneratorException &ex) {
+            std::cerr << ERROR_MESSAGES[ex.errorCode()] << std::endl;
             return -1;
         } catch (const std::string &message) {
             std::cerr << message << std::endl;
@@ -116,10 +116,10 @@ static PasswordGeneratorOptions build_options(const QStringList &arguments) {
             for (auto char_it = std::next(it->begin()); char_it < it->end(); ++char_it) {
                 char ch = char_it->toLatin1();
                 switch (ch) {
-                    case 'u': options.use_upper_case = true; break;
-                    case 'l': options.use_lower_case = true; break;
-                    case 'd': options.use_digits = true; break;
-                    case 's': options.use_symbols = true; break;
+                    case 'u': options.useUpperCase = true; break;
+                    case 'l': options.useLowerCase = true; break;
+                    case 'd': options.useDigits = true; break;
+                    case 's': options.useSymbols = true; break;
                     default: throw std::string("Invalid option -") + ch;
                 }
             }

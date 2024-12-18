@@ -3,10 +3,10 @@
   SPDX-License-Identifier: BSD-2-Clause
 */
 
-#include "character_set.h"
+#include "characterset.h"
 #include <algorithm>
 
-namespace password_generator {
+namespace pwdgen {
 
 const CharacterSet CharacterSet::UPPER_CASE_CHARS{{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
                                                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}};
@@ -24,8 +24,8 @@ bool CharacterSet::contains(char ch) const {
     return std::find(characters_.begin(), characters_.end(), ch) != characters_.end();
 }
 
-bool CharacterSet::contains_any(const std::string &str) const {
+bool CharacterSet::containsAny(const std::string &str) const {
     return std::find_if(str.begin(), str.end(), [this](auto ch) { return this->contains(ch); }) != str.end();
 }
 
-} // namespace password_generator
+} // namespace pwdgen

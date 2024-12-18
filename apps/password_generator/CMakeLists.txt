@@ -1,37 +1,16 @@
-cmake_minimum_required(VERSION 3.5)
-
 project(password_generator VERSION 24.11.1 LANGUAGES CXX)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
-
-set(TS_FILES src/password_generator_ru.ts)
-
-set(PROJECT_SOURCES
-        src/main.cpp
-        src/mainwindow.h
-        src/mainwindow.cpp
-        src/mainwindow.ui
-)
-
-include(src/generator/generator.cmake)
-
-set(RESOURCE_FILES
+set(PASSWORD_GENERATOR_RESOURCE_FILES
     resources/icon.png
 )
 
-qt_add_executable(password_generator
-    MANUAL_FINALIZATION
-    ${PROJECT_SOURCES}
-)
+qt_add_executable(password_generator)
 
 target_compile_options(password_generator PRIVATE
     -Werror
@@ -39,23 +18,33 @@ target_compile_options(password_generator PRIVATE
     -Wpedantic
 )
 
+target_sources(password_generator PRIVATE
+    src/main.cpp
+    src/mainwindow.h
+    src/mainwindow.cpp
+    src/mainwindow.ui
+)
+
 qt_add_resources(password_generator "resources"
     PREFIX "/images"
     BASE "resources"
-    FILES ${RESOURCE_FILES}
+    FILES ${PASSWORD_GENERATOR_RESOURCE_FILES}
 )
 
 qt_add_translations(password_generator
     INCLUDE_DIRECTORIES
-        ${PROJECT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
     TS_FILES
-        ${TS_FILES})
-add_dependencies(password_generator update_translations)
+        src/password_generator_ru.ts
+)
 
-target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+add_dependencies(password_generator password_generator_lupdate)
+
+target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets pwdgen)
+
 target_include_directories(password_generator PRIVATE
     src
-    src/generator
+    ../../libs/pwdgen/src
 )
 
 set_target_properties(password_generator PROPERTIES
@@ -68,6 +57,5 @@ set_target_properties(password_generator PROPERTIES
 
 install(TARGETS password_generator
     BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-qt_finalize_executable(password_generator)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

@@ -59,7 +59,7 @@ class MainWindow : public QMainWindow {
     void on_actionNew_triggered();
     void on_actionChangePassword_triggered();
     void on_actionShow_Deleted_toggled(bool checked);
-    void on_actionExit_triggered();
+    void onActionExit();
     void on_actionDelete_triggered();
     void on_actionRestore_triggered();
 

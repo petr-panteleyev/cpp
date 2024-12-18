@@ -42,7 +42,7 @@ template <typename T> class EnumClass {
     static const T &valueOf(unsigned ordinal) { return values_.at(ordinal); }
 
   protected:
-    EnumClass(const std::string &name) noexcept : ordinal_{nextOrdinal_++}, name_{name} {}
+    explicit EnumClass(const std::string &name) noexcept : ordinal_{nextOrdinal_++}, name_{name} {}
 
   private:
     EnumClass<T>(const EnumClass<T> &) = delete;
