@@ -5,12 +5,26 @@
 
 #include "cardeditdialog.h"
 #include "fieldvalueeditdelegate.h"
+#include "generator.h"
 #include "picture.h"
+#include "qnamespace.h"
 #include "qthelpers.h"
 #include "ui_cardeditdialog.h"
 #include <QAbstractScrollArea>
-#include <QValidator>
 #include <QMessageBox>
+#include <QValidator>
+#include <memory>
+#include <unordered_map>
+
+constexpr int TAB_FIELDS = 0;
+constexpr int TAB_NOTES = 1;
+
+static std::unordered_map<unsigned, pwdgen::PasswordGeneratorOptions> GENERATOR_OPTIONS{
+    {FieldType::PIN.ordinal(), pwdgen::PIN_OPTIONS},
+    {FieldType::UNIX_PASSWORD.ordinal(), pwdgen::UNIX_OPTIONS},
+    {FieldType::SHORT_PASSWORD.ordinal(), pwdgen::MEDIUM_OPTIONS},
+    {FieldType::LONG_PASSWORD.ordinal(), pwdgen::LONG_OPTIONS},
+};
 
 class NotEmptyValidator : public QValidator {
   public:
@@ -19,38 +33,53 @@ class NotEmptyValidator : public QValidator {
     }
 };
 
-CardEditDialog::CardEditDialog(const Card &card, QWidget *parent)
-    : QDialog(parent), ui(new Ui::CardEditDialog), card_{card}, fieldTableModel_{this},
-      fieldAddAction_{tr("Add"), this}, fieldDeleteAction_{tr("Delete"), this}, fieldUpAction_{tr("Up"), this},
-      fieldDownAction_{tr("Down"), this}, fieldGenerateAction_(tr("Generate"), this)
+CardEditDialog::CardEditDialog(QWidget *parent)
+    : QDialog(parent), ui(new Ui::CardEditDialog), fieldTableModel_{this}, fieldAddAction_{tr("Add"), this},
+      fieldDeleteAction_{tr("Delete"), this}, fieldUpAction_{tr("Up"), this}, fieldDownAction_{tr("Down"), this},
+      fieldGenerateAction_(tr("Generate"), this)
 
 {
     ui->setupUi(this);
 
-    fieldTableModel_.setFields(card.fields());
-
     setupFieldTable();
     setupFieldTableContextMenu();
 
-    ui->notesEditor->appendPlainText(card.note());
-    ui->nameEditor->setText(card.name());
     ui->nameEditor->setValidator(new NotEmptyValidator());
 
-    initPictureComboBox();
-
-    // Fields and picture are editable for CARD only
-    bool isCard = card.isCard();
-    ui->tabWidget->setTabVisible(0, isCard);
-    ui->pictureComboBox->setVisible(isCard);
-    ui->pictureLabel->setVisible(isCard);
+    ui->pictureComboBox->setStyleSheet("QComboBox { combobox-popup: 0; }");
+    for (const Picture &picture : Picture::values()) {
+        ui->pictureComboBox->addItem(picture.icon(), "", picture.ordinal());
+    }
 }
 
 CardEditDialog::~CardEditDialog() {
     delete ui;
 }
 
+void CardEditDialog::setCard(const Card &card) {
+    card_ = std::shared_ptr<Card>(new Card(card));
+
+    fieldTableModel_.setFields(card.fields());
+
+    ui->notesEditor->appendPlainText(card.note());
+    ui->nameEditor->setText(card.name());
+
+    // Fields and picture are editable for CARD only
+    bool isCard = card.isCard();
+    ui->tabWidget->setTabVisible(TAB_FIELDS, isCard);
+    ui->tabWidget->setCurrentIndex(isCard ? TAB_FIELDS : TAB_NOTES);
+    ui->pictureComboBox->setVisible(isCard);
+    ui->pictureLabel->setVisible(isCard);
+
+    // Picture
+    auto pictureIndex = QtHelpers::indexOfData(*ui->pictureComboBox, card.picture().ordinal());
+    if (pictureIndex != -1) {
+        ui->pictureComboBox->setCurrentIndex(pictureIndex);
+    }
+}
+
 void CardEditDialog::setupFieldTable() {
-    QTableView *t = ui->fieldsTable;
+    auto t = ui->fieldsTable;
 
     QtHelpers::addActions(
         t, {&fieldAddAction_, &fieldDeleteAction_, &fieldGenerateAction_, &fieldUpAction_, &fieldDownAction_});
@@ -60,8 +89,8 @@ void CardEditDialog::setupFieldTable() {
     t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_TYPE_COLUMN, new FieldValueEditDelegate());
     t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_VALUE_COLUMN, new FieldValueEditDelegate());
 
-    connect(t->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this,
-            SLOT(fieldTableCurrentRowChanged(QModelIndex, QModelIndex)));
+    connect(t->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &CardEditDialog::fieldTableCurrentRowChanged);
 
     auto header = t->horizontalHeader();
     header->setSectionResizeMode(EditFieldListModel::FIELD_TABLE_NAME_COLUMN, QHeaderView::Stretch);
@@ -80,13 +109,14 @@ void CardEditDialog::setupFieldTableContextMenu() {
                           {&fieldAddAction_, &fieldDeleteAction_, nullptr, &fieldGenerateAction_, nullptr,
                            &fieldUpAction_, &fieldDownAction_});
 
-    connect(&fieldAddAction_, SIGNAL(triggered(bool)), this, SLOT(onAddField()));
-    connect(&fieldDeleteAction_, SIGNAL(triggered(bool)), this, SLOT(onDeleteField()));
-    connect(&fieldUpAction_, SIGNAL(triggered(bool)), this, SLOT(onFieldUp()));
-    connect(&fieldDownAction_, SIGNAL(triggered(bool)), this, SLOT(onFieldDown()));
+    connect(&fieldAddAction_, &QAction::triggered, this, &CardEditDialog::onAddField);
+    connect(&fieldDeleteAction_, &QAction::triggered, this, &CardEditDialog::onDeleteField);
+    connect(&fieldUpAction_, &QAction::triggered, this, &CardEditDialog::onFieldUp);
+    connect(&fieldDownAction_, &QAction::triggered, this, &CardEditDialog::onFieldDown);
+    connect(&fieldGenerateAction_, &QAction::triggered, this, &CardEditDialog::onGenerate);
 
-    connect(ui->fieldsTable, SIGNAL(customContextMenuRequested(QPoint)), this,
-            SLOT(fieldTableContextMenuRequested(QPoint)));
+    connect(ui->fieldsTable, &QTableView::customContextMenuRequested, this,
+            &CardEditDialog::fieldTableContextMenuRequested);
 }
 
 // TODO: do some validation here
@@ -97,26 +127,15 @@ void CardEditDialog::done(int code) {
             return;
         }
 
-        card_.setName(newName);
-        card_.setFields(fieldTableModel_.fields());
+        card_->setName(newName);
+        card_->setFields(fieldTableModel_.fields());
         // picture
         auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
-        card_.setPicture(Picture::valueOf(pictureOrdinal));
+        card_->setPicture(Picture::valueOf(pictureOrdinal));
         // note
-        card_.setNote(ui->notesEditor->toPlainText());
+        card_->setNote(ui->notesEditor->toPlainText());
     }
     QDialog::done(code);
-}
-
-void CardEditDialog::initPictureComboBox() {
-    auto index = 0;
-    for (const Picture &picture : Picture::values()) {
-        ui->pictureComboBox->addItem(picture.icon(), "", picture.ordinal());
-        if (card_.picture() == picture) {
-            ui->pictureComboBox->setCurrentIndex(index);
-        }
-        ++index;
-    }
 }
 
 void CardEditDialog::onAddField() {
@@ -154,6 +173,20 @@ void CardEditDialog::onFieldDown() {
     fieldTableModel_.moveDown(index.row());
 }
 
+void CardEditDialog::onGenerate() {
+    auto index = ui->fieldsTable->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    auto field = fieldTableModel_.at(index.row());
+
+    if (GENERATOR_OPTIONS.contains(field->type().ordinal())) {
+        auto options = GENERATOR_OPTIONS[field->type().ordinal()];
+        auto password = pwdgen::generate(options);
+        fieldTableModel_.setFieldValue(index.row(), field, QString::fromStdString(password));
+    }
+}
+
 void CardEditDialog::fieldTableContextMenuRequested(QPoint pos) {
     auto index = ui->fieldsTable->indexAt(pos);
     if (!index.isValid()) {
@@ -169,7 +202,5 @@ void CardEditDialog::fieldTableCurrentRowChanged(const QModelIndex &current, con
     auto field = fieldTableModel_.at(current.row());
     fieldUpAction_.setEnabled(current.row() != 0);
     fieldDownAction_.setEnabled(current.row() != fieldTableModel_.rowCount() - 1);
-    fieldGenerateAction_.setEnabled(field->type() == FieldType::PIN || field->type() == FieldType::UNIX_PASSWORD ||
-                                    field->type() == FieldType::LONG_PASSWORD ||
-                                    field->type() == FieldType::SHORT_PASSWORD);
+    fieldGenerateAction_.setEnabled(GENERATOR_OPTIONS.contains(field->type().ordinal()));
 }

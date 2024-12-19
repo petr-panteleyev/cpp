@@ -8,7 +8,7 @@ namespace Crypto {
 
 class CryptoException : public std::exception {
   public:
-    CryptoException(const std::string &message) noexcept : message_{message} {}
+    explicit CryptoException(const std::string &message) noexcept : message_{message} {}
 
     const std::string &message() const noexcept { return message_; }
 

@@ -4,8 +4,8 @@
 */
 
 #include "aes256.h"
+#include "cryptoexception.h"
 #include <cstring>
-
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
@@ -34,8 +34,6 @@ static void cleanupAndThrow(EVP_CIPHER_CTX *ctx) {
 std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &passwd) {
     unsigned char key[AES_KEY_SIZE], iv[AES_BLOCK_SIZE], dummy[AES_BLOCK_SIZE];
 
-    std::vector<char> decrypted;
-
     std::memcpy(iv, encrypted.data(), AES_BLOCK_SIZE);
     EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha256(), NULL, reinterpret_cast<ConstCharPtr>(passwd.c_str()),
                    passwd.length(), 1, key, dummy);
@@ -46,6 +44,7 @@ std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &p
     int firstLength = 0;
     int finalLength = 0;
 
+    std::vector<char> decrypted;
     decrypted.resize(encrypted.size());
 
     if (!EVP_DecryptUpdate(ctx, reinterpret_cast<CharPtr>(decrypted.data()), &firstLength,
@@ -96,4 +95,4 @@ std::vector<char> encrypt(const std::span<char> &decrypted, const std::string &p
     return encrypted;
 }
 
-} // namespace aes256
+} // namespace Crypto::aes256

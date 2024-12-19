@@ -3,7 +3,7 @@ add_library(pwdgen STATIC)
 target_compile_options(pwdgen PRIVATE
     -Werror
     -Wall
-    -Wpedantic
+    -pedantic
 )
 
 target_sources(pwdgen

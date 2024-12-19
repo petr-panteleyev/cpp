@@ -1,4 +1,4 @@
-project(password_manager VERSION 24.12.1 LANGUAGES CXX)
+project(password_manager VERSION 24.12.2 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -9,34 +9,16 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Xml)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 
-set(TS_FILES
-    src/ui/password_manager_ru_RU.ts
-)
-
-set(PROJECT_SOURCES
-    src/main.cpp
-    src/serializer.h
-    src/serializer.cpp
-    src/exceptions.h
-    src/version.h
-)
-
-include(src/model/model.cmake)
-include(src/ui/ui.cmake)
-include(src/crypto/crypto.cmake)
-
-file(GLOB PASSWORD_MANAGER_RESOURCE_FILES "resources/*.png")
-
-qt_add_executable(password_manager
-    MANUAL_FINALIZATION
-    ${PROJECT_SOURCES}
-)
+qt_add_executable(password_manager)
+add_subdirectory(src)
 
 target_compile_options(password_manager PRIVATE
     -Werror
     -Wall
-    -Wpedantic
+    -pedantic
 )
+
+file(GLOB PASSWORD_MANAGER_RESOURCE_FILES "resources/*.png")
 
 target_compile_definitions(password_manager
                            PRIVATE "PROJECT_VERSION=${PROJECT_VERSION}")
@@ -51,16 +33,22 @@ qt_add_translations(password_manager
     INCLUDE_DIRECTORIES
         ${CMAKE_CURRENT_SOURCE_DIR}
     TS_FILES
-        ${TS_FILES})
+        src/ui/password_manager_ru_RU.ts
+)
+
 add_dependencies(password_manager password_manager_lupdate)
 
-target_link_libraries(password_manager PRIVATE Qt6::Core Qt6::Widgets Qt6::Xml OpenSSL::Crypto)
+target_link_libraries(password_manager PRIVATE 
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Xml
+    OpenSSL::Crypto
+    pwdgen
+)
+
 target_include_directories(password_manager PRIVATE
-  src
-  src/model
-  src/ui
-  src/crypto
-  ../../include
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
 )
 
 set_target_properties(password_manager PROPERTIES
@@ -73,6 +61,5 @@ set_target_properties(password_manager PROPERTIES
 
 install(TARGETS password_manager
     BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-qt_finalize_executable(password_manager)
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

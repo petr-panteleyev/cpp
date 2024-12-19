@@ -103,3 +103,9 @@ void EditFieldListModel::moveDown(int row) {
     std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row + 1));
     endMoveRows();
 }
+
+void EditFieldListModel::setFieldValue(int row, const FieldPtr &field, const QVariant &value) {
+    field->setValue(value);
+    auto updateIndex = index(row, FIELD_TABLE_VALUE_COLUMN);
+    emit dataChanged(updateIndex, updateIndex, {Qt::EditRole});
+}

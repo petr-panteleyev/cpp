@@ -11,18 +11,12 @@ set(PASSWORD_GENERATOR_RESOURCE_FILES
 )
 
 qt_add_executable(password_generator)
+add_subdirectory(src)
 
 target_compile_options(password_generator PRIVATE
     -Werror
     -Wall
-    -Wpedantic
-)
-
-target_sources(password_generator PRIVATE
-    src/main.cpp
-    src/mainwindow.h
-    src/mainwindow.cpp
-    src/mainwindow.ui
+    -pedantic
 )
 
 qt_add_resources(password_generator "resources"
@@ -43,8 +37,7 @@ add_dependencies(password_generator password_generator_lupdate)
 target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets pwdgen)
 
 target_include_directories(password_generator PRIVATE
-    src
-    ../../libs/pwdgen/src
+    ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
 )
 
 set_target_properties(password_generator PROPERTIES

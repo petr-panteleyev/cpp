@@ -35,7 +35,11 @@ class EditFieldListModel : public QAbstractItemModel {
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    void               setFields(const FieldVec &fields) { fields_ = fields; }
+    void setFields(const FieldVec &fields) {
+        beginResetModel();
+        fields_ = fields;
+        endResetModel();
+    }
     const FieldVec &fields() const { return fields_; }
 
     const FieldPtr &at(int row) const { return fields_.at(row); };
@@ -44,6 +48,7 @@ class EditFieldListModel : public QAbstractItemModel {
     void deleteField(int row);
     void moveUp(int row);
     void moveDown(int row);
+    void setFieldValue(int row, const FieldPtr &field, const QVariant &value);
 
   private:
     static inline const QModelIndex parentIndex = QModelIndex();

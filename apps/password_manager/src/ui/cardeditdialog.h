@@ -16,34 +16,35 @@ namespace Ui {
 class CardEditDialog;
 }
 
-class CardEditDialog : public QDialog {
+class CardEditDialog final : public QDialog {
     Q_OBJECT
 
   public:
-    explicit CardEditDialog(const Card &card, QWidget *parent = nullptr);
+    explicit CardEditDialog(QWidget *parent = nullptr);
     ~CardEditDialog();
 
-    const Card &card() const { return card_; }
+    void setCard(const Card &card);
+    const CardPtr &card() const { return card_; }
 
     virtual void done(int code) override;
 
   private:
-    void initPictureComboBox();
     void setupFieldTable();
     void setupFieldTableContextMenu();
 
-  private slots:
+    // Actions
     void onAddField();
     void onDeleteField();
     void onFieldUp();
     void onFieldDown();
+    void onGenerate();
     void fieldTableContextMenuRequested(QPoint pos);
     void fieldTableCurrentRowChanged(const QModelIndex &, const QModelIndex &);
 
   private:
     Ui::CardEditDialog *ui;
 
-    Card               card_;
+    CardPtr card_;
     EditFieldListModel fieldTableModel_;
 
     // Field table actions

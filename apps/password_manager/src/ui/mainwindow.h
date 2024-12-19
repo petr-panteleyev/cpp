@@ -6,6 +6,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "cardeditdialog.h"
 #include "cardtableitemmodel.h"
 #include "cardtablesortfiltermodel.h"
 #include "changepassworddialog.h"
@@ -38,34 +39,33 @@ class MainWindow : public QMainWindow {
     void updateWindowTitle();
     void scrollToCurrentCard();
 
-  private slots:
-    void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
-    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    void onFieldTableDoubleClicked(const QModelIndex &index);
-    void fieldTableContextMenuRequested(QPoint pos);
+    // Actions and other events
     void onCopyField();
     void onOpenLink();
     void onEditMenuAboutToShow();
     void onToolsMenuAboutToShow();
+    void onFieldTableDoubleClicked(const QModelIndex &index);
+    void onFieldTableContextMenuRequested(QPoint pos);
+    void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void onSearchFieldTextChanged(const QString &text);
 
-    void on_actionOpen_triggered();
-    void on_actionFilter_triggered();
-    void on_searchField_textChanged(const QString &text);
-    void on_actionAbout_triggered();
-    void on_actionEdit_triggered();
-    void on_actionFavorite_triggered();
-    void on_actionNewCard_triggered();
-    void on_actionNewNote_triggered();
-    void on_actionNew_triggered();
-    void on_actionChangePassword_triggered();
-    void on_actionShow_Deleted_toggled(bool checked);
+    void onActionAbout();
+    void onActionChangePassword();
+    void onActionDelete();
+    void onActionEdit();
     void onActionExit();
-    void on_actionDelete_triggered();
-    void on_actionRestore_triggered();
+    void onActionFilter();
+    void onActionFavorite();
+    void onActionNew();
+    void onActionNewCard();
+    void onActionNewNote();
+    void onActionOpen();
+    void onActionPurge();
+    void onActionRestore();
+    void onActionShowDeletedToggled(bool checked);
 
-    void on_actionPurge_triggered();
-
-private:
+  private:
     Ui::MainWindow *ui;
 
     CardTableItemModel       model_;
@@ -83,5 +83,6 @@ private:
 
     // Dialogs
     ChangePasswordDialog changePasswordDialog_;
+    CardEditDialog       cardEditDialog_;
 };
 #endif // MAINWINDOW_H

@@ -1,5 +1,0 @@
-list(APPEND PROJECT_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/cryptoexception.h
-    ${CMAKE_CURRENT_LIST_DIR}/aes256.h
-    ${CMAKE_CURRENT_LIST_DIR}/aes256.cpp
-)

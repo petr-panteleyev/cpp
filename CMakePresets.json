@@ -38,14 +38,6 @@
             "displayName": "All - Release",
             "configurePreset": "Release",
             "cleanFirst": true
-        },
-        {
-            "name": "PasswordGenerator_Debug",
-            "displayName": "Password Generator - Debug",
-            "configurePreset": "Debug",
-            "targets":[
-                "password_generator"
-            ]
         }
     ],
     "testPresets": [

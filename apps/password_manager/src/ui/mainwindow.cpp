@@ -9,6 +9,7 @@
 #include "card.h"
 #include "cardeditdialog.h"
 #include "changepassworddialog.h"
+#include "cryptoexception.h"
 #include "exceptions.h"
 #include "newcarddialog.h"
 #include "newnotedialog.h"
@@ -26,12 +27,12 @@
 
 using namespace Crypto;
 
-static constexpr int TAB_FIELDS = 0;
-static constexpr int TAB_NOTE = 1;
+constexpr int TAB_FIELDS = 0;
+constexpr int TAB_NOTE = 1;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), copyFieldAction_{this}, openLinkAction_{tr("Open Link"), this},
-      fieldContextMenu_{this}, changePasswordDialog_{this} {
+      fieldContextMenu_{this}, changePasswordDialog_{this}, cardEditDialog_{this} {
     ui->setupUi(this);
 
     sortFilterModel_.setSourceModel(&model_);
@@ -71,27 +72,42 @@ MainWindow::MainWindow(QWidget *parent)
     QtHelpers::addActions(&fieldContextMenu_, {&copyFieldAction_, &openLinkAction_});
 
     auto selectionModel = ui->cardListView->selectionModel();
-    connect(selectionModel, SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,
-            SLOT(onCurrentCardChanged(QModelIndex, QModelIndex)));
-    connect(selectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
+    connect(selectionModel, &QItemSelectionModel::currentChanged, this, &MainWindow::onCurrentCardChanged);
+    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectionChanged);
 
-    connect(ui->fieldTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onFieldTableDoubleClicked(QModelIndex)));
-    connect(ui->fieldTable, SIGNAL(customContextMenuRequested(QPoint)), this,
-            SLOT(fieldTableContextMenuRequested(QPoint)));
+    connect(ui->fieldTable, &QTableView::doubleClicked, this, &MainWindow::onFieldTableDoubleClicked);
+    connect(ui->fieldTable, &QTableView::customContextMenuRequested, this,
+            &MainWindow::onFieldTableContextMenuRequested);
 
-    connect(&copyFieldAction_, SIGNAL(triggered(bool)), this, SLOT(onCopyField()));
-    connect(&openLinkAction_, SIGNAL(triggered(bool)), this, SLOT(onOpenLink()));
+    connect(ui->searchField, &QLineEdit::textChanged, this, &MainWindow::onSearchFieldTextChanged);
 
-    connect(ui->menuEdit, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
-    connect(ui->menuTools, SIGNAL(aboutToShow()), this, SLOT(onToolsMenuAboutToShow()));
+    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::onActionExit);
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onActionOpen);
+    connect(ui->actionFilter, &QAction::triggered, this, &MainWindow::onActionFilter);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onActionAbout);
+    connect(ui->actionFavorite, &QAction::triggered, this, &MainWindow::onActionFavorite);
+    connect(ui->actionNewCard, &QAction::triggered, this, &MainWindow::onActionNewCard);
+    connect(ui->actionNewNote, &QAction::triggered, this, &MainWindow::onActionNewNote);
+    connect(ui->actionChangePassword, &QAction::triggered, this, &MainWindow::onActionChangePassword);
+    connect(ui->actionDelete, &QAction::triggered, this, &MainWindow::onActionDelete);
+    connect(ui->actionRestore, &QAction::triggered, this, &MainWindow::onActionRestore);
+    connect(ui->actionPurge, &QAction::triggered, this, &MainWindow::onActionPurge);
+    connect(ui->actionShow_Deleted, &QAction::toggled, this, &MainWindow::onActionShowDeletedToggled);
+    connect(ui->actionNew, &QAction::toggled, this, &MainWindow::onActionNew);
+    connect(ui->actionEdit, &QAction::triggered, this, &MainWindow::onActionEdit);
+
+    connect(&copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
+    connect(&openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
+
+    connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
+    connect(ui->menuTools, &QMenu::aboutToShow, this, &MainWindow::onToolsMenuAboutToShow);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_actionOpen_triggered() {
+void MainWindow::onActionOpen() {
     auto fileName = QFileDialog::getOpenFileName(this);
     if (fileName.isEmpty()) {
         return;
@@ -175,7 +191,7 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemS
     }
 }
 
-void MainWindow::on_actionShow_Deleted_toggled(bool checked) {
+void MainWindow::onActionShowDeletedToggled(bool checked) {
     sortFilterModel_.set_show_deleted(checked);
     scrollToCurrentCard();
 }
@@ -190,7 +206,7 @@ void MainWindow::onFieldTableDoubleClicked(const QModelIndex &index) {
     fieldModel_.toggleMasking(sourceIndex, field);
 }
 
-void MainWindow::fieldTableContextMenuRequested(QPoint pos) {
+void MainWindow::onFieldTableContextMenuRequested(QPoint pos) {
     auto index = ui->fieldTable->indexAt(pos);
     if (!index.isValid()) {
         return;
@@ -219,39 +235,38 @@ void MainWindow::onOpenLink() {
     QDesktopServices::openUrl(QUrl(urlText));
 }
 
-void MainWindow::on_actionFilter_triggered() {
+void MainWindow::onActionFilter() {
     ui->searchField->setFocus();
 }
 
-void MainWindow::on_searchField_textChanged(const QString &text) {
+void MainWindow::onSearchFieldTextChanged(const QString &text) {
     sortFilterModel_.setFilterText(text);
 }
 
-void MainWindow::on_actionAbout_triggered() {
+void MainWindow::onActionAbout() {
     AboutDialog aboutDialog{this};
     aboutDialog.exec();
 }
 
-void MainWindow::on_actionEdit_triggered() {
+void MainWindow::onActionEdit() {
     auto currentIndex = ui->cardListView->selectionModel()->currentIndex();
     if (!currentIndex.isValid()) {
         return;
     }
-
     auto sourceIndex = sortFilterModel_.mapToSource(currentIndex);
     auto currentCard = model_.cardAtIndex(sourceIndex.row());
 
-    CardEditDialog dialog{*currentCard, this};
-    auto           result = dialog.exec();
-    if (result == QDialog::Accepted) {
-        auto &updatedCard = dialog.card();
-        model_.replace(sourceIndex, updatedCard);
+    cardEditDialog_.setCard(*currentCard);
+
+    if (cardEditDialog_.exec() == QDialog::Accepted) {
+        auto &updatedCard = cardEditDialog_.card();
+        model_.replace(sourceIndex, *updatedCard);
         onCurrentCardChanged(currentIndex, currentIndex);
         writeFile();
     }
 }
 
-void MainWindow::on_actionFavorite_triggered() {
+void MainWindow::onActionFavorite() {
     auto index = currentIndex();
     if (!index.isValid()) {
         return;
@@ -281,7 +296,7 @@ std::optional<CardPtr> MainWindow::currentCard() const noexcept {
     return std::optional(this->model_.cardAtIndex(index.row()));
 }
 
-void MainWindow::on_actionNewCard_triggered() {
+void MainWindow::onActionNewCard() {
     NewCardDialog dialog{this};
     auto          result = dialog.exec();
     if (result == QDialog::Accepted) {
@@ -290,7 +305,7 @@ void MainWindow::on_actionNewCard_triggered() {
     }
 }
 
-void MainWindow::on_actionNewNote_triggered() {
+void MainWindow::onActionNewNote() {
     NewNoteDialog dialog{this};
     auto          result = dialog.exec();
     if (result == QDialog::Accepted) {
@@ -322,7 +337,7 @@ void MainWindow::writeFile() const {
     file.close();
 }
 
-void MainWindow::on_actionNew_triggered() {
+void MainWindow::onActionNew() {
     auto fileName = QFileDialog::getSaveFileName(this);
     if (fileName.isEmpty()) {
         return;
@@ -378,7 +393,7 @@ void MainWindow::updateWindowTitle() {
     }
 }
 
-void MainWindow::on_actionChangePassword_triggered() {
+void MainWindow::onActionChangePassword() {
     changePasswordDialog_.reset(currentFileName_);
     if (changePasswordDialog_.exec() != QDialog::Accepted) {
         return;
@@ -387,7 +402,7 @@ void MainWindow::on_actionChangePassword_triggered() {
     writeFile();
 }
 
-void MainWindow::on_actionDelete_triggered() {
+void MainWindow::onActionDelete() {
     auto index = currentIndex();
     if (!index.isValid()) {
         return;
@@ -419,7 +434,7 @@ void MainWindow::scrollToCurrentCard() {
     ui->cardListView->scrollTo(ui->cardListView->currentIndex());
 }
 
-void MainWindow::on_actionRestore_triggered() {
+void MainWindow::onActionRestore() {
     auto index = currentIndex();
     if (!index.isValid()) {
         return;
@@ -437,7 +452,7 @@ void MainWindow::on_actionRestore_triggered() {
     writeFile();
 }
 
-void MainWindow::on_actionPurge_triggered() {
+void MainWindow::onActionPurge() {
     auto result = QMessageBox::question(this, tr("Purge"), tr("Are you sure to purge all deleted items?"));
     if (result != QMessageBox::Yes) {
         return;

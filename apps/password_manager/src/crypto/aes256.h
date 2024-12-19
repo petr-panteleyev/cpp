@@ -6,7 +6,6 @@
 #ifndef AES256_H
 #define AES256_H
 
-#include "cryptoexception.h"
 #include <span>
 #include <string>
 #include <vector>
