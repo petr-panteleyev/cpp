@@ -11,11 +11,14 @@
 #include "changepassworddialog.h"
 #include "cryptoexception.h"
 #include "exceptions.h"
+#include "importutil.h"
 #include "newcarddialog.h"
 #include "newnotedialog.h"
 #include "passworddialog.h"
+#include "qmainwindow.h"
 #include "qthelpers.h"
 #include "serializer.h"
+#include "settings.h"
 #include "ui_mainwindow.h"
 #include <QClipboard>
 #include <QDesktopServices>
@@ -24,6 +27,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTableWidgetItem>
+#include <QTimer>
+#include <ranges>
 
 using namespace Crypto;
 
@@ -32,7 +37,8 @@ constexpr int TAB_NOTE = 1;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), copyFieldAction_{this}, openLinkAction_{tr("Open Link"), this},
-      fieldContextMenu_{this}, changePasswordDialog_{this}, cardEditDialog_{this} {
+      fieldContextMenu_{this}, passwordDialog_{this}, changePasswordDialog_{this}, cardEditDialog_{this},
+      importDialog_{this}, settingsDialog_{this} {
     ui->setupUi(this);
 
     sortFilterModel_.setSourceModel(&model_);
@@ -93,18 +99,70 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionRestore, &QAction::triggered, this, &MainWindow::onActionRestore);
     connect(ui->actionPurge, &QAction::triggered, this, &MainWindow::onActionPurge);
     connect(ui->actionShow_Deleted, &QAction::toggled, this, &MainWindow::onActionShowDeletedToggled);
-    connect(ui->actionNew, &QAction::toggled, this, &MainWindow::onActionNew);
+    connect(ui->actionNew, &QAction::triggered, this, &MainWindow::onActionNew);
     connect(ui->actionEdit, &QAction::triggered, this, &MainWindow::onActionEdit);
+    connect(ui->actionExport, &QAction::triggered, this, &MainWindow::onActionExport);
+    connect(ui->actionImport, &QAction::triggered, this, &MainWindow::onActionImport);
+    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::onActionSettings);
 
     connect(&copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
     connect(&openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
 
     connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
     connect(ui->menuTools, &QMenu::aboutToShow, this, &MainWindow::onToolsMenuAboutToShow);
+
+    connect(&passwordDialog_, &QDialog::accepted, this, &MainWindow::onPasswordDialogAccepted);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    QMainWindow::showEvent(event);
+
+    auto fileName = Settings::getCurrentFile();
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QTimer::singleShot(10, [fileName, this]() {
+        passwordDialog_.setFileName(fileName);
+        passwordDialog_.show(PasswordDialog::Mode::OPEN);
+    });
+}
+
+void MainWindow::onPasswordDialogAccepted() {
+    auto fileName = passwordDialog_.getFileName();
+    auto password = passwordDialog_.getPassword();
+
+    if (passwordDialog_.getMode() == PasswordDialog::Mode::OPEN) {
+        continueOpen(fileName, password);
+    } else {
+        continueImport(fileName, password);
+    }
+}
+
+void MainWindow::continueOpen(const QString &fileName, const QString &password) {
+    try {
+        CardVec cards;
+        loadRecords(fileName, password, cards);
+
+        model_.setItems(cards);
+        if (model_.rowCount() > 0) {
+            ui->cardListView->setCurrentIndex(sortFilterModel_.index(0, 0));
+        }
+
+        currentFileName_ = fileName;
+        currentPassword_ = password;
+        updateWindowTitle();
+
+        Settings::setCurrentFile(currentFileName_);
+    } catch (const PasswordManagerException &ex) {
+        QMessageBox::critical(this, tr("Critical Error"), ex.message());
+    } catch (const CryptoException &ex) {
+        QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
+    }
 }
 
 void MainWindow::onActionOpen() {
@@ -113,46 +171,8 @@ void MainWindow::onActionOpen() {
         return;
     }
 
-    PasswordDialog passwordDialog{this, fileName};
-    passwordDialog.exec();
-    auto password = passwordDialog.password();
-
-    try {
-        QFile file{fileName};
-        if (!file.open(QIODevice::ReadOnly)) {
-            throw PasswordManagerException("File cannot be opened!");
-        } else {
-            QDomDocument doc;
-
-            if (password.isEmpty()) {
-                bool success = doc.setContent(&file);
-                if (!success) {
-                    throw PasswordManagerException("File cannot be parsed!");
-                }
-            } else {
-                auto data = file.readAll();
-                auto decrypted = aes256::decrypt(data, password.toStdString());
-                doc.setContent(QByteArray::fromRawData(decrypted.data(), decrypted.size()));
-            }
-            file.close();
-
-            std::vector<CardPtr> cards;
-            Serializer::deserialize(doc, cards);
-            model_.setItems(cards);
-
-            if (model_.rowCount() > 0) {
-                ui->cardListView->setCurrentIndex(sortFilterModel_.index(0, 0));
-            }
-
-            currentFileName_ = fileName;
-            currentPassword_ = password;
-            updateWindowTitle();
-        }
-    } catch (const PasswordManagerException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), ex.message());
-    } catch (const CryptoException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
-    }
+    passwordDialog_.setFileName(fileName);
+    passwordDialog_.show(PasswordDialog::Mode::OPEN);
 }
 
 void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -260,7 +280,7 @@ void MainWindow::onActionEdit() {
 
     if (cardEditDialog_.exec() == QDialog::Accepted) {
         auto &updatedCard = cardEditDialog_.card();
-        model_.replace(sourceIndex, *updatedCard);
+        model_.replace(sourceIndex.row(), updatedCard);
         onCurrentCardChanged(currentIndex, currentIndex);
         writeFile();
     }
@@ -273,7 +293,7 @@ void MainWindow::onActionFavorite() {
     }
     auto card = this->model_.cardAtIndex(index.row());
     card->toggleFavorite();
-    this->model_.replace(index, *card);
+    this->model_.replace(index.row(), card);
     this->sortFilterModel_.invalidate();
     scrollToCurrentCard();
     writeFile();
@@ -314,21 +334,21 @@ void MainWindow::onActionNewNote() {
     }
 }
 
-void MainWindow::writeFile() const {
-    if (currentFileName_.isEmpty()) {
+void MainWindow::writeFile(const QString &fileName, const QString &password) const {
+    if (fileName.isEmpty()) {
         return;
     }
 
     QByteArray buffer;
     Serializer::serialize(model_.data(), buffer);
 
-    QFile file{currentFileName_};
+    QFile file{fileName};
     if (!file.open(QIODevice::WriteOnly)) {
         throw PasswordManagerException("File cannot be saved!");
     }
 
-    if (!currentPassword_.isEmpty()) {
-        auto encrypted = aes256::encrypt(buffer, currentPassword_.toStdString());
+    if (!password.isEmpty()) {
+        auto encrypted = aes256::encrypt(buffer, password.toStdString());
         file.write(encrypted.data(), encrypted.size());
     } else {
         file.write(buffer);
@@ -381,7 +401,8 @@ void MainWindow::onEditMenuAboutToShow() {
 
 void MainWindow::onToolsMenuAboutToShow() {
     bool fileOpened = !currentFileName_.isEmpty();
-    QtHelpers::enableActions(fileOpened, {ui->actionChangePassword, ui->actionPurge});
+    QtHelpers::enableActions(fileOpened,
+                             {ui->actionImport, ui->actionExport, ui->actionChangePassword, ui->actionPurge});
 }
 
 void MainWindow::updateWindowTitle() {
@@ -415,14 +436,14 @@ void MainWindow::onActionDelete() {
             return;
         }
         card->toggleActive();
-        model_.replace(index, *card);
+        model_.replace(index.row(), card);
     } else {
         auto result = QMessageBox::question(this, tr("Finally Delete"),
                                             tr("Are you sure to finally delete ") + card->name() + "?");
         if (result != QMessageBox::Yes) {
             return;
         }
-        model_.deleteCard(index);
+        model_.deleteCard(index.row());
     }
 
     sortFilterModel_.invalidate();
@@ -446,7 +467,7 @@ void MainWindow::onActionRestore() {
     }
 
     card->toggleActive();
-    model_.replace(index, *card);
+    model_.replace(index.row(), card);
     sortFilterModel_.invalidate();
     scrollToCurrentCard();
     writeFile();
@@ -461,4 +482,82 @@ void MainWindow::onActionPurge() {
     sortFilterModel_.invalidate();
     scrollToCurrentCard();
     writeFile();
+}
+
+void MainWindow::onActionExport() {
+    auto fileName = QFileDialog::getSaveFileName(this, tr("Export"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    changePasswordDialog_.reset(fileName);
+    if (changePasswordDialog_.exec() != QDialog::Accepted) {
+        return;
+    }
+    auto password = changePasswordDialog_.password();
+    writeFile(fileName, password);
+}
+
+void MainWindow::onActionImport() {
+    auto fileName = QFileDialog::getOpenFileName(this, tr("Import"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    passwordDialog_.setFileName(fileName);
+    passwordDialog_.show(PasswordDialog::Mode::IMPORT);
+}
+
+void MainWindow::continueImport(const QString &fileName, const QString &password) {
+    try {
+        CardVec toImport;
+        loadRecords(fileName, password, toImport);
+
+        auto importRecords = ImportUtil::calculateImport(model_.data(), toImport);
+        if (importRecords.empty()) {
+            QMessageBox::information(this, tr("Import"), tr("No cards to import"));
+        } else {
+            importDialog_.setup(importRecords);
+            if (importDialog_.exec() == QDialog::Accepted) {
+                auto view = importRecords | std::views::filter([](const auto &rec) { return rec->approved(); }) |
+                            std::views::transform([](const auto &rec) { return rec->cardToImport(); });
+
+                if (!view.empty()) {
+                    for (const auto &c : view) {
+                        model_.addOrReplace(c);
+                    }
+                    writeFile();
+                }
+            }
+        }
+    } catch (const PasswordManagerException &ex) {
+        QMessageBox::critical(this, tr("Critical Error"), ex.message());
+    } catch (const CryptoException &ex) {
+        QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
+    }
+}
+
+void MainWindow::loadRecords(const QString &fileName, const QString &password, CardVec &result) {
+    QFile file{fileName};
+    if (!file.open(QIODevice::ReadOnly)) {
+        throw PasswordManagerException("File cannot be opened!");
+    } else {
+        QDomDocument doc;
+
+        if (password.isEmpty()) {
+            bool success = doc.setContent(&file);
+            if (!success) {
+                throw PasswordManagerException("File cannot be parsed!");
+            }
+        } else {
+            auto data = file.readAll();
+            auto decrypted = aes256::decrypt(data, password.toStdString());
+            doc.setContent(QByteArray::fromRawData(decrypted.data(), decrypted.size()));
+        }
+        file.close();
+
+        Serializer::deserialize(doc, result);
+    }
+}
+
+void MainWindow::onActionSettings() {
+    settingsDialog_.show();
 }

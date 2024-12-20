@@ -4,9 +4,12 @@
 */
 
 #include "cardtableitemmodel.h"
+#include <algorithm>
+#include <iterator>
 #include <memory>
+#include <vector>
 
-static QVariant build_aux_icon_value(const Card &card) {
+static QVariant buildAuxIconValue(const Card &card) {
     if (!card.active()) {
         return Picture::TRASH.icon();
     } else {
@@ -28,14 +31,24 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
     switch (index.column()) {
         case 0: return role == Qt::DecorationRole ? card->picture().icon() : QVariant();
         case 1: return role == Qt::DisplayRole ? card->name() : QVariant();
-        case 2: return role == Qt::DecorationRole ? build_aux_icon_value(*card) : QVariant();
+        case 2: return role == Qt::DecorationRole ? buildAuxIconValue(*card) : QVariant();
         default: return QVariant();
     }
 }
 
-void CardTableItemModel::replace(const QModelIndex &index, const Card &card) {
-    data_[index.row()] = std::make_shared<Card>(card);
-    emit dataChanged(index, index);
+void CardTableItemModel::replace(int row, const CardPtr &card) {
+    data_[row] = card;
+    emit dataChanged(createIndex(row, 0), createIndex(row, 2));
+}
+
+void CardTableItemModel::addOrReplace(const CardPtr &card) {
+    auto found = std::find_if(data_.begin(), data_.end(), [&card](auto &c) { return c->uuid() == card->uuid(); });
+    if (found != data_.end()) {
+        auto row = std::distance(data_.begin(), found);
+        replace(row, card);
+    } else {
+        add(card);
+    }
 }
 
 void CardTableItemModel::add(const CardPtr &card) {
@@ -44,15 +57,14 @@ void CardTableItemModel::add(const CardPtr &card) {
     endInsertRows();
 }
 
-void CardTableItemModel::deleteCard(const QModelIndex &index) {
-    beginRemoveRows(parent_index, index.row(), index.row());
-    data_.erase(std::next(data_.begin(), index.row()));
+void CardTableItemModel::deleteCard(int row) {
+    beginRemoveRows(parent_index, row, row);
+    data_.erase(std::next(data_.begin(), row));
     endRemoveRows();
 }
 
 void CardTableItemModel::purgeInactive() {
     beginResetModel();
-    data_.erase(std::remove_if(data_.begin(), data_.end(), [](auto const &card) { return !card->active(); }),
-                data_.end());
+    std::erase_if(data_, [](auto const &card) { return !card->active(); });
     endResetModel();
 }

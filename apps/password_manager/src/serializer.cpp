@@ -57,7 +57,7 @@ static QUuid getUuidAttribute(const QDomNamedNodeMap &attributes, const QString 
 static long getLongAttribute(const QDomNamedNodeMap &attributes, const QString &name, long defaultValue) {
     if (attributes.contains(name)) {
         bool ok;
-        auto long_value = attributes.namedItem(name).toAttr().name().toLong(&ok);
+        auto long_value = attributes.namedItem(name).toAttr().value().toLong(&ok);
         return ok ? long_value : defaultValue;
     } else {
         return defaultValue;
@@ -94,8 +94,8 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
     auto  cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
     auto &cardClass = CardClass::valueOf(cardClassAttr.toStdString());
 
-    QUuid   uuid = getUuidAttribute(attrs, ATTR_UUID);
-    QString name = getStringAttribute(attrs, ATTR_NAME, "");
+    auto uuid = getUuidAttribute(attrs, ATTR_UUID);
+    auto name = getStringAttribute(attrs, ATTR_NAME, "");
     if (name.isEmpty()) {
         throw PasswordManagerException("Mandatory attribute name is missing");
     }

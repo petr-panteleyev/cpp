@@ -7,6 +7,7 @@
 #define GENERATOR_H
 
 #include <exception>
+#include <memory>
 #include <string>
 
 namespace pwdgen {
@@ -28,13 +29,19 @@ class PasswordGeneratorException final : std::exception {
     PasswordGeneratorError errorCode() const { return errorCode_; }
 };
 
-typedef struct {
+struct PasswordGeneratorOptions {
     bool useUpperCase;
     bool useLowerCase;
     bool useDigits;
     bool useSymbols;
     int  length;
-} PasswordGeneratorOptions;
+
+    std::shared_ptr<PasswordGeneratorOptions> copy() const {
+        return std::make_shared<PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols, length);
+    }
+};
+
+using PasswordGeneratorOptionsPtr = std::shared_ptr<PasswordGeneratorOptions>;
 
 constexpr PasswordGeneratorOptions PIN_OPTIONS = {false, false, true, false, 4};
 constexpr PasswordGeneratorOptions UNIX_OPTIONS = {true, true, true, true, 8};

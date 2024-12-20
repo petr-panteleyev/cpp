@@ -1,3 +1,8 @@
+/*
+  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+*/
+
 #ifndef RECORDTYPE_H
 #define RECORDTYPE_H
 
@@ -15,16 +20,16 @@ class RecordType final : public Common::EnumClass<RecordType> {
     static const RecordType PASSWORD;
 
   public:
-    const Picture               &picture() const noexcept { return picture_; }
-    const std::vector<FieldPtr> &fields() const noexcept { return fields_; }
+    const Picture  &picture() const noexcept { return picture_; }
+    const FieldVec &fields() const noexcept { return fields_; }
 
   private:
-    RecordType(const std::string &name, const Picture &picture, const std::vector<FieldPtr> &fields)
+    explicit RecordType(const std::string &name, const Picture &picture, const FieldVec &fields) noexcept
         : EnumClass{name}, picture_{picture}, fields_{fields} {}
 
   private:
-    const Picture              &picture_;
-    const std::vector<FieldPtr> fields_;
+    const Picture &picture_;
+    const FieldVec fields_;
 };
 
 #endif // RECORDTYPE_H

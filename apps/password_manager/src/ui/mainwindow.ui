@@ -186,9 +186,14 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
     <addaction name="actionPurge"/>
     <addaction name="separator"/>
     <addaction name="actionChangePassword"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -328,6 +333,24 @@
   <action name="actionPurge">
    <property name="text">
     <string>Purge...</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export...</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import...</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>
