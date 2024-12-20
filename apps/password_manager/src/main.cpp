@@ -13,6 +13,9 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setWindowIcon(QIcon(":images/icon.png"));
 
+    QApplication::setOrganizationDomain("panteleyev.org");
+    QApplication::setApplicationName("Password Manager");
+
     QTranslator       translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {

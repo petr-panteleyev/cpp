@@ -3,10 +3,11 @@ target_sources(password_manager PRIVATE
     serializer.h
     serializer.cpp
     exceptions.h
-    version.h
 )
 target_include_directories(password_manager PRIVATE .)
 
 add_subdirectory(crypto)
 add_subdirectory(model)
 add_subdirectory(ui)
+add_subdirectory(import)
+add_subdirectory(settings)

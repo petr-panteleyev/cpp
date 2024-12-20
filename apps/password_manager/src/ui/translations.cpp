@@ -4,10 +4,13 @@
 */
 
 #include "translations.h"
+#include "settings.h"
 #include <QApplication>
 
-std::unordered_map<unsigned, QString> Translations::fieldTypeTranslated_;
-std::unordered_map<unsigned, QString> Translations::recordTypeTranslated_;
+std::unordered_map<unsigned, QString>               Translations::fieldTypeTranslated_;
+std::unordered_map<unsigned, QString>               Translations::recordTypeTranslated_;
+std::unordered_map<ImportAction, QString>           Translations::importActionTranslated_;
+std::unordered_map<Settings::PasswordType, QString> Translations::passwordSettingTranslated_;
 
 void Translations::initialize() {
     fieldTypeTranslated_ = {
@@ -29,5 +32,20 @@ void Translations::initialize() {
         {RecordType::EMPTY.ordinal(), tr("Empty")},
         {RecordType::CREDIT_CARD.ordinal(), tr("Credit Card")},
         {RecordType::PASSWORD.ordinal(), tr("Password")},
+    };
+
+    importActionTranslated_ = {
+        {ImportAction::ADD, QApplication::translate("ImportAction", "Add")},
+        {ImportAction::DELETE, QApplication::translate("ImportAction", "Delete")},
+        {ImportAction::REPLACE, QApplication::translate("ImportAction", "Replace")},
+        {ImportAction::RESTORE, QApplication::translate("ImportAction", "Restore")},
+        {ImportAction::SKIP, QApplication::translate("ImportAction", "Skip")},
+    };
+
+    passwordSettingTranslated_ = {
+        {Settings::PasswordType::Pin, "PIN"},
+        {Settings::PasswordType::Unix, QApplication::translate("PasswordType", "UNIX password")},
+        {Settings::PasswordType::Short, QApplication::translate("PasswordType", "Short password")},
+        {Settings::PasswordType::Long, QApplication::translate("PasswordType", "Long password")},
     };
 }

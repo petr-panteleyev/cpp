@@ -89,7 +89,7 @@ class Picture final : public Common::EnumClass<Picture> {
     const QIcon &icon() const;
 
   private:
-    Picture(const std::string &name, const QString &fileName) : EnumClass{name}, fileName_{fileName} {}
+    explicit Picture(const std::string &name, const QString &fileName) : EnumClass{name}, fileName_{fileName} {}
 
   private:
     const QString fileName_;

@@ -31,9 +31,10 @@ class CardTableItemModel : public QAbstractItemModel {
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     const CardPtr    cardAtIndex(int index) const { return data_.at(index); }
 
-    void replace(const QModelIndex &index, const Card &card);
+    void replace(int row, const CardPtr &card);
+    void addOrReplace(const CardPtr &card);
     void add(const CardPtr &card);
-    void deleteCard(const QModelIndex &index);
+    void deleteCard(int row);
     void purgeInactive();
 
     const CardVec &data() const noexcept { return data_; }

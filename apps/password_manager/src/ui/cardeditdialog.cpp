@@ -9,6 +9,8 @@
 #include "picture.h"
 #include "qnamespace.h"
 #include "qthelpers.h"
+#include "settings.h"
+#include "timeutil.h"
 #include "ui_cardeditdialog.h"
 #include <QAbstractScrollArea>
 #include <QMessageBox>
@@ -19,11 +21,11 @@
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTES = 1;
 
-static std::unordered_map<unsigned, pwdgen::PasswordGeneratorOptions> GENERATOR_OPTIONS{
-    {FieldType::PIN.ordinal(), pwdgen::PIN_OPTIONS},
-    {FieldType::UNIX_PASSWORD.ordinal(), pwdgen::UNIX_OPTIONS},
-    {FieldType::SHORT_PASSWORD.ordinal(), pwdgen::MEDIUM_OPTIONS},
-    {FieldType::LONG_PASSWORD.ordinal(), pwdgen::LONG_OPTIONS},
+static std::unordered_map<unsigned, Settings::PasswordType> GENERATOR_OPTIONS{
+    {FieldType::PIN.ordinal(), Settings::PasswordType::Pin},
+    {FieldType::UNIX_PASSWORD.ordinal(), Settings::PasswordType::Unix},
+    {FieldType::SHORT_PASSWORD.ordinal(), Settings::PasswordType::Short},
+    {FieldType::LONG_PASSWORD.ordinal(), Settings::PasswordType::Long},
 };
 
 class NotEmptyValidator : public QValidator {
@@ -127,6 +129,7 @@ void CardEditDialog::done(int code) {
             return;
         }
 
+        card_->setModified(TimeUtil::currentTimeMillis());
         card_->setName(newName);
         card_->setFields(fieldTableModel_.fields());
         // picture
@@ -181,7 +184,7 @@ void CardEditDialog::onGenerate() {
     auto field = fieldTableModel_.at(index.row());
 
     if (GENERATOR_OPTIONS.contains(field->type().ordinal())) {
-        auto options = GENERATOR_OPTIONS[field->type().ordinal()];
+        const auto &options = Settings::getPasswordOptions(GENERATOR_OPTIONS[field->type().ordinal()]);
         auto password = pwdgen::generate(options);
         fieldTableModel_.setFieldValue(index.row(), field, QString::fromStdString(password));
     }

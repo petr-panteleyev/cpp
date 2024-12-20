@@ -12,10 +12,13 @@
 #include "changepassworddialog.h"
 #include "fieldtableitemmodel.h"
 #include "fieldtablesortfiltermodel.h"
+#include "passworddialog.h"
+#include "settingsdialog.h"
 #include <QAction>
 #include <QItemSelection>
 #include <QMainWindow>
 #include <QMenu>
+#include <importdialog.h>
 #include <optional>
 
 QT_BEGIN_NAMESPACE
@@ -31,10 +34,15 @@ class MainWindow : public QMainWindow {
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+  protected:
+    virtual void showEvent(QShowEvent *event) override;
+
   private:
     const QModelIndex      currentIndex() const noexcept;
     std::optional<CardPtr> currentCard() const noexcept;
-    void                   writeFile() const;
+
+    void writeFile() const { writeFile(currentFileName_, currentPassword_); }
+    void writeFile(const QString &fileName, const QString &password) const;
 
     void updateWindowTitle();
     void scrollToCurrentCard();
@@ -50,20 +58,30 @@ class MainWindow : public QMainWindow {
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void onSearchFieldTextChanged(const QString &text);
 
+    void onPasswordDialogAccepted();
+    void continueOpen(const QString &fileName, const QString &password);
+    void continueImport(const QString &fileName, const QString &password);
+
     void onActionAbout();
     void onActionChangePassword();
     void onActionDelete();
     void onActionEdit();
     void onActionExit();
+    void onActionExport();
     void onActionFilter();
     void onActionFavorite();
+    void onActionImport();
     void onActionNew();
     void onActionNewCard();
     void onActionNewNote();
     void onActionOpen();
     void onActionPurge();
     void onActionRestore();
+    void onActionSettings();
     void onActionShowDeletedToggled(bool checked);
+
+  private:
+    static void loadRecords(const QString &fileName, const QString &password, CardVec &result);
 
   private:
     Ui::MainWindow *ui;
@@ -82,7 +100,10 @@ class MainWindow : public QMainWindow {
     QString currentPassword_;
 
     // Dialogs
+    PasswordDialog       passwordDialog_;
     ChangePasswordDialog changePasswordDialog_;
     CardEditDialog       cardEditDialog_;
+    ImportDialog         importDialog_;
+    SettingsDialog       settingsDialog_;
 };
 #endif // MAINWINDOW_H

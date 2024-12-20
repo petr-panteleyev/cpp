@@ -14,15 +14,28 @@ class PasswordDialog;
 
 class PasswordDialog : public QDialog {
     Q_OBJECT
+  public:
+    enum class Mode { OPEN, IMPORT };
 
   public:
-    explicit PasswordDialog(QWidget *parent, const QString &fileName);
+    explicit PasswordDialog(QWidget *parent);
     ~PasswordDialog();
 
-    QString password() const;
+    void          setFileName(const QString &fileName);
+    const QString getFileName() const;
+
+    Mode    getMode() const noexcept { return mode_; }
+    QString getPassword() const;
+
+    void show(Mode mode) {
+        mode_ = mode;
+        QDialog::show();
+    }
 
   private:
     Ui::PasswordDialog *ui;
+
+    Mode mode_;
 };
 
 #endif // PASSWORDDIALOG_H

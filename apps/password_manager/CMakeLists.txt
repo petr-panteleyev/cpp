@@ -1,4 +1,4 @@
-project(password_manager VERSION 24.12.2 LANGUAGES CXX)
+project(password_manager VERSION 24.12.3 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

@@ -5,6 +5,7 @@
 
 #include "fieldtableitemmodel.h"
 #include "creditcardtype.h"
+#include "settings.h"
 #include <QColor>
 
 static const QString MASK = "*****";
@@ -21,17 +22,18 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
             switch (role) {
                 case Qt::DisplayRole: return field->name();
                 case Qt::TextAlignmentRole: return Qt::AlignRight;
-                case Qt::ForegroundRole: return QColorConstants::Blue;
-                default: return QVariant(); ;
+                case Qt::ForegroundRole: return Settings::getColor(Settings::Color::FieldName);
+                default: return QVariant();
             }
         }
         case 1: {
             switch (role) {
                 case Qt::DisplayRole: return field->showContent() ? field->getValueAsString() : MASK;
                 case Qt::TextAlignmentRole: return Qt::AlignLeft;
+                case Qt::ForegroundRole: return Settings::getColor(Settings::Color::FieldValue);
                 case Qt::DecorationRole: {
                     if (field->type() == FieldType::CARD_TYPE) {
-                        auto ordinal = field->value().toUInt();
+                        auto        ordinal = field->value().toUInt();
                         const auto &cardType = CreditCardType::valueOf(ordinal);
                         return cardType.picture().icon();
                     } else {

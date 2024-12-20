@@ -31,7 +31,7 @@ class CreditCardType final : public Common::EnumClass<CreditCardType> {
     const Picture &picture() const noexcept { return picture_; }
 
   private:
-    CreditCardType(const std::string &name, const QString &cardTypeName, const Picture &picture)
+    explicit CreditCardType(const std::string &name, const QString &cardTypeName, const Picture &picture)
         : EnumClass{name}, cardTypeName_{cardTypeName}, picture_{picture} {}
 
   private:

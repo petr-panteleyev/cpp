@@ -12,22 +12,23 @@
 
 class Field final {
   public:
-    Field(const FieldType &type, const QString &name, const QVariant &value) : type_{type}, name_{name}, value_{value} {
+    explicit Field(const FieldType &type, const QString &name, const QVariant &value) noexcept
+        : type_{type}, name_{name}, value_{value} {
         showContent_ = !type.masked();
     }
 
-    explicit Field(const Field &f) : type_{f.type()}, name_{f.name()}, value_{f.value()} {}
+    explicit Field(const Field &f) noexcept : Field(f.type(), f.name(), f.value()) {}
 
-    const FieldType &type() const { return type_; }
-    const QString   &name() const { return name_; }
-    const QVariant  &value() const { return value_; }
+    const FieldType &type() const noexcept { return type_; }
+    const QString   &name() const noexcept { return name_; }
+    const QVariant  &value() const noexcept { return value_; }
 
-    void setType(const FieldType &type) { type_ = type; }
-    void setName(const QString &name) { name_ = name; }
-    void setValue(const QVariant &value) { value_ = value; }
+    void setType(const FieldType &type) noexcept { type_ = type; }
+    void setName(const QString &name) noexcept { name_ = name; }
+    void setValue(const QVariant &value) noexcept { value_ = value; }
 
-    bool showContent() const { return showContent_; }
-    void toggleShow() {
+    bool showContent() const noexcept { return showContent_; }
+    void toggleShow() noexcept {
         if (type().masked()) {
             showContent_ = !showContent_;
         }
