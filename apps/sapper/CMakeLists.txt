@@ -1,7 +1,7 @@
 # Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 24.12.2 LANGUAGES CXX)
+project(sapper VERSION 24.12.2.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -23,8 +23,10 @@ target_compile_options(sapper PRIVATE
 
 file(GLOB SAPPER_RESOURCE_FILES "resources/*.png")
 
-target_compile_definitions(sapper
-                           PRIVATE "PROJECT_VERSION=${PROJECT_VERSION}")
+target_compile_definitions(sapper PRIVATE
+    "PROJECT_VERSION=${PROJECT_VERSION}"
+    "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}"
+)
 
 qt_add_resources(sapper "resources"
     PREFIX "/images"

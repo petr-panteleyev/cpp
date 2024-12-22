@@ -19,6 +19,12 @@ static const std::string projectVersion{xstr(PROJECT_VERSION)};
 static const std::string projectVersion{"NOT DEFINED"};
 #endif
 
+#ifdef BUILD_TIMESTAMP
+static const std::string buildDate{xstr(BUILD_TIMESTAMP)};
+#else
+static const std::string buildDate{xstr("NOT DEFINED")};
+#endif
+
 } // namespace Version
 
 #endif

@@ -14,8 +14,8 @@ GameTimer::GameTimer() : timer_{this}, localTime_{0, 0} {
 void GameTimer::onTimer() {
     auto current = localTime_;
     localTime_ = localTime_.addMSecs(INTERVAL_MS);
-    if (localTime_ != current) {
-        emit timeString(localTime_.toString("mm:ss.z"));
+    if (localTime_.second() != current.second()) {
+        emit timeString(localTime_.toString("mm:ss"));
     }
 }
 

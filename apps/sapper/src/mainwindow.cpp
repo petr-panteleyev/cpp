@@ -10,6 +10,7 @@
 #include "picture.h"
 #include "qcolor.h"
 #include "qgridlayout.h"
+#include "qmessagebox.h"
 #include "qnamespace.h"
 #include "scoreboarddialog.h"
 #include "settings.h"
@@ -18,6 +19,7 @@
 #include <iterator>
 #include <ranges>
 #include <stdexcept>
+#include "version.h"
 
 static constexpr int CELL_SIZE{40};
 static constexpr QSize IMAGE_SIZE{24, 24};
@@ -28,6 +30,13 @@ static const QString STYLE_RED{"color: red"};
 static const QString STYLE_BLACK{"color: black"};
 
 static const QIcon EMPTY_ICON;
+
+static const QString ABOUT_TEXT = R"(
+<h1>Sapper</h1>
+<h2>Sapper %1</h2>
+Built on %2<br>
+Copyright &copy; 2024 Petr Panteleyev
+)";
 
 static std::array<QColor, 9> NUMBER_COLORS{
     QColorConstants::White, // unused
@@ -68,9 +77,10 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onHelpAbout);
     connect(&gameTimer_, &GameTimer::timeString, [this](const QString &text) { ui->lcdTimer->setText(text); });
     connect(&boardSizeDialog_, &QDialog::accepted, [this]() { newGame(boardSizeDialog_.boardSize()); });
-    connect(&newCustomGameAction_, &QAction::triggered, this, &MainWindow::onNewCustomGame);
+    connect(&newCustomGameAction_, &QAction::triggered, this, &MainWindow::onNewCustomGame);   
 
     setupGameMenu();
     newGame(Settings::getLastBoardSize());
@@ -267,4 +277,11 @@ void MainWindow::buildCustomGameMenu() {
             connect(action, &QAction::triggered, [this, customSize]() { newGame(customSize); });
         }
     }
+}
+
+void MainWindow::onHelpAbout() {
+    auto text = QString(ABOUT_TEXT)
+            .arg(QString::fromStdString(Version::projectVersion))
+            .arg(QString::fromStdString(Version::buildDate));
+    QMessageBox::about(this, tr("About Sapper"), text);
 }

@@ -44,6 +44,7 @@ class MainWindow : public QMainWindow, GameCallbackHandler {
     int hitPointToButtonIndex(int hitPoint);
     void onNewCustomGame();
     void buildCustomGameMenu();
+    void onHelpAbout();
 
   private:
     Ui::MainWindow *ui;

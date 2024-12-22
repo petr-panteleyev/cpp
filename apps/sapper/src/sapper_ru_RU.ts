@@ -72,24 +72,39 @@
         <translation>Игра</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="125"/>
+        <location filename="mainwindow.ui" line="122"/>
+        <source>Help</source>
+        <translation>Справка</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="132"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="40"/>
+        <location filename="mainwindow.ui" line="137"/>
+        <source>About Sapper...</source>
+        <translation>О Сапёре...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="49"/>
         <source>Results</source>
         <translation>Результаты</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="50"/>
         <source>Custom</source>
         <translation>Пользовательская</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="50"/>
         <source>New...</source>
         <translation>Новая...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="286"/>
+        <source>About Sapper</source>
+        <translation>О Сапёре</translation>
     </message>
 </context>
 <context>
