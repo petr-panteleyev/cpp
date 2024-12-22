@@ -1,3 +1,6 @@
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
 project(password_generator VERSION 24.11.1 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)

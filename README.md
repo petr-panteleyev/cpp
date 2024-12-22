@@ -6,6 +6,13 @@ Monorepo with C++ sources.
 
 ## Build
 
+Requirements:
+* gcc 10+ (C++20 compatible compiler)
+* cmake 3.23+
+* Qt6
+* OpenSSL
+* GTest
+
 ```sh
 cmake . --preset <Debug | Release>
 cmake --build --preset <Debug | Release> [--target <target>]

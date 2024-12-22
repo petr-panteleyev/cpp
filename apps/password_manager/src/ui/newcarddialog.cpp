@@ -51,8 +51,6 @@ CardPtr NewCardDialog::card() const {
     std::vector<FieldPtr> fields;
     fields.reserve(type.fields().size());   
 
-    [[maybe_unused]]
-    int fieldIndex = 0;
     for (auto &f : type.fields()) {
         auto translatedName = QApplication::translate("RecordType", f->name().toStdString().c_str());
         auto newField = std::make_shared<Field>(f->type(), translatedName, f->value());

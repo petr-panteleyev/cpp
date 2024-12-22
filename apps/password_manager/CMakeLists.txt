@@ -1,3 +1,6 @@
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
 project(password_manager VERSION 24.12.3 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

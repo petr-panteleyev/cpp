@@ -4,7 +4,7 @@ IndentWidth: 4
 IndentCaseLabels: true
 
 AlignConsecutiveDeclarations:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: false
   AcrossComments: false
 

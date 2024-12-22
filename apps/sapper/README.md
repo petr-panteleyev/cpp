@@ -11,21 +11,6 @@ Three standard board sizes:
 * 16 x 16, 40 mines
 * 30 x 16, 99 mines
 
-## Build
+Custom board can be from 8 x 8 up to 30 x 24 with maximum mines number equal to (w - 1) * (h - 1).
 
-Requirements:
-* Qt6
-
-**Debug**
-
-```sh
-cmake . --preset Debug
-cmake --build --preset Debug --target sapper
-```
-
-**Release**
-
-```sh
-cmake . --preset Release
-cmake --build --preset Release --target sapper
-```
+![Custom Game](docs/custom_game.png)

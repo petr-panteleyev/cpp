@@ -20,6 +20,8 @@ class GameTimer : public QObject {
     void stop() { timer_.stop(); };
     void reset() { emit timeString("00:00"); }
 
+    QTime localTime() const noexcept { return localTime_; }
+
   signals:
     void timeString(const QString &text) const;
 

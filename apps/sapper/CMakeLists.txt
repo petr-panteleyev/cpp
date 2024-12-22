@@ -1,4 +1,7 @@
-project(sapper VERSION 24.12.1 LANGUAGES CXX)
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
+project(sapper VERSION 24.12.2 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

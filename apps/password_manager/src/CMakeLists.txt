@@ -1,3 +1,6 @@
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
 target_sources(password_manager PRIVATE
     main.cpp
     serializer.h

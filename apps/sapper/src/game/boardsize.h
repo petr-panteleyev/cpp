@@ -7,9 +7,8 @@
 #define BOARDSIZE_H
 
 #include <QString>
-#include <functional>
+#include <set>
 #include <stdexcept>
-#include <vector>
 
 class BoardSize final {
   public:
@@ -19,8 +18,8 @@ class BoardSize final {
     static constexpr int MAX_HEIGHT{24};
     static constexpr int BOARD_ARRAY_SIZE = MAX_HEIGHT * MAX_WIDTH;
 
-    static const BoardSize                                            BIG, MEDIUM, SMALL;
-    static const std::vector<std::reference_wrapper<const BoardSize>> STANDARD_SIZES;
+    static const BoardSize BIG, MEDIUM, SMALL;
+    static const std::set<BoardSize> STANDARD_SIZES;
 
   public:
     int width() const noexcept { return width_; }
@@ -28,6 +27,9 @@ class BoardSize final {
     int mines() const noexcept { return mines_; }
 
     QString toString() const { return QString("%1 * %2 : %3").arg(width_).arg(height_).arg(mines_); }
+
+    bool operator==(const BoardSize &that) const noexcept = default;
+    bool operator<(const BoardSize &that) const noexcept { return this->mines_ < that.mines_; }
 
     static BoardSize boardSize(int width, int height, int mines) {
         if (width < MIN_WIDTH || width > MAX_WIDTH || height < MIN_HEIGHT || height > MAX_HEIGHT) {
@@ -49,12 +51,10 @@ inline const BoardSize BoardSize::BIG{30, 16, 99};
 inline const BoardSize BoardSize::MEDIUM{16, 16, 40};
 inline const BoardSize BoardSize::SMALL{8, 8, 10};
 
-inline const std::vector<std::reference_wrapper<const BoardSize>> BoardSize::STANDARD_SIZES{
-    std::cref(BoardSize::BIG),
-    std::cref(BoardSize::MEDIUM),
-    std::cref(BoardSize::SMALL),
+inline const std::set<BoardSize> BoardSize::STANDARD_SIZES{
+    BoardSize::BIG,
+    BoardSize::MEDIUM,
+    BoardSize::SMALL,
 };
-
-
 
 #endif // BOARDSIZE_H

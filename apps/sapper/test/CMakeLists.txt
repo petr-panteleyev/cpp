@@ -1,3 +1,6 @@
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
 add_executable(sapper_tests)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)

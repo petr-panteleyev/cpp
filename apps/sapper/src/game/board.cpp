@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <random>
 #include <span>
-#include <stdexcept>
 
 static std::random_device rd;
 static std::mt19937       randomGenerator(rd());
@@ -44,7 +43,8 @@ void Board::initialize(int center) {
 int Board::toggleFlag(int x) {
     auto value = board_[x];
     if (value <= MAX_MINES) {
-        throw std::runtime_error("Cannot toggle mine on open cell");
+        // Cannot toggle mine on opened cell, ignore
+        return value;
     }
     value = Cell::toggleFlag(value);
 

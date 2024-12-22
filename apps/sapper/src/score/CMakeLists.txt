@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 target_sources(sapper PRIVATE
-    boardsize.h
-    gamestatus.h
-    game.h
-    game.cpp
-    board.h
-    board.cpp
-    callbacks.h
+    scoreboard.h
+    scoreboard.cpp
+    scoreboarddialog.h
+    scoreboarddialog.cpp
+    scoreboarddialog.ui
+    scoreboarditemmodel.h
+    scoreboarditemmodel.cpp
 )
 
 target_include_directories(sapper PRIVATE .)

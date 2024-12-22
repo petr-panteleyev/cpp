@@ -1,3 +1,6 @@
+# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
 add_library(pwdgen STATIC)
 
 target_compile_options(pwdgen PRIVATE

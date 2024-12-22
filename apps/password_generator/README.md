@@ -18,24 +18,3 @@ There are several presets called by the corresponding menu item:
 ## Ambiguous Letters
 
 The following characters that may look confusing depending on font are excluded: 'I', 'l', 'O'.
-
-## Build
-
-Requirements:
-* Qt6
-
-**Debug**
-
-
-```sh
-cmake . --preset Debug
-cmake --build --preset Debug --target password_generator
-```
-
-**Release**
-
-
-```sh
-cmake . --preset Release
-cmake --build --preset Release --target password_generator
-```

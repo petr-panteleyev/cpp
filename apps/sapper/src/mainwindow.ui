@@ -110,6 +110,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuGame">
     <property name="title">
@@ -119,6 +120,11 @@
    <addaction name="menuFile"/>
    <addaction name="menuGame"/>
   </widget>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
