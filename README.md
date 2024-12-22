@@ -1,5 +1,7 @@
 # C++
 
+[![License](docs/license.svg)](LICENSE)
+
 Monorepo with C++ sources.
 
 ## Build
@@ -12,6 +14,7 @@ cmake --build --preset <Debug | Release> [--target <target>]
 Application targets:
 * password_generator
 * password_manager
+* sapper
 
 ## Test
 
@@ -27,6 +30,7 @@ ctest --preset Debug
 
 + [Password Generator](./apps/password_generator)
 + [Password Manager](./apps/password_manager)
++ [Sapper](./apps/sapper)
 
 ## Libraries
 

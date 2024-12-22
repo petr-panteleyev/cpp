@@ -16,3 +16,4 @@ add_subdirectory(libs/pwdgen)
 # Applications
 add_subdirectory(apps/password_generator)
 add_subdirectory(apps/password_manager)
+add_subdirectory(apps/sapper)

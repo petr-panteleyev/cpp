@@ -68,33 +68,33 @@
         <translation>Заголовок:</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="38"/>
+        <location filename="cardeditdialog.cpp" line="39"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="39"/>
-        <location filename="cardeditdialog.cpp" line="153"/>
+        <location filename="cardeditdialog.cpp" line="40"/>
+        <location filename="cardeditdialog.cpp" line="155"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="40"/>
+        <location filename="cardeditdialog.cpp" line="41"/>
         <source>Generate</source>
         <translation>Генерировать</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="153"/>
+        <location filename="cardeditdialog.cpp" line="155"/>
         <source>Are you sure to delete </source>
         <translation>Уверены, что хотите удалить </translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="39"/>
+        <location filename="cardeditdialog.cpp" line="40"/>
         <source>Up</source>
         <translation>Вверх</translation>
     </message>
     <message>
-        <location filename="cardeditdialog.cpp" line="39"/>
+        <location filename="cardeditdialog.cpp" line="40"/>
         <source>Down</source>
         <translation>Вниз</translation>
     </message>
