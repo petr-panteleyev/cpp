@@ -1,11 +1,8 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "buttoneventfilter.h"
 #include "mainwindow.h"
-#include "qevent.h"
 #include <QEvent>
 
 bool ButtonEventFilter::eventFilter(QObject *obj, QEvent *event) {

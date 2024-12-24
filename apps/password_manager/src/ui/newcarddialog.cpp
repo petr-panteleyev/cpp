@@ -1,9 +1,8 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "newcarddialog.h"
+#include "card.h"
 #include "field.h"
 #include "picture.h"
 #include "qthelpers.h"
@@ -41,15 +40,15 @@ void NewCardDialog::initPictureComboBox() {
     }
 }
 
-CardPtr NewCardDialog::card() const {
-    auto  typeOrdinal = ui->typeComboBox->currentData().toUInt();
+std::shared_ptr<Card> NewCardDialog::card() const {
+    auto typeOrdinal = ui->typeComboBox->currentData().toUInt();
     auto &type = RecordType::valueOf(typeOrdinal);
 
-    auto  pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
+    auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
     auto &picture = Picture::valueOf(pictureOrdinal);
 
-    std::vector<FieldPtr> fields;
-    fields.reserve(type.fields().size());   
+    std::vector<std::shared_ptr<Field>> fields;
+    fields.reserve(type.fields().size());
 
     for (auto &f : type.fields()) {
         auto translatedName = QApplication::translate("RecordType", f->name().toStdString().c_str());
@@ -65,9 +64,9 @@ void NewCardDialog::on_typeComboBox_currentIndexChanged(int index) {
         return;
     }
 
-    auto  ordinal = ui->typeComboBox->currentData().toUInt();
+    auto ordinal = ui->typeComboBox->currentData().toUInt();
     auto &type = RecordType::valueOf(ordinal);
-    auto  pictureOrdinal = type.picture().ordinal();
+    auto pictureOrdinal = type.picture().ordinal();
 
     auto pictureIndex = QtHelpers::indexOfData(*(ui->pictureComboBox), pictureOrdinal);
     if (index != -1) {

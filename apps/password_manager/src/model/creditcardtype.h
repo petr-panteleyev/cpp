@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CREDITCARDTYPE_H
 #define CREDITCARDTYPE_H
@@ -9,7 +7,6 @@
 #include "enumclass.h"
 #include "picture.h"
 #include <QString>
-#include <functional>
 
 class CreditCardType;
 using CreditCardTypeRef = std::reference_wrapper<const CreditCardType>;
@@ -35,7 +32,7 @@ class CreditCardType final : public Common::EnumClass<CreditCardType> {
         : EnumClass{name}, cardTypeName_{cardTypeName}, picture_{picture} {}
 
   private:
-    QString        cardTypeName_;
+    QString cardTypeName_;
     const Picture &picture_;
 };
 

@@ -1,11 +1,9 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "boardsizedialog.h"
-#include "qslider.h"
 #include "ui_boardsizedialog.h"
+#include <QSlider>
 
 BoardSizeDialog::BoardSizeDialog(QWidget *parent) : QDialog(parent), ui(new Ui::BoardSizeDialog) {
     ui->setupUi(this);

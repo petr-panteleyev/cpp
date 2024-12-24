@@ -1,13 +1,29 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "field.h"
-#include <QDate>
 #include "creditcardtype.h"
+#include "fieldtype.h"
+#include <QDate>
 
 static QDate parseLocalDate(const QString &stringValue);
+
+Field::Field(const FieldType &type, const QString &name, const QVariant &value) noexcept
+    : type_{type}, name_{name}, value_{value} {
+    showContent_ = !type.masked();
+}
+
+Field::Field(const Field &f) noexcept : Field(f.type(), f.name(), f.value()) {
+}
+
+Field::~Field() {
+}
+
+void Field::toggleShow() noexcept {
+    if (type().masked()) {
+        showContent_ = !showContent_;
+    }
+}
 
 QString Field::getValueAsString() const {
     if (type_ == FieldType::DATE) {
@@ -54,4 +70,3 @@ static QDate parseLocalDate(const QString &stringValue) {
     auto date = QDate::fromString(stringValue, "yyyy-MM-dd");
     return date.isValid() ? date : QDate::currentDate();
 }
-

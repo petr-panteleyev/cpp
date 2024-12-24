@@ -1,25 +1,33 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "gametimer.h"
+#include <QTimer>
+#include <memory>
 
 constexpr int INTERVAL_MS = 100;
 
-GameTimer::GameTimer() : timer_{this}, localTime_{0, 0} {
-    connect(&timer_, &QTimer::timeout, this, &GameTimer::onTimer);
+GameTimer::GameTimer(GameTimerHandler &handler)
+    : timer_{std::make_unique<QTimer>()}, localTime_{ZERO_TIME}, handler_{&handler} {
+    QObject::connect(timer_.get(), &QTimer::timeout, [this]() { onTimer(); });
+}
+
+GameTimer::~GameTimer() {
 }
 
 void GameTimer::onTimer() {
     auto current = localTime_;
     localTime_ = localTime_.addMSecs(INTERVAL_MS);
     if (localTime_.second() != current.second()) {
-        emit timeString(localTime_.toString("mm:ss"));
+        handler_->onTimerUpdate(localTime_);
     }
 }
 
 void GameTimer::start() {
-    localTime_ = QTime{0, 0};
-    timer_.start(INTERVAL_MS);
+    localTime_ = ZERO_TIME;
+    timer_->start(INTERVAL_MS);
+}
+
+void GameTimer::stop() {
+    timer_->stop();
 }

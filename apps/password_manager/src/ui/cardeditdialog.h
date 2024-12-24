@@ -1,20 +1,18 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CARDEDITDIALOG_H
 #define CARDEDITDIALOG_H
 
-#include "editfieldlistmodel.h"
-#include <QAction>
 #include <QDialog>
 #include <QMenu>
-#include <card.h>
 
 namespace Ui {
 class CardEditDialog;
 }
+
+class Card;
+class EditFieldListModel;
 
 class CardEditDialog final : public QDialog {
     Q_OBJECT
@@ -24,7 +22,7 @@ class CardEditDialog final : public QDialog {
     ~CardEditDialog();
 
     void setCard(const Card &card);
-    const CardPtr &card() const { return card_; }
+    const std::shared_ptr<Card> &card() const { return card_; }
 
     virtual void done(int code) override;
 
@@ -42,10 +40,10 @@ class CardEditDialog final : public QDialog {
     void fieldTableCurrentRowChanged(const QModelIndex &, const QModelIndex &);
 
   private:
-    Ui::CardEditDialog *ui;
+    std::unique_ptr<Ui::CardEditDialog> ui;
+    std::unique_ptr<EditFieldListModel> model_;
 
-    CardPtr card_;
-    EditFieldListModel fieldTableModel_;
+    std::shared_ptr<Card> card_;
 
     // Field table actions
     QAction fieldAddAction_;
@@ -53,7 +51,7 @@ class CardEditDialog final : public QDialog {
     QAction fieldUpAction_;
     QAction fieldDownAction_;
     QAction fieldGenerateAction_;
-    QMenu   fieldTableContextMenu_;
+    QMenu fieldTableContextMenu_;
 };
 
 #endif // CARDEDITDIALOG_H

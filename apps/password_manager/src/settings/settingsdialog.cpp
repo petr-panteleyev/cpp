@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "settingsdialog.h"
 #include "qcheckbox.h"
@@ -11,8 +9,6 @@
 #include "translations.h"
 #include "ui_settingsdialog.h"
 #include <QColorDialog>
-#include <array>
-#include <memory>
 
 static const std::array<int, 6> LENGTH{4, 6, 8, 16, 24, 32};
 

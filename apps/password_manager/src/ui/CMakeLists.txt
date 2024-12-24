@@ -13,9 +13,6 @@ target_sources(password_manager PRIVATE
     fieldtableitemmodel.cpp
     fieldtablesortfiltermodel.h
     fieldtablesortfiltermodel.cpp
-    aboutdialog.h
-    aboutdialog.cpp
-    aboutdialog.ui
     cardeditdialog.h
     cardeditdialog.cpp
     cardeditdialog.ui

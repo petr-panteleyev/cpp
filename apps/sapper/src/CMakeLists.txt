@@ -8,8 +8,8 @@ target_sources(sapper PRIVATE
     mainwindow.ui
     buttoneventfilter.h
     buttoneventfilter.cpp
-    picture.h
-    picture.cpp
+    pictures.h
+    pictures.cpp
     gametimer.h
     gametimer.cpp
     boardsizedialog.h

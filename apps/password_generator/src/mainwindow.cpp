@@ -6,12 +6,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QClipboard>
-#include <vector>
 
 static const std::vector<int> password_length_options = {4, 6, 8, 16, 24, 32, 40, 48, 56, 64};
-static const int              DEFAULT_LENGTH_INDEX = 3;
+static const int DEFAULT_LENGTH_INDEX = 3;
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(std::make_unique<Ui::MainWindow>()) {
     ui->setupUi(this);
 
     this->setWindowTitle(tr("Password Generator"));
@@ -35,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
-    delete ui;
 }
 
 void MainWindow::onActionGenerate() {

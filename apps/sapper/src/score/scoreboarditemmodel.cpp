@@ -1,13 +1,10 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboarditemmodel.h"
 #include "qnamespace.h"
 
-ScoreBoardItemModel::ScoreBoardItemModel(QObject *parent, const ScoreBoard &scoreBoard)
-    : QAbstractItemModel(parent), scoreBoard_{scoreBoard} {
+ScoreBoardItemModel::ScoreBoardItemModel(QObject *parent, const ScoreBoard &scoreBoard) : QAbstractItemModel(parent) {
 }
 
 QVariant ScoreBoardItemModel::headerData(int section, Qt::Orientation orientation, int role) const {

@@ -1,13 +1,12 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "changepassworddialog.h"
 #include "ui_changepassworddialog.h"
 #include <QPushButton>
 
-ChangePasswordDialog::ChangePasswordDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ChangePasswordDialog) {
+ChangePasswordDialog::ChangePasswordDialog(QWidget *parent)
+    : QDialog{parent}, ui{std::make_unique<Ui::ChangePasswordDialog>()} {
     ui->setupUi(this);
 
     enabledColors_.setColor(QPalette::Text, Qt::black);
@@ -18,7 +17,6 @@ ChangePasswordDialog::ChangePasswordDialog(QWidget *parent) : QDialog(parent), u
 }
 
 ChangePasswordDialog::~ChangePasswordDialog() {
-    delete ui;
 }
 
 void ChangePasswordDialog::reset(const QString &fileName) {

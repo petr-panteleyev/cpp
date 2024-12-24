@@ -1,20 +1,26 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef GAME_H
 #define GAME_H
 
 #include "board.h"
-#include "callbacks.h"
-#include "gamestatus.h"
+
+class GameCallbackHandler;
 
 class Game final {
   public:
-    explicit Game(GameCallbackHandler &callbacks) : gameStatus_{GameStatus::INITIAL}, callbacks_{callbacks} {};
+    enum class Status {
+        INITIAL,
+        IN_PROGRESS,
+        SUCCESS,
+        FAILURE,
+    };
 
-    const GameStatus &gameStatus() const noexcept { return gameStatus_; }
+  public:
+    explicit Game(GameCallbackHandler &callbacks) : gameStatus_{Status::INITIAL}, callbacks_{callbacks} {};
+
+    bool finished() const noexcept { return gameStatus_ == Status::SUCCESS || gameStatus_ == Status::FAILURE; }
 
     int remainingMines() const noexcept { return board_.remainingMines(); }
     int size() const noexcept { return board_.size(); }
@@ -25,19 +31,25 @@ class Game final {
 
     void newGame(const BoardSize &boardSize) {
         board_.setup(boardSize);
-        gameStatus_ = GameStatus::INITIAL;
+        gameStatus_ = Status::INITIAL;
     }
 
   private:
-    const GameStatus &checkForGameStatus() const {
-        return board_.hasUnexploredCells() ? GameStatus::IN_PROGRESS : GameStatus::SUCCESS;
+    const Status checkForGameStatus() const {
+        return board_.hasUnexploredCells() ? Status::IN_PROGRESS : Status::SUCCESS;
     }
     void countMines(int x);
 
   private:
-    Board                board_;
-    GameStatusRef        gameStatus_;
+    Board board_;
+    Status gameStatus_;
     GameCallbackHandler &callbacks_;
+};
+
+class GameCallbackHandler {
+  public:
+    virtual void onCellChanged(int x, int newValue) = 0;
+    virtual void onGameStatusChanged(int x, const Game::Status &newStatus) = 0;
 };
 
 #endif // GAME_H

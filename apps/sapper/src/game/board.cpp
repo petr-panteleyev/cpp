@@ -1,16 +1,12 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "board.h"
 #include "cell.h"
-#include <algorithm>
 #include <random>
-#include <span>
 
 static std::random_device rd;
-static std::mt19937       randomGenerator(rd());
+static std::mt19937 randomGenerator(rd());
 
 static int randomNumber(int max_value) {
     return randomGenerator() % max_value;

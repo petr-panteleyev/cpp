@@ -1,11 +1,10 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "fieldvalueeditdelegate.h"
 #include "creditcardtype.h"
 #include "editfieldlistmodel.h"
+#include "field.h"
 #include "fieldtype.h"
 #include "translations.h"
 #include <QComboBox>
@@ -72,8 +71,8 @@ void FieldValueEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
 
     switch (index.column()) {
         case EditFieldListModel::FIELD_TABLE_TYPE_COLUMN: {
-            auto  comboBox = reinterpret_cast<QComboBox *>(editor);
-            auto  ordinal = comboBox->currentData().toUInt();
+            auto comboBox = reinterpret_cast<QComboBox *>(editor);
+            auto ordinal = comboBox->currentData().toUInt();
             auto &newType = FieldType::valueOf(ordinal);
             if (newType != field->type()) {
                 auto newValue = field->convertValue(newType);

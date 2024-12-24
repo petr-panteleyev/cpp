@@ -1,12 +1,9 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboard.h"
 #include "boardsize.h"
 #include "settings.h"
-#include <vector>
 
 constexpr int TOP_SIZE = 10;
 

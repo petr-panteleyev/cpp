@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CHANGEPASSWORDDIALOG_H
 #define CHANGEPASSWORDDIALOG_H
@@ -33,7 +31,7 @@ class ChangePasswordDialog : public QDialog {
     void on_repeatEdit_textChanged(const QString &text);
 
   private:
-    Ui::ChangePasswordDialog *ui;
+    std::unique_ptr<Ui::ChangePasswordDialog> ui;
 
     QPalette enabledColors_;
     QPalette disabledColors_;

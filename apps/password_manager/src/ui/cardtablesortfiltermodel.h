@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CARDTABLESORTFILTERMODEL_H
 #define CARDTABLESORTFILTERMODEL_H
@@ -13,7 +11,7 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     explicit CardTableSortFilterModel(QObject *parent = nullptr)
         : QSortFilterProxyModel{parent}, show_deleted_{false} {};
 
-    void set_show_deleted(bool show_deleted) {
+    void setShowDeleted(bool show_deleted) {
         show_deleted_ = show_deleted;
         invalidateRowsFilter();
     }
@@ -27,7 +25,7 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
   private:
-    bool    show_deleted_;
+    bool show_deleted_;
     QString filterText_;
 };
 

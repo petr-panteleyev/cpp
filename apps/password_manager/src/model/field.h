@@ -6,33 +6,27 @@
 #ifndef FIELD_H
 #define FIELD_H
 
-#include "fieldtype.h"
 #include <QString>
 #include <QVariant>
 
+class FieldType;
+
 class Field final {
   public:
-    explicit Field(const FieldType &type, const QString &name, const QVariant &value) noexcept
-        : type_{type}, name_{name}, value_{value} {
-        showContent_ = !type.masked();
-    }
-
-    explicit Field(const Field &f) noexcept : Field(f.type(), f.name(), f.value()) {}
+    explicit Field(const FieldType &type, const QString &name, const QVariant &value) noexcept;
+    explicit Field(const Field &f) noexcept;
+    ~Field();
 
     const FieldType &type() const noexcept { return type_; }
-    const QString   &name() const noexcept { return name_; }
-    const QVariant  &value() const noexcept { return value_; }
+    const QString &name() const noexcept { return name_; }
+    const QVariant &value() const noexcept { return value_; }
 
     void setType(const FieldType &type) noexcept { type_ = type; }
     void setName(const QString &name) noexcept { name_ = name; }
     void setValue(const QVariant &value) noexcept { value_ = value; }
 
     bool showContent() const noexcept { return showContent_; }
-    void toggleShow() noexcept {
-        if (type().masked()) {
-            showContent_ = !showContent_;
-        }
-    }
+    void toggleShow() noexcept;
 
     [[nodiscard]] QVariant convertValue(const FieldType &newType) const noexcept;
 
@@ -43,14 +37,11 @@ class Field final {
     static QVariant deserialize(const QString &str, const FieldType &type);
 
   private:
-    FieldTypeRef type_;
-    QString      name_;
-    QVariant     value_;
+    std::reference_wrapper<const FieldType> type_;
+    QString name_;
+    QVariant value_;
 
     bool showContent_;
 };
-
-using FieldPtr = std::shared_ptr<Field>;
-using FieldVec = std::vector<FieldPtr>;
 
 #endif // FIELD_H

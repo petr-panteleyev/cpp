@@ -1,13 +1,14 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "serializer.h"
+#include "card.h"
+#include "cardclass.h"
 #include "creditcardtype.h"
 #include "exceptions.h"
-#include "model/cardclass.h"
-#include "model/picture.h"
+#include "field.h"
+#include "fieldtype.h"
+#include "picture.h"
 #include "version.h"
 #include <QDate>
 #include <QDomElement>
@@ -74,24 +75,24 @@ static bool getBoolAttribute(const QDomNamedNodeMap &attributes, const QString &
     }
 }
 
-static FieldPtr deserializeField(const QDomElement &fieldElement) {
+static std::shared_ptr<Field> deserializeField(const QDomElement &fieldElement) {
     auto attrs = fieldElement.attributes();
 
-    auto  fieldTypeStr = getStringAttribute(attrs, ATTR_TYPE, "STRING");
+    auto fieldTypeStr = getStringAttribute(attrs, ATTR_TYPE, "STRING");
     auto &fieldType = FieldType::valueOf(fieldTypeStr.toStdString());
 
     auto name = getStringAttribute(attrs, ATTR_NAME, "");
 
-    auto     stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
+    auto stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
     QVariant value = Field::deserialize(stringValue, fieldType);
 
     return std::make_shared<Field>(fieldType, name, value);
 }
 
-static CardPtr deserializeCard(const QDomElement &cardElement) {
+static std::shared_ptr<Card> deserializeCard(const QDomElement &cardElement) {
     auto attrs = cardElement.attributes();
 
-    auto  cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
+    auto cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
     auto &cardClass = CardClass::valueOf(cardClassAttr.toStdString());
 
     auto uuid = getUuidAttribute(attrs, ATTR_UUID);
@@ -100,14 +101,14 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
         throw PasswordManagerException("Mandatory attribute name is missing");
     }
 
-    auto  pictureStrValue = getStringAttribute(attrs, ATTR_PICTURE, "GENERIC");
+    auto pictureStrValue = getStringAttribute(attrs, ATTR_PICTURE, "GENERIC");
     auto &picture = Picture::valueOf(pictureStrValue.toStdString());
-    auto  modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
-    bool  favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
-    auto  active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
+    auto modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
+    bool favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
+    auto active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
 
     // Deserialize fields
-    std::vector<FieldPtr> fields;
+    std::vector<std::shared_ptr<Field>> fields;
 
     auto fieldNodes = cardElement.elementsByTagName(ELEMENT_FIELD);
     for (auto index = 0; index < fieldNodes.count(); ++index) {
@@ -118,7 +119,7 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
 
     // Deserialize note
     QString note;
-    auto    noteNodes = cardElement.elementsByTagName(ELEMENT_NOTE);
+    auto noteNodes = cardElement.elementsByTagName(ELEMENT_NOTE);
     if (!noteNodes.isEmpty()) {
         note = noteNodes.at(0).toElement().text();
     }
@@ -126,7 +127,7 @@ static CardPtr deserializeCard(const QDomElement &cardElement) {
     return std::make_shared<Card>(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
 }
 
-void deserialize(const QDomDocument &doc, std::vector<CardPtr> &list) {
+void deserialize(const QDomDocument &doc, std::vector<std::shared_ptr<Card>> &list) {
     auto recordNodes = doc.elementsByTagName("record");
     for (auto index = 0; index < recordNodes.size(); ++index) {
         auto node = recordNodes.at(index);
@@ -136,14 +137,14 @@ void deserialize(const QDomDocument &doc, std::vector<CardPtr> &list) {
 }
 
 static QString fieldValueToString(const Field &field) {
-    auto  value = field.value();
+    auto value = field.value();
     auto &type = field.type();
 
     if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
         auto date = value.toDate();
         return date.toString("yyyy-MM-dd");
     } else if (type == FieldType::CARD_TYPE) {
-        auto  ordinal = value.toUInt();
+        auto ordinal = value.toUInt();
         auto &creditCardType = CreditCardType::valueOf(ordinal);
         return QString::fromStdString(creditCardType.name());
     } else {
@@ -185,7 +186,7 @@ static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
     stream.writeEndElement();
 }
 
-void serialize(const std::vector<CardPtr> &list, QByteArray &byteArray) {
+void serialize(const std::vector<std::shared_ptr<Card>> &list, QByteArray &byteArray) {
     QXmlStreamWriter stream{&byteArray};
 
     stream.writeStartDocument();

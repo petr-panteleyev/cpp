@@ -1,16 +1,14 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardclass.h"
 #include "creditcardtype.h"
+#include "field.h"
 #include "fieldtype.h"
 #include "picture.h"
 #include "recordtype.h"
 #include <QApplication>
 #include <QDate>
-#include <vector>
 
 using std::cref;
 
@@ -130,7 +128,7 @@ const FieldType FieldType::DATE{"DATE"};
 const FieldType FieldType::EXPIRATION_MONTH{"EXPIRATION_MONTH"};
 
 template <>
-const std::vector<FieldTypeRef> Common::EnumClass<FieldType>::values_{
+const std::vector<std::reference_wrapper<const FieldType>> Common::EnumClass<FieldType>::values_{
     cref(FieldType::STRING),        cref(FieldType::HIDDEN),
     cref(FieldType::EMAIL),         cref(FieldType::CREDIT_CARD_NUMBER),
     cref(FieldType::LINK),          cref(FieldType::PIN),

@@ -1,37 +1,38 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "translations.h"
-#include "settings.h"
+#include "fieldtype.h"
+#include "recordtype.h"
 #include <QApplication>
 
-std::unordered_map<unsigned, QString>               Translations::fieldTypeTranslated_;
-std::unordered_map<unsigned, QString>               Translations::recordTypeTranslated_;
-std::unordered_map<ImportAction, QString>           Translations::importActionTranslated_;
-std::unordered_map<Settings::PasswordType, QString> Translations::passwordSettingTranslated_;
+namespace Translations {
 
-void Translations::initialize() {
+std::unordered_map<unsigned, QString> fieldTypeTranslated_;
+std::unordered_map<unsigned, QString> recordTypeTranslated_;
+std::unordered_map<ImportAction, QString> importActionTranslated_;
+std::unordered_map<Settings::PasswordType, QString> passwordSettingTranslated_;
+
+void initialize() {
     fieldTypeTranslated_ = {
-        {FieldType::STRING.ordinal(), tr("String")},
-        {FieldType::HIDDEN.ordinal(), tr("Hidden String")},
-        {FieldType::EMAIL.ordinal(), tr("E-mail")},
-        {FieldType::CREDIT_CARD_NUMBER.ordinal(), tr("Credit Card Number")},
-        {FieldType::LINK.ordinal(), tr("Web Link")},
-        {FieldType::PIN.ordinal(), tr("PIN code")},
-        {FieldType::UNIX_PASSWORD.ordinal(), tr("UNIX password")},
-        {FieldType::SHORT_PASSWORD.ordinal(), tr("Short password")},
-        {FieldType::LONG_PASSWORD.ordinal(), tr("Long password")},
-        {FieldType::CARD_TYPE.ordinal(), tr("Card type")},
-        {FieldType::DATE.ordinal(), tr("Date")},
-        {FieldType::EXPIRATION_MONTH.ordinal(), tr("Expiration Month")},
+        {FieldType::STRING.ordinal(), QApplication::translate("FieldType", "String")},
+        {FieldType::HIDDEN.ordinal(), QApplication::translate("FieldType", "Hidden String")},
+        {FieldType::EMAIL.ordinal(), QApplication::translate("FieldType", "E-mail")},
+        {FieldType::CREDIT_CARD_NUMBER.ordinal(), QApplication::translate("FieldType", "Credit Card Number")},
+        {FieldType::LINK.ordinal(), QApplication::translate("FieldType", "Web Link")},
+        {FieldType::PIN.ordinal(), QApplication::translate("FieldType", "PIN code")},
+        {FieldType::UNIX_PASSWORD.ordinal(), QApplication::translate("FieldType", "UNIX password")},
+        {FieldType::SHORT_PASSWORD.ordinal(), QApplication::translate("FieldType", "Short password")},
+        {FieldType::LONG_PASSWORD.ordinal(), QApplication::translate("FieldType", "Long password")},
+        {FieldType::CARD_TYPE.ordinal(), QApplication::translate("FieldType", "Card type")},
+        {FieldType::DATE.ordinal(), QApplication::translate("FieldType", "Date")},
+        {FieldType::EXPIRATION_MONTH.ordinal(), QApplication::translate("FieldType", "Expiration Month")},
     };
 
     recordTypeTranslated_ = {
-        {RecordType::EMPTY.ordinal(), tr("Empty")},
-        {RecordType::CREDIT_CARD.ordinal(), tr("Credit Card")},
-        {RecordType::PASSWORD.ordinal(), tr("Password")},
+        {RecordType::EMPTY.ordinal(), QApplication::translate("NewRecordType", "Empty")},
+        {RecordType::CREDIT_CARD.ordinal(), QApplication::translate("NewRecordType", "Credit Card")},
+        {RecordType::PASSWORD.ordinal(), QApplication::translate("NewRecordType", "Password")},
     };
 
     importActionTranslated_ = {
@@ -49,3 +50,21 @@ void Translations::initialize() {
         {Settings::PasswordType::Long, QApplication::translate("PasswordType", "Long password")},
     };
 }
+
+QString translate(const FieldType &type) {
+    return fieldTypeTranslated_.at(type.ordinal());
+}
+
+QString translate(const RecordType &type) {
+    return recordTypeTranslated_.at(type.ordinal());
+}
+
+QString translate(ImportAction action) {
+    return importActionTranslated_.at(action);
+}
+
+QString translate(Settings::PasswordType type) {
+    return passwordSettingTranslated_.at(type);
+}
+
+} // namespace Translations

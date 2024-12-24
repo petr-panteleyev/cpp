@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "game.h"
 #include "cell.h"
@@ -13,14 +11,14 @@ void Game::processHit(int x) {
         return;
     }
 
-    if (gameStatus_ == GameStatus::INITIAL) {
+    if (gameStatus_ == Status::INITIAL) {
         board_.initialize(x);
-        gameStatus_ = GameStatus::IN_PROGRESS;
+        gameStatus_ = Status::IN_PROGRESS;
         callbacks_.onGameStatusChanged(x, gameStatus_);
     }
 
     if (Cell::mineNoFlag(value)) {
-        gameStatus_ = GameStatus::FAILURE;
+        gameStatus_ = Status::FAILURE;
         callbacks_.onGameStatusChanged(x, gameStatus_);
         return;
     }
@@ -39,7 +37,7 @@ void Game::toggleFlag(int x) {
     auto newValue = board_.toggleFlag(x);
     callbacks_.onCellChanged(x, newValue);
 
-    if (gameStatus_ != GameStatus::INITIAL) {
+    if (gameStatus_ != Status::INITIAL) {
         const auto &newStatus = checkForGameStatus();
         if (newStatus != gameStatus_) {
             gameStatus_ = newStatus;

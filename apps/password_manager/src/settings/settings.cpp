@@ -1,17 +1,15 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "settings.h"
 #include "generator.h"
 #include <QSettings>
-#include <unordered_map>
 
 namespace Settings {
 
 static const QString COLOR_GROUP{"colors"};
 static const QString SETTING_CURRENT_FILE{"currentFile"};
+static const QString OPEN_LINKS_WITH_DOUBLE_CLICK{"openLinksWithDoubleClick"};
 
 static const QString PASSWORDS_GROUP{"passwords"};
 static const QString PASSWORD_LENGTH{"length"};
@@ -134,6 +132,11 @@ PasswordTypePtrMap getAllPasswordOptions() {
     }
 
     return result;
+}
+
+bool getOpenLinkWithDoubleClick() {
+    QSettings settings;
+    return settings.value(OPEN_LINKS_WITH_DOUBLE_CLICK, true).toBool();
 }
 
 } // namespace Settings

@@ -1,14 +1,12 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include "boardsize.h"
+#include "boardsizedialog.h"
 #include "buttoneventfilter.h"
-#include "callbacks.h"
 #include "game.h"
 #include "gametimer.h"
 #include "qfont.h"
@@ -16,7 +14,6 @@
 #include "scoreboarddialog.h"
 #include <QMainWindow>
 #include <QMenu>
-#include "boardsizedialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +21,7 @@ class MainWindow;
 
 class QPushButton;
 
-class MainWindow : public QMainWindow, GameCallbackHandler {
+class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandler {
     Q_OBJECT
 
   public:
@@ -34,7 +31,8 @@ class MainWindow : public QMainWindow, GameCallbackHandler {
     void onButtonClicked(QPushButton *button, QMouseEvent *event);
 
     virtual void onCellChanged(int x, int newValue) override;
-    virtual void onGameStatusChanged(int x, const GameStatus &newStatus) override;
+    virtual void onGameStatusChanged(int x, const Game::Status &newStatus) override;
+    virtual void onTimerUpdate(QTime time) override;
 
   private:
     void newGame(const BoardSize &boardSize);
@@ -63,11 +61,6 @@ class MainWindow : public QMainWindow, GameCallbackHandler {
 
     ScoreBoardDialog scoreBoardDialog_;
     BoardSizeDialog boardSizeDialog_;
-
-    // Actions
-    QAction resultsAction_;
-    QMenu customGameMenu_;
-    QAction newCustomGameAction_;
 };
 
 #endif // MAINWINDOW_H

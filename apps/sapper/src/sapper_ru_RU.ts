@@ -72,37 +72,37 @@
         <translation>Игра</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="122"/>
+        <location filename="mainwindow.ui" line="135"/>
         <source>Help</source>
         <translation>Справка</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="132"/>
+        <location filename="mainwindow.ui" line="145"/>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="137"/>
+        <location filename="mainwindow.ui" line="150"/>
         <source>About Sapper...</source>
         <translation>О Сапёре...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="49"/>
+        <location filename="mainwindow.ui" line="170"/>
         <source>Results</source>
         <translation>Результаты</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="50"/>
+        <location filename="mainwindow.ui" line="121"/>
         <source>Custom</source>
         <translation>Пользовательская</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="50"/>
+        <location filename="mainwindow.ui" line="175"/>
         <source>New...</source>
         <translation>Новая...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="286"/>
+        <location filename="mainwindow.cpp" line="283"/>
         <source>About Sapper</source>
         <translation>О Сапёре</translation>
     </message>
@@ -123,12 +123,12 @@
 <context>
     <name>ScoreBoardItemModel</name>
     <message>
-        <location filename="score/scoreboarditemmodel.cpp" line="20"/>
+        <location filename="score/scoreboarditemmodel.cpp" line="17"/>
         <source>Time</source>
         <translation>Время</translation>
     </message>
     <message>
-        <location filename="score/scoreboarditemmodel.cpp" line="21"/>
+        <location filename="score/scoreboarditemmodel.cpp" line="18"/>
         <source>Date</source>
         <translation>Дата</translation>
     </message>

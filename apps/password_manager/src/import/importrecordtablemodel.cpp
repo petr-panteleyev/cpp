@@ -1,16 +1,13 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "importrecordtablemodel.h"
+#include "card.h"
 #include "importrecord.h"
 #include "qdatetime.h"
 #include "qnamespace.h"
 #include "settings.h"
 #include "translations.h"
-#include <unordered_map>
-#include <vector>
 
 static std::unordered_map<ImportAction, Settings::Color> ACTION_COLORS{
     {ImportAction::ADD, Settings::Color::ImportAdd},
@@ -22,6 +19,12 @@ static std::unordered_map<ImportAction, Settings::Color> ACTION_COLORS{
 static std::vector<unsigned> COLUMN_ALIGNMENT{Qt::AlignLeft, Qt::AlignCenter, Qt::AlignCenter};
 
 static const QColor WHITE = QColor::fromRgb(255, 255, 255);
+
+ImportRecordTableModel::ImportRecordTableModel(QObject *parent) : QAbstractItemModel{parent} {
+}
+
+ImportRecordTableModel::~ImportRecordTableModel() {
+}
 
 QVariant ImportRecordTableModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) {

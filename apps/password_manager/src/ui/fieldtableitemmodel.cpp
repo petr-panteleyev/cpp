@@ -1,12 +1,11 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "fieldtableitemmodel.h"
 #include "creditcardtype.h"
+#include "field.h"
+#include "fieldtype.h"
 #include "settings.h"
-#include <QColor>
 
 static const QString MASK = "*****";
 
@@ -33,7 +32,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
                 case Qt::ForegroundRole: return Settings::getColor(Settings::Color::FieldValue);
                 case Qt::DecorationRole: {
                     if (field->type() == FieldType::CARD_TYPE) {
-                        auto        ordinal = field->value().toUInt();
+                        auto ordinal = field->value().toUInt();
                         const auto &cardType = CreditCardType::valueOf(ordinal);
                         return cardType.picture().icon();
                     } else {
@@ -48,7 +47,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void FieldTableItemModel::toggleMasking(const QModelIndex &index, const FieldPtr &field) {
+void FieldTableItemModel::toggleMasking(const QModelIndex &index, const std::shared_ptr<Field> &field) {
     field->toggleShow();
     emit dataChanged(index, index, {Qt::DisplayRole});
 }

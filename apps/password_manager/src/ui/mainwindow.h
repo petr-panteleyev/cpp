@@ -1,31 +1,29 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "cardeditdialog.h"
-#include "cardtableitemmodel.h"
-#include "cardtablesortfiltermodel.h"
-#include "changepassworddialog.h"
-#include "fieldtableitemmodel.h"
-#include "fieldtablesortfiltermodel.h"
-#include "passworddialog.h"
-#include "settingsdialog.h"
-#include <QAction>
-#include <QItemSelection>
 #include <QMainWindow>
-#include <QMenu>
-#include <importdialog.h>
-#include <optional>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+class Card;
+class CardEditDialog;
+class CardTableItemModel;
+class CardTableSortFilterModel;
+class ChangePasswordDialog;
+class FieldTableItemModel;
+class FieldTableSortFilterModel;
+class ImportDialog;
+class PasswordDialog;
+class QItemSelection;
+class QMenu;
+class SettingsDialog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -38,8 +36,8 @@ class MainWindow : public QMainWindow {
     virtual void showEvent(QShowEvent *event) override;
 
   private:
-    const QModelIndex      currentIndex() const noexcept;
-    std::optional<CardPtr> currentCard() const noexcept;
+    const QModelIndex currentIndex() const noexcept;
+    std::optional<std::shared_ptr<Card>> currentCard() const noexcept;
 
     void writeFile() const { writeFile(currentFileName_, currentPassword_); }
     void writeFile(const QString &fileName, const QString &password) const;
@@ -81,29 +79,30 @@ class MainWindow : public QMainWindow {
     void onActionShowDeletedToggled(bool checked);
 
   private:
-    static void loadRecords(const QString &fileName, const QString &password, CardVec &result);
+    static void loadRecords(const QString &fileName, const QString &password,
+                            std::vector<std::shared_ptr<Card>> &result);
 
   private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
 
-    CardTableItemModel       model_;
-    CardTableSortFilterModel sortFilterModel_;
+    std::unique_ptr<CardTableItemModel> cardModel_;
+    std::unique_ptr<CardTableSortFilterModel> sortFilterModel_;
 
-    FieldTableItemModel       fieldModel_;
-    FieldTableSortFilterModel fieldFilterModel_;
+    std::unique_ptr<FieldTableItemModel> fieldModel_;
+    std::unique_ptr<FieldTableSortFilterModel> fieldFilterModel_;
 
     QAction copyFieldAction_;
     QAction openLinkAction_;
-    QMenu   fieldContextMenu_;
+    std::unique_ptr<QMenu> fieldContextMenu_;
 
     QString currentFileName_;
     QString currentPassword_;
 
     // Dialogs
-    PasswordDialog       passwordDialog_;
-    ChangePasswordDialog changePasswordDialog_;
-    CardEditDialog       cardEditDialog_;
-    ImportDialog         importDialog_;
-    SettingsDialog       settingsDialog_;
+    std::unique_ptr<PasswordDialog> passwordDialog_;
+    std::unique_ptr<ChangePasswordDialog> changePasswordDialog_;
+    std::unique_ptr<CardEditDialog> cardEditDialog_;
+    std::unique_ptr<ImportDialog> importDialog_;
+    std::unique_ptr<SettingsDialog> settingsDialog_;
 };
 #endif // MAINWINDOW_H

@@ -1,13 +1,8 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardtableitemmodel.h"
-#include <algorithm>
-#include <iterator>
-#include <memory>
-#include <vector>
+#include "card.h"
 
 static QVariant buildAuxIconValue(const Card &card) {
     if (!card.active()) {
@@ -36,12 +31,12 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void CardTableItemModel::replace(int row, const CardPtr &card) {
+void CardTableItemModel::replace(int row, const std::shared_ptr<Card> &card) {
     data_[row] = card;
     emit dataChanged(createIndex(row, 0), createIndex(row, 2));
 }
 
-void CardTableItemModel::addOrReplace(const CardPtr &card) {
+void CardTableItemModel::addOrReplace(const std::shared_ptr<Card> &card) {
     auto found = std::find_if(data_.begin(), data_.end(), [&card](auto &c) { return c->uuid() == card->uuid(); });
     if (found != data_.end()) {
         auto row = std::distance(data_.begin(), found);
@@ -51,7 +46,7 @@ void CardTableItemModel::addOrReplace(const CardPtr &card) {
     }
 }
 
-void CardTableItemModel::add(const CardPtr &card) {
+void CardTableItemModel::add(const std::shared_ptr<Card> &card) {
     beginInsertRows(parent_index, data_.size(), data_.size());
     data_.push_back(card);
     endInsertRows();

@@ -1,13 +1,10 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "editfieldlistmodel.h"
+#include "field.h"
+#include "fieldtype.h"
 #include "translations.h"
-#include <QComboBox>
-#include <QList>
-#include <algorithm>
 
 EditFieldListModel::EditFieldListModel(QObject *parent) : QAbstractItemModel(parent) {
 }
@@ -80,31 +77,31 @@ Qt::ItemFlags EditFieldListModel::flags(const QModelIndex &index) const {
 }
 
 void EditFieldListModel::addField() {
-    beginInsertRows(parentIndex, fields_.size(), fields_.size());
+    beginInsertRows(TOP_LEVEL, fields_.size(), fields_.size());
     auto field = std::make_shared<Field>(FieldType::STRING, "Field", "");
     fields_.push_back(field);
     endInsertRows();
 }
 
 void EditFieldListModel::deleteField(int row) {
-    beginRemoveRows(parentIndex, row, row);
+    beginRemoveRows(TOP_LEVEL, row, row);
     fields_.erase(std::next(fields_.begin(), row));
     endRemoveRows();
 }
 
 void EditFieldListModel::moveUp(int row) {
-    beginMoveRows(parentIndex, row, row, parentIndex, row - 1);
+    beginMoveRows(TOP_LEVEL, row, row, TOP_LEVEL, row - 1);
     std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row - 1));
     endMoveRows();
 }
 
 void EditFieldListModel::moveDown(int row) {
-    beginMoveRows(parentIndex, row, row, parentIndex, row + 2);
+    beginMoveRows(TOP_LEVEL, row, row, TOP_LEVEL, row + 2);
     std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row + 1));
     endMoveRows();
 }
 
-void EditFieldListModel::setFieldValue(int row, const FieldPtr &field, const QVariant &value) {
+void EditFieldListModel::setFieldValue(int row, const std::shared_ptr<Field> &field, const QVariant &value) {
     field->setValue(value);
     auto updateIndex = index(row, FIELD_TABLE_VALUE_COLUMN);
     emit dataChanged(updateIndex, updateIndex, {Qt::EditRole});

@@ -1,13 +1,11 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
 #include "boardsize.h"
 #include "buttoneventfilter.h"
 #include "cell.h"
-#include "picture.h"
+#include "pictures.h"
 #include "qcolor.h"
 #include "qgridlayout.h"
 #include "qmessagebox.h"
@@ -15,11 +13,8 @@
 #include "scoreboarddialog.h"
 #include "settings.h"
 #include "ui_mainwindow.h"
-#include <QMouseEvent>
-#include <iterator>
-#include <ranges>
-#include <stdexcept>
 #include "version.h"
+#include <QMouseEvent>
 
 static constexpr int CELL_SIZE{40};
 static constexpr QSize IMAGE_SIZE{24, 24};
@@ -45,9 +40,8 @@ static std::array<QColor, 9> NUMBER_COLORS{
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), game_{*this}, eventFilter_{this}, boardSize_{BoardSize::BIG},
-      buttonFont_{"Mine-Sweeper", 14, QFont::Medium}, lcdFont_{"Neat LCD", 20, QFont::Medium},
-      scoreBoardDialog_{this, scoreBoard_}, boardSizeDialog_{this}, resultsAction_{tr("Results")},
-      customGameMenu_{tr("Custom")}, newCustomGameAction_{tr("New...")} {
+      buttonFont_{"Mine-Sweeper", 14, QFont::Medium}, lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
+      scoreBoardDialog_{this, scoreBoard_}, boardSizeDialog_{this} {
     ui->setupUi(this);
 
     scoreBoard_.load();
@@ -58,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lcdTimer->setFont(lcdFont_);
     ui->lcdTimer->setStyleSheet(STYLE_RED);
 
-    ui->controlButton->setIcon(Picture::SMILING_FACE.icon());
+    ui->controlButton->setIcon(Pictures::icon(Picture::SMILING_FACE));
     connect(ui->controlButton, &QPushButton::clicked, [this]() { newGame(boardSize_); });
 
     auto index = 0;
@@ -78,9 +72,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onHelpAbout);
-    connect(&gameTimer_, &GameTimer::timeString, [this](const QString &text) { ui->lcdTimer->setText(text); });
     connect(&boardSizeDialog_, &QDialog::accepted, [this]() { newGame(boardSizeDialog_.boardSize()); });
-    connect(&newCustomGameAction_, &QAction::triggered, this, &MainWindow::onNewCustomGame);   
+    connect(ui->actionNewCustomGame, &QAction::triggered, this, &MainWindow::onNewCustomGame);
 
     setupGameMenu();
     newGame(Settings::getLastBoardSize());
@@ -91,20 +84,16 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupGameMenu() {
-    for (const BoardSize &size : BoardSize::STANDARD_SIZES) {
-        auto action = new QAction(size.toString());
-        ui->menuGame->addAction(action);
-        connect(action, &QAction::triggered, [this, &size]() { newGame(size); });
-    }
-
-    ui->menuGame->addSeparator();
-    ui->menuGame->addMenu(&customGameMenu_);
+    ui->actionBigGame->setText(BoardSize::BIG.toString());
+    connect(ui->actionBigGame, &QAction::triggered, [this]() { newGame(BoardSize::BIG); });
+    ui->actionMediumGame->setText(BoardSize::MEDIUM.toString());
+    connect(ui->actionMediumGame, &QAction::triggered, [this]() { newGame(BoardSize::MEDIUM); });
+    ui->actionSmallGame->setText(BoardSize::SMALL.toString());
+    connect(ui->actionSmallGame, &QAction::triggered, [this]() { newGame(BoardSize::SMALL); });
 
     buildCustomGameMenu();
 
-    ui->menuGame->addSeparator();
-    ui->menuGame->addAction(&resultsAction_);
-    connect(&resultsAction_, &QAction::triggered, [this]() {
+    connect(ui->actionResults, &QAction::triggered, [this]() {
         scoreBoardDialog_.setup();
         scoreBoardDialog_.show();
     });
@@ -115,7 +104,7 @@ void MainWindow::newGame(const BoardSize &boardSize) {
     gameTimer_.reset();
 
     eventFilter_.setDisabled(false);
-    ui->controlButton->setIcon(Picture::SMILING_FACE.icon());
+    ui->controlButton->setIcon(Pictures::icon(Picture::SMILING_FACE));
 
     boardSize_ = boardSize;
     game_.newGame(boardSize);
@@ -150,7 +139,7 @@ void MainWindow::newGame(const BoardSize &boardSize) {
 }
 
 void MainWindow::onButtonClicked(QPushButton *button, QMouseEvent *event) {
-    if (game_.gameStatus().isFinal()) {
+    if (game_.finished()) {
         return;
     }
 
@@ -183,7 +172,7 @@ void MainWindow::onCellChanged(int x, int newValue) {
 
     if (Cell::flag(newValue)) {
         button->setText(nullptr);
-        button->setIcon(Picture::RED_FLAG.icon());
+        button->setIcon(Pictures::icon(Picture::RED_FLAG));
         button->setIconSize(IMAGE_SIZE);
     } else if (Cell::isExplored(newValue)) {
         button->setIcon(EMPTY_ICON);
@@ -202,21 +191,25 @@ void MainWindow::onCellChanged(int x, int newValue) {
     }
 }
 
-void MainWindow::onGameStatusChanged(int x, const GameStatus &newStatus) {
-    if (newStatus == GameStatus::SUCCESS) {
+void MainWindow::onGameStatusChanged(int x, const Game::Status &newStatus) {
+    if (newStatus == Game::Status::SUCCESS) {
         renderSuccess();
-    } else if (newStatus == GameStatus::FAILURE) {
+    } else if (newStatus == Game::Status::FAILURE) {
         renderFailure(x);
-    } else if (newStatus == GameStatus::IN_PROGRESS) {
+    } else if (newStatus == Game::Status::IN_PROGRESS) {
         gameTimer_.start();
     }
+}
+
+void MainWindow::onTimerUpdate(QTime time) {
+    ui->lcdTimer->setText(time.toString("mm:ss"));
 }
 
 void MainWindow::renderSuccess() {
     gameTimer_.stop();
 
     eventFilter_.setDisabled(true);
-    ui->controlButton->setIcon(Picture::LAUGHING_FACE.icon());
+    ui->controlButton->setIcon(Pictures::icon(Picture::LAUGHING_FACE));
 
     auto gameScore = GameScore{.boardSize = boardSize_, .date = QDate::currentDate(), .time = gameTimer_.localTime()};
     auto top = scoreBoard_.add(gameScore);
@@ -234,7 +227,7 @@ void MainWindow::renderFailure(int clickPoint) {
     eventFilter_.setDisabled(true);
 
     gameTimer_.stop();
-    ui->controlButton->setIcon(Picture::SAD_FACE.icon());
+    ui->controlButton->setIcon(Pictures::icon(Picture::SAD_FACE));
 
     for (int x = 0; x < game_.size(); x++) {
         auto value = game_.value(x);
@@ -246,7 +239,7 @@ void MainWindow::renderFailure(int clickPoint) {
         } else {
             if (Cell::emptyWithFlag(value)) {
                 button->setText(nullptr);
-                button->setIcon(Picture::BLACK_FLAG.icon());
+                button->setIcon(Pictures::icon(Picture::BLACK_FLAG));
             }
 
             if (Cell::mineNoFlag(value)) {
@@ -262,18 +255,22 @@ void MainWindow::onNewCustomGame() {
 }
 
 void MainWindow::buildCustomGameMenu() {
-    customGameMenu_.clear();
-    customGameMenu_.addAction(&newCustomGameAction_);
+    auto menu = ui->customGameMenu;
+
+    auto actions = menu->actions();
+    for (auto index = 1; index < actions.count(); ++index) {
+        menu->removeAction(actions.at(index));
+    }
 
     auto sizes = scoreBoard_.boardSizes();
     auto filteredSizes =
         sizes | std::views::filter([](const auto &s) { return !BoardSize::STANDARD_SIZES.contains(s); });
 
     if (!filteredSizes.empty()) {
-        customGameMenu_.addSeparator();
+        menu->addSeparator();
         for (const auto &customSize : filteredSizes) {
-            auto action = new QAction(customSize.toString(), &customGameMenu_);
-            customGameMenu_.addAction(action);
+            auto action = new QAction(customSize.toString(), menu);
+            menu->addAction(action);
             connect(action, &QAction::triggered, [this, customSize]() { newGame(customSize); });
         }
     }
@@ -281,7 +278,7 @@ void MainWindow::buildCustomGameMenu() {
 
 void MainWindow::onHelpAbout() {
     auto text = QString(ABOUT_TEXT)
-            .arg(QString::fromStdString(Version::projectVersion))
-            .arg(QString::fromStdString(Version::buildDate));
+                    .arg(QString::fromStdString(Version::projectVersion))
+                    .arg(QString::fromStdString(Version::buildDate));
     QMessageBox::about(this, tr("About Sapper"), text);
 }

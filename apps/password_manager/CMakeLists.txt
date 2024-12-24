@@ -1,7 +1,7 @@
 # Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_manager VERSION 24.12.3 LANGUAGES CXX)
+project(password_manager VERSION 24.12.4 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -23,8 +23,10 @@ target_compile_options(password_manager PRIVATE
 
 file(GLOB PASSWORD_MANAGER_RESOURCE_FILES "resources/*.png")
 
-target_compile_definitions(password_manager
-                           PRIVATE "PROJECT_VERSION=${PROJECT_VERSION}")
+target_compile_definitions(password_manager PRIVATE
+    "PROJECT_VERSION=${PROJECT_VERSION}"
+    "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}"
+)
 
 qt_add_resources(password_manager "resources"
     PREFIX "/images"

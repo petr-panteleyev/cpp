@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 target_sources(password_manager PRIVATE
+    importaction.h
     importrecord.h
     importutil.h
     importutil.cpp

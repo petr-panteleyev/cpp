@@ -1,18 +1,22 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboarddialog.h"
 #include "qcombobox.h"
+#include "scoreboard.h"
+#include "scoreboarditemmodel.h"
 #include "ui_scoreboarddialog.h"
-#include <algorithm>
+#include <memory>
+
+using std::make_unique;
 
 ScoreBoardDialog::ScoreBoardDialog(QWidget *parent, const ScoreBoard &scoreBoard)
-    : QDialog(parent), ui(new Ui::ScoreBoardDialog), scoreBoard_{scoreBoard}, model_{this, scoreBoard_} {
+    : QDialog(parent), scoreBoard_{scoreBoard}, ui(make_unique<Ui::ScoreBoardDialog>()),
+      model_{make_unique<ScoreBoardItemModel>(this, scoreBoard_)} {
+
     ui->setupUi(this);
 
-    ui->scoreTableView->setModel(&model_);
+    ui->scoreTableView->setModel(model_.get());
     ui->scoreTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->scoreTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -26,7 +30,6 @@ ScoreBoardDialog::ScoreBoardDialog(QWidget *parent, const ScoreBoard &scoreBoard
 }
 
 ScoreBoardDialog::~ScoreBoardDialog() {
-    delete ui;
 }
 
 void ScoreBoardDialog::setup() {
@@ -51,5 +54,5 @@ void ScoreBoardDialog::onBoardSizeComboBoxIndexChanged(int index) {
     auto boardSize = boardSizes_.at(index);
     auto scores = scoreBoard_.scores(boardSize);
     auto vec = std::vector<GameScore>(scores.begin(), scores.end());
-    model_.setScores(vec);
+    model_->setScores(vec);
 }

@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef BOARDSIZEDIALOG_H
 #define BOARDSIZEDIALOG_H
@@ -13,7 +11,7 @@ namespace Ui {
 class BoardSizeDialog;
 }
 
-class BoardSizeDialog : public QDialog {
+class BoardSizeDialog final : public QDialog {
     Q_OBJECT
 
   public:

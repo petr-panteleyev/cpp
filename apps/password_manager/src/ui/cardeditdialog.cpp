@@ -1,9 +1,11 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardeditdialog.h"
+#include "card.h"
+#include "editfieldlistmodel.h"
+#include "field.h"
+#include "fieldtype.h"
 #include "fieldvalueeditdelegate.h"
 #include "generator.h"
 #include "picture.h"
@@ -12,11 +14,9 @@
 #include "settings.h"
 #include "timeutil.h"
 #include "ui_cardeditdialog.h"
-#include <QAbstractScrollArea>
 #include <QMessageBox>
-#include <QValidator>
-#include <memory>
-#include <unordered_map>
+
+using std::make_unique;
 
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTES = 1;
@@ -36,9 +36,9 @@ class NotEmptyValidator : public QValidator {
 };
 
 CardEditDialog::CardEditDialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::CardEditDialog), fieldTableModel_{this}, fieldAddAction_{tr("Add"), this},
-      fieldDeleteAction_{tr("Delete"), this}, fieldUpAction_{tr("Up"), this}, fieldDownAction_{tr("Down"), this},
-      fieldGenerateAction_(tr("Generate"), this)
+    : QDialog(parent), ui(make_unique<Ui::CardEditDialog>()), model_{make_unique<EditFieldListModel>(this)},
+      fieldAddAction_{tr("Add"), this}, fieldDeleteAction_{tr("Delete"), this}, fieldUpAction_{tr("Up"), this},
+      fieldDownAction_{tr("Down"), this}, fieldGenerateAction_(tr("Generate"), this)
 
 {
     ui->setupUi(this);
@@ -55,13 +55,12 @@ CardEditDialog::CardEditDialog(QWidget *parent)
 }
 
 CardEditDialog::~CardEditDialog() {
-    delete ui;
 }
 
 void CardEditDialog::setCard(const Card &card) {
     card_ = std::shared_ptr<Card>(new Card(card));
 
-    fieldTableModel_.setFields(card.fields());
+    model_->setFields(card.fields());
 
     ui->notesEditor->appendPlainText(card.note());
     ui->nameEditor->setText(card.name());
@@ -86,7 +85,7 @@ void CardEditDialog::setupFieldTable() {
     QtHelpers::addActions(
         t, {&fieldAddAction_, &fieldDeleteAction_, &fieldGenerateAction_, &fieldUpAction_, &fieldDownAction_});
 
-    t->setModel(&fieldTableModel_);
+    t->setModel(model_.get());
     t->setEditTriggers(QAbstractItemView::DoubleClicked);
     t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_TYPE_COLUMN, new FieldValueEditDelegate());
     t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_VALUE_COLUMN, new FieldValueEditDelegate());
@@ -131,7 +130,7 @@ void CardEditDialog::done(int code) {
 
         card_->setModified(TimeUtil::currentTimeMillis());
         card_->setName(newName);
-        card_->setFields(fieldTableModel_.fields());
+        card_->setFields(model_->fields());
         // picture
         auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
         card_->setPicture(Picture::valueOf(pictureOrdinal));
@@ -142,7 +141,7 @@ void CardEditDialog::done(int code) {
 }
 
 void CardEditDialog::onAddField() {
-    fieldTableModel_.addField();
+    model_->addField();
 }
 
 void CardEditDialog::onDeleteField() {
@@ -150,14 +149,14 @@ void CardEditDialog::onDeleteField() {
     if (!index.isValid()) {
         return;
     }
-    auto field = fieldTableModel_.at(index.row());
+    auto field = model_->at(index.row());
 
     auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + field->name() + "?");
     if (result != QMessageBox::Yes) {
         return;
     }
 
-    fieldTableModel_.deleteField(index.row());
+    model_->deleteField(index.row());
 }
 
 void CardEditDialog::onFieldUp() {
@@ -165,15 +164,15 @@ void CardEditDialog::onFieldUp() {
     if (!index.isValid() || index.row() == 0) {
         return;
     }
-    fieldTableModel_.moveUp(index.row());
+    model_->moveUp(index.row());
 }
 
 void CardEditDialog::onFieldDown() {
     auto index = ui->fieldsTable->currentIndex();
-    if (!index.isValid() || index.row() == fieldTableModel_.rowCount() - 1) {
+    if (!index.isValid() || index.row() == model_->rowCount() - 1) {
         return;
     }
-    fieldTableModel_.moveDown(index.row());
+    model_->moveDown(index.row());
 }
 
 void CardEditDialog::onGenerate() {
@@ -181,12 +180,12 @@ void CardEditDialog::onGenerate() {
     if (!index.isValid()) {
         return;
     }
-    auto field = fieldTableModel_.at(index.row());
+    auto field = model_->at(index.row());
 
     if (GENERATOR_OPTIONS.contains(field->type().ordinal())) {
         const auto &options = Settings::getPasswordOptions(GENERATOR_OPTIONS[field->type().ordinal()]);
-        auto        password = pwdgen::generate(options);
-        fieldTableModel_.setFieldValue(index.row(), field, QString::fromStdString(password));
+        auto password = pwdgen::generate(options);
+        model_->setFieldValue(index.row(), field, QString::fromStdString(password));
     }
 }
 
@@ -202,8 +201,8 @@ void CardEditDialog::fieldTableCurrentRowChanged(const QModelIndex &current, con
     if (!current.isValid()) {
         return;
     }
-    auto field = fieldTableModel_.at(current.row());
+    auto field = model_->at(current.row());
     fieldUpAction_.setEnabled(current.row() != 0);
-    fieldDownAction_.setEnabled(current.row() != fieldTableModel_.rowCount() - 1);
+    fieldDownAction_.setEnabled(current.row() != model_->rowCount() - 1);
     fieldGenerateAction_.setEnabled(GENERATOR_OPTIONS.contains(field->type().ordinal()));
 }

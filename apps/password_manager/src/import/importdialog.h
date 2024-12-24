@@ -7,13 +7,14 @@
 #define IMPORTDIALOG_H
 
 #include "importrecord.h"
-#include "importrecordtablemodel.h"
 #include <QDialog>
-#include <QMenu>
+#include <memory>
 
 namespace Ui {
 class ImportDialog;
 }
+
+class ImportRecordTableModel;
 
 class ImportDialog : public QDialog {
     Q_OBJECT
@@ -22,7 +23,7 @@ class ImportDialog : public QDialog {
     explicit ImportDialog(QWidget *parent = nullptr);
     ~ImportDialog();
 
-    void setup(const ImportRecordVec &toImport);
+    void setup(const std::vector<std::shared_ptr<ImportRecord>> &toImport);
 
   private:
     void setupTableView();
@@ -34,9 +35,9 @@ class ImportDialog : public QDialog {
   private:
     Ui::ImportDialog *ui;
 
-    ImportRecordTableModel model_;
-    QAction                actionToggleApproval_;
-    QMenu                  contextMenu_;
+    const std::unique_ptr<ImportRecordTableModel> model_;
+    const std::unique_ptr<QMenu> contextMenu_;
+    const std::unique_ptr<QAction> actionToggleApproval_;
 };
 
 #endif // IMPORTDIALOG_H

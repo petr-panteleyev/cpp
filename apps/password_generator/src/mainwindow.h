@@ -36,6 +36,6 @@ class MainWindow : public QMainWindow {
     void onActionCopy();
 
   private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
 };
 #endif // MAINWINDOW_H

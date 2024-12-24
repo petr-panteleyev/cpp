@@ -1,36 +1,42 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef GAMETIMER_H
 #define GAMETIMER_H
 
-#include "qdatetime.h"
-#include "qtmetamacros.h"
-#include <QTimer>
+#include <QTime>
 
-class GameTimer : public QObject {
-    Q_OBJECT
+class QTimer;
+
+class GameTimerHandler {
+  public:
+    virtual void onTimerUpdate(QTime time) = 0;
+};
+
+class GameTimer final {
+  private:
+    static inline const QTime ZERO_TIME{0, 0};
 
   public:
-    explicit GameTimer();
+    explicit GameTimer(GameTimerHandler &handler);
+    ~GameTimer();
 
     void start();
-    void stop() { timer_.stop(); };
-    void reset() { emit timeString("00:00"); }
+    void stop();
+    void reset() { handler_->onTimerUpdate(ZERO_TIME); }
 
     QTime localTime() const noexcept { return localTime_; }
 
-  signals:
-    void timeString(const QString &text) const;
-
   private:
+    GameTimer(const GameTimer &) = delete;
+    GameTimer(const GameTimer &&) = delete;
+
     void onTimer();
 
   private:
-    QTimer timer_;
-    QTime  localTime_;
+    std::unique_ptr<QTimer> timer_;
+    QTime localTime_;
+    GameTimerHandler *handler_;
 };
 
 #endif // GAMETIMER_H

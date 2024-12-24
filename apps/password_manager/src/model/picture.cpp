@@ -1,10 +1,7 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "picture.h"
-#include <unordered_map>
 
 static std::unordered_map<unsigned, QIcon> ICON_CACHE;
 

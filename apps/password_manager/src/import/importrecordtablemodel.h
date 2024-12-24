@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef IMPORTRECORDTABLEMODEL_H
 #define IMPORTRECORDTABLEMODEL_H
@@ -18,7 +16,8 @@ class ImportRecordTableModel final : public QAbstractItemModel {
     static constexpr int COLUMN_ACTION = 2;
 
   public:
-    explicit ImportRecordTableModel(QObject *parent = nullptr) : QAbstractItemModel{parent} {}
+    explicit ImportRecordTableModel(QObject *parent = nullptr);
+    ~ImportRecordTableModel();
 
     void setItems(const ImportRecordVec data) {
         beginResetModel();
@@ -36,7 +35,7 @@ class ImportRecordTableModel final : public QAbstractItemModel {
     int rowCount(const QModelIndex &parent = QModelIndex()) const override { return data_.size(); }
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 3; }
 
-    QVariant               data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     const ImportRecordPtr &at(int row) const { return data_.at(row); }
 
   private:

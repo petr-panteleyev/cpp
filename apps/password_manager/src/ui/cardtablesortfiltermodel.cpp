@@ -1,9 +1,8 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardtablesortfiltermodel.h"
+#include "card.h"
 #include "cardtableitemmodel.h"
 
 static int compareByActive(const Card &left, const Card &right) {

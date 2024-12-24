@@ -1,18 +1,18 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef SCOREBOARDDIALOG_H
 #define SCOREBOARDDIALOG_H
 
-#include "scoreboard.h"
-#include "scoreboarditemmodel.h"
+#include "boardsize.h"
 #include <QDialog>
 
 namespace Ui {
 class ScoreBoardDialog;
 }
+
+class ScoreBoard;
+class ScoreBoardItemModel;
 
 class ScoreBoardDialog : public QDialog {
     Q_OBJECT
@@ -27,11 +27,11 @@ class ScoreBoardDialog : public QDialog {
     void onBoardSizeComboBoxIndexChanged(int index);
 
   private:
-    Ui::ScoreBoardDialog *ui;
-
     const ScoreBoard &scoreBoard_;
-    ScoreBoardItemModel model_;
     std::vector<BoardSize> boardSizes_;
+
+    std::unique_ptr<Ui::ScoreBoardDialog> ui;
+    std::unique_ptr<ScoreBoardItemModel> model_;
 };
 
 #endif // SCOREBOARDDIALOG_H

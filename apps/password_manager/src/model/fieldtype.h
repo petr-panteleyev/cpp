@@ -1,17 +1,10 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef FIELDTYPE_H
 #define FIELDTYPE_H
 
 #include "enumclass.h"
-#include <functional>
-#include <string>
-
-class FieldType;
-using FieldTypeRef = std::reference_wrapper<const FieldType>;
 
 class FieldType final : public Common::EnumClass<FieldType> {
   public:
@@ -32,8 +25,8 @@ class FieldType final : public Common::EnumClass<FieldType> {
     bool masked() const { return masked_; }
 
   private:
-    FieldType(const std::string &name) : EnumClass{name}, masked_{false} {}
-    FieldType(const std::string &name, bool masked) : EnumClass{name}, masked_{masked} {}
+    explicit FieldType(const std::string &name) : EnumClass{name}, masked_{false} {}
+    explicit FieldType(const std::string &name, bool masked) : EnumClass{name}, masked_{masked} {}
 
   private:
     const bool masked_;

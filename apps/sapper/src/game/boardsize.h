@@ -1,14 +1,11 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef BOARDSIZE_H
 #define BOARDSIZE_H
 
 #include <QString>
 #include <set>
-#include <stdexcept>
 
 class BoardSize final {
   public:

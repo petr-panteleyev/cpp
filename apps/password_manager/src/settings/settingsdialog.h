@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
@@ -41,7 +39,7 @@ class SettingsDialog : public QDialog {
   private:
     Ui::SettingsDialog *ui;
 
-    Settings::ColorMap           colors_;
+    Settings::ColorMap colors_;
     Settings::PasswordTypePtrMap passwords_;
 };
 
