@@ -5,21 +5,21 @@
 #define MAINWINDOW_H
 
 #include "boardsize.h"
-#include "boardsizedialog.h"
 #include "buttoneventfilter.h"
 #include "game.h"
 #include "gametimer.h"
-#include "qfont.h"
 #include "scoreboard.h"
-#include "scoreboarddialog.h"
 #include <QMainWindow>
 #include <QMenu>
+#include <memory>
 
 namespace Ui {
 class MainWindow;
 }
 
+class BoardSizeDialog;
 class QPushButton;
+class ScoreBoardDialog;
 
 class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandler {
     Q_OBJECT
@@ -40,12 +40,11 @@ class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandl
     void renderSuccess();
     void renderFailure(int hitPoint);
     int hitPointToButtonIndex(int hitPoint);
-    void onNewCustomGame();
     void buildCustomGameMenu();
     void onHelpAbout();
 
   private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
 
     Game game_;
     ScoreBoard scoreBoard_;
@@ -59,8 +58,8 @@ class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandl
     QFont lcdFont_;
     GameTimer gameTimer_;
 
-    ScoreBoardDialog scoreBoardDialog_;
-    BoardSizeDialog boardSizeDialog_;
+    ScoreBoardDialog *scoreBoardDialog_;
+    BoardSizeDialog *boardSizeDialog_;
 };
 
 #endif // MAINWINDOW_H

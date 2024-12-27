@@ -5,11 +5,9 @@
 #define CREDITCARDTYPE_H
 
 #include "enumclass.h"
-#include "picture.h"
 #include <QString>
 
-class CreditCardType;
-using CreditCardTypeRef = std::reference_wrapper<const CreditCardType>;
+class Picture;
 
 class CreditCardType final : public Common::EnumClass<CreditCardType> {
   public:
@@ -28,7 +26,7 @@ class CreditCardType final : public Common::EnumClass<CreditCardType> {
     const Picture &picture() const noexcept { return picture_; }
 
   private:
-    explicit CreditCardType(const std::string &name, const QString &cardTypeName, const Picture &picture)
+    explicit CreditCardType(const std::string &name, const QString &cardTypeName, const Picture &picture) noexcept
         : EnumClass{name}, cardTypeName_{cardTypeName}, picture_{picture} {}
 
   private:

@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #include "generator.h"
 #include "mainwindow.h"
@@ -15,7 +13,7 @@ using namespace pwdgen;
 
 static const int DEFAULT_PASSWORD_LENGTH = 16;
 
-static PasswordGeneratorOptions build_options(const QStringList &arguments);
+static PasswordGeneratorOptions buildOptions(const QStringList &arguments);
 
 static const std::string USAGE_MESSAGE = R"(Password Generator v24.11.1
 (c) 2024, Petr Panteleyev
@@ -32,7 +30,7 @@ Usage:
   --help    - print this help message and exit
 )";
 
-static std::map<PasswordGeneratorError, std::string> ERROR_MESSAGES{
+static std::unordered_map<PasswordGeneratorError, std::string> ERROR_MESSAGES{
     {PasswordGeneratorError::LENGTH_TOO_SMALL, "Password length is invalid"},
     {PasswordGeneratorError::NO_CHARACTER_SET, "At least one character set must be selected"},
 };
@@ -44,7 +42,7 @@ int main(int argc, char *argv[]) {
     if (arguments.size() == 1) {
         a.setWindowIcon(QIcon(":images/icon.png"));
 
-        QTranslator       translator;
+        QTranslator translator;
         const auto uiLanguages = QLocale::system().uiLanguages();
         for (const auto &locale : uiLanguages) {
             const auto baseName = "password_generator_" + QLocale(locale).name();
@@ -58,7 +56,7 @@ int main(int argc, char *argv[]) {
         return a.exec();
     } else {
         try {
-            auto options = build_options(arguments);
+            auto options = buildOptions(arguments);
             std::cout << generate(options) << std::endl;
         } catch (const PasswordGeneratorException &ex) {
             std::cerr << ERROR_MESSAGES[ex.errorCode()] << std::endl;
@@ -75,11 +73,11 @@ int main(int argc, char *argv[]) {
 
 static int as_number(const QString &arg) {
     bool ok;
-    int  result = arg.toInt(&ok);
+    int result = arg.toInt(&ok);
     return ok ? result : -1;
 }
 
-static PasswordGeneratorOptions build_options(const QStringList &arguments) {
+static PasswordGeneratorOptions buildOptions(const QStringList &arguments) {
     PasswordGeneratorOptions options = {false, false, false, false, DEFAULT_PASSWORD_LENGTH};
 
     for (auto it = std::next(arguments.begin()); it < arguments.end(); ++it) {

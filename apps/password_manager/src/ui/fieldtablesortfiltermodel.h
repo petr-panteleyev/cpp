@@ -8,7 +8,7 @@
 
 class FieldTableSortFilterModel : public QSortFilterProxyModel {
   public:
-    explicit FieldTableSortFilterModel(QObject *parent = nullptr) : QSortFilterProxyModel{parent} {}
+    explicit FieldTableSortFilterModel(QObject *parent) : QSortFilterProxyModel{parent} {}
 
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };

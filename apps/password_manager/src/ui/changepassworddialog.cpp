@@ -14,6 +14,11 @@ ChangePasswordDialog::ChangePasswordDialog(QWidget *parent)
 
     disabledColors_.setColor(QPalette::Text, Qt::black);
     disabledColors_.setColor(QPalette::Base, QColor::fromRgb(0xFF, 0xC0, 0xCB));
+
+    connect(ui->passwordEdit, &QLineEdit::textChanged,
+            [this](const auto &text) { setEditBackground(text != ui->repeatEdit->text()); });
+    connect(ui->repeatEdit, &QLineEdit::textChanged,
+            [this](const auto &text) { setEditBackground(text != ui->passwordEdit->text()); });
 }
 
 ChangePasswordDialog::~ChangePasswordDialog() {
@@ -41,16 +46,8 @@ void ChangePasswordDialog::done(int code) {
     return QDialog::done(code);
 }
 
-void ChangePasswordDialog::on_passwordEdit_textChanged(const QString &text) {
-    setEditBackground(text != ui->repeatEdit->text());
-}
-
-void ChangePasswordDialog::on_repeatEdit_textChanged(const QString &text) {
-    setEditBackground(text != ui->passwordEdit->text());
-}
-
 void ChangePasswordDialog::setEditBackground(bool disabled) {
-    const QPalette &palette = disabled ? disabledColors_ : enabledColors_;
+    auto &palette = disabled ? disabledColors_ : enabledColors_;
     ui->repeatEdit->setPalette(palette);
     ui->passwordEdit->setPalette(palette);
 

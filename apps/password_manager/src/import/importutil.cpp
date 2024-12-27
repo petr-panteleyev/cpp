@@ -3,16 +3,20 @@
 
 #include "importutil.h"
 #include "card.h"
+#include "importrecord.h"
+
+using ImportRecordVec = std::vector<std::shared_ptr<ImportRecord>>;
 
 namespace ImportUtil {
 
-static void processAddition(ImportRecordVec &result, const std::shared_ptr<Card> &toImport) {
+static void processAddition(std::vector<std::shared_ptr<ImportRecord>> &result, const std::shared_ptr<Card> &toImport) {
     if (toImport->active()) {
         result.push_back(std::make_shared<ImportRecord>(toImport));
     }
 }
 
-static void processUpdate(ImportRecordVec &result, const std::shared_ptr<Card> &existing, const std::shared_ptr<Card> &toImport) {
+static void processUpdate(std::vector<std::shared_ptr<ImportRecord>> &result, const std::shared_ptr<Card> &existing,
+                          const std::shared_ptr<Card> &toImport) {
     if (existing->modified() < toImport->modified()) {
         auto action = existing->active()   ? ImportAction::REPLACE
                       : toImport->active() ? ImportAction::RESTORE
@@ -21,9 +25,9 @@ static void processUpdate(ImportRecordVec &result, const std::shared_ptr<Card> &
     }
 }
 
-ImportRecordVec calculateImport(const std::vector<std::shared_ptr<Card>> &existing,
-                                const std::vector<std::shared_ptr<Card>> &toImport) {
-    ImportRecordVec result;
+std::vector<std::shared_ptr<ImportRecord>> calculateImport(const std::vector<std::shared_ptr<Card>> &existing,
+                                                           const std::vector<std::shared_ptr<Card>> &toImport) {
+    std::vector<std::shared_ptr<ImportRecord>> result;
 
     for (auto card : toImport) {
         auto found = std::find_if(existing.begin(), existing.end(),

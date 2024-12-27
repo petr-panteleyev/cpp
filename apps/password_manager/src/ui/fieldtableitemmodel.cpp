@@ -5,6 +5,7 @@
 #include "creditcardtype.h"
 #include "field.h"
 #include "fieldtype.h"
+#include "picture.h"
 #include "settings.h"
 
 static const QString MASK = "*****";

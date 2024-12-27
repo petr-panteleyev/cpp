@@ -5,7 +5,6 @@
 #define CARDEDITDIALOG_H
 
 #include <QDialog>
-#include <QMenu>
 
 namespace Ui {
 class CardEditDialog;
@@ -18,7 +17,7 @@ class CardEditDialog final : public QDialog {
     Q_OBJECT
 
   public:
-    explicit CardEditDialog(QWidget *parent = nullptr);
+    explicit CardEditDialog(QWidget *parent);
     ~CardEditDialog();
 
     void setCard(const Card &card);
@@ -27,6 +26,7 @@ class CardEditDialog final : public QDialog {
     virtual void done(int code) override;
 
   private:
+    void setupActions();
     void setupFieldTable();
     void setupFieldTableContextMenu();
 
@@ -41,17 +41,17 @@ class CardEditDialog final : public QDialog {
 
   private:
     std::unique_ptr<Ui::CardEditDialog> ui;
-    std::unique_ptr<EditFieldListModel> model_;
+    EditFieldListModel *model_;
 
     std::shared_ptr<Card> card_;
 
     // Field table actions
-    QAction fieldAddAction_;
-    QAction fieldDeleteAction_;
-    QAction fieldUpAction_;
-    QAction fieldDownAction_;
-    QAction fieldGenerateAction_;
-    QMenu fieldTableContextMenu_;
+    QAction *fieldAddAction_;
+    QAction *fieldDeleteAction_;
+    QAction *fieldUpAction_;
+    QAction *fieldDownAction_;
+    QAction *fieldGenerateAction_;
+    QMenu *fieldTableContextMenu_;
 };
 
 #endif // CARDEDITDIALOG_H

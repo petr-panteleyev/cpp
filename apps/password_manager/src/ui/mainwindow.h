@@ -27,6 +27,7 @@ class SettingsDialog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
+    Q_PROPERTY(QString currentFileName MEMBER currentFileName_ NOTIFY currentFileNameChanged)
 
   public:
     MainWindow(QWidget *parent = nullptr);
@@ -49,7 +50,6 @@ class MainWindow : public QMainWindow {
     void onCopyField();
     void onOpenLink();
     void onEditMenuAboutToShow();
-    void onToolsMenuAboutToShow();
     void onFieldTableDoubleClicked(const QModelIndex &index);
     void onFieldTableContextMenuRequested(QPoint pos);
     void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
@@ -59,6 +59,8 @@ class MainWindow : public QMainWindow {
     void onPasswordDialogAccepted();
     void continueOpen(const QString &fileName, const QString &password);
     void continueImport(const QString &fileName, const QString &password);
+
+    void updateFonts();
 
     void onActionAbout();
     void onActionChangePassword();
@@ -79,30 +81,32 @@ class MainWindow : public QMainWindow {
     void onActionShowDeletedToggled(bool checked);
 
   private:
-    static void loadRecords(const QString &fileName, const QString &password,
-                            std::vector<std::shared_ptr<Card>> &result);
+    static std::vector<std::shared_ptr<Card>> loadRecords(const QString &fileName, const QString &password);
+
+  signals:
+    void currentFileNameChanged(const QString &text);
 
   private:
     std::unique_ptr<Ui::MainWindow> ui;
 
-    std::unique_ptr<CardTableItemModel> cardModel_;
-    std::unique_ptr<CardTableSortFilterModel> sortFilterModel_;
+    CardTableItemModel *cardModel_;
+    CardTableSortFilterModel *sortFilterModel_;
 
-    std::unique_ptr<FieldTableItemModel> fieldModel_;
-    std::unique_ptr<FieldTableSortFilterModel> fieldFilterModel_;
+    FieldTableItemModel *fieldModel_;
+    FieldTableSortFilterModel *fieldFilterModel_;
 
-    QAction copyFieldAction_;
-    QAction openLinkAction_;
-    std::unique_ptr<QMenu> fieldContextMenu_;
+    QAction *copyFieldAction_;
+    QAction *openLinkAction_;
+    QMenu *fieldContextMenu_;
 
     QString currentFileName_;
     QString currentPassword_;
 
     // Dialogs
-    std::unique_ptr<PasswordDialog> passwordDialog_;
-    std::unique_ptr<ChangePasswordDialog> changePasswordDialog_;
-    std::unique_ptr<CardEditDialog> cardEditDialog_;
-    std::unique_ptr<ImportDialog> importDialog_;
-    std::unique_ptr<SettingsDialog> settingsDialog_;
+    PasswordDialog *passwordDialog_;
+    ChangePasswordDialog *changePasswordDialog_;
+    CardEditDialog *cardEditDialog_;
+    ImportDialog *importDialog_;
+    SettingsDialog *settingsDialog_;
 };
 #endif // MAINWINDOW_H

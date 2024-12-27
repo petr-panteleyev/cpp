@@ -4,10 +4,9 @@
 #include "importrecordtablemodel.h"
 #include "card.h"
 #include "importrecord.h"
-#include "qdatetime.h"
-#include "qnamespace.h"
 #include "settings.h"
 #include "translations.h"
+#include <QDate>
 
 static std::unordered_map<ImportAction, Settings::Color> ACTION_COLORS{
     {ImportAction::ADD, Settings::Color::ImportAdd},

@@ -4,7 +4,9 @@
 #include "cardtableitemmodel.h"
 #include "card.h"
 
-static QVariant buildAuxIconValue(const Card &card) {
+namespace {
+
+QVariant buildAuxIconValue(const Card &card) {
     if (!card.active()) {
         return Picture::TRASH.icon();
     } else {
@@ -15,6 +17,8 @@ static QVariant buildAuxIconValue(const Card &card) {
         }
     }
 }
+
+} // namespace
 
 QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || (std::size_t)index.row() >= data_.size()) {

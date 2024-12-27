@@ -5,7 +5,7 @@
 #define SETTINGS_H
 
 #include "boardsize.h"
-#include "scoreboard.h"
+#include "gamescore.h"
 #include <span>
 
 namespace Settings {

@@ -8,11 +8,11 @@
 
 class CardTableSortFilterModel : public QSortFilterProxyModel {
   public:
-    explicit CardTableSortFilterModel(QObject *parent = nullptr)
-        : QSortFilterProxyModel{parent}, show_deleted_{false} {};
+    explicit CardTableSortFilterModel(QObject *parent)
+        : QSortFilterProxyModel{parent}, showDeleted_{false} {};
 
     void setShowDeleted(bool show_deleted) {
-        show_deleted_ = show_deleted;
+        showDeleted_ = show_deleted;
         invalidateRowsFilter();
     }
 
@@ -25,7 +25,7 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
   private:
-    bool show_deleted_;
+    bool showDeleted_;
     QString filterText_;
 };
 

@@ -2,6 +2,7 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "settingsdialog.h"
+#include "fonttype.h"
 #include "qcheckbox.h"
 #include "qcombobox.h"
 #include "qthelpers.h"
@@ -9,13 +10,15 @@
 #include "translations.h"
 #include "ui_settingsdialog.h"
 #include <QColorDialog>
+#include <QFontDialog>
 
 static const std::array<int, 6> LENGTH{4, 6, 8, 16, 24, 32};
 
-SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog) {
+SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(std::make_unique<Ui::SettingsDialog>()) {
     ui->setupUi(this);
 
     setupColorButtons(true);
+    setupFontButtons();
 
     for (const auto &entry : Settings::getAllPasswordOptions()) {
         passwords_[entry.first] = entry.second;
@@ -29,14 +32,25 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     connect(ui->passwordLengthComboBox, &QComboBox::currentIndexChanged, this,
             &SettingsDialog::onPasswordLengthSelected);
 
-    connect(ui->upperCaseCheckBox, &QCheckBox::clicked, this, &SettingsDialog::onUpperCaseClicked);
-    connect(ui->lowerCaseCheckBox, &QCheckBox::clicked, this, &SettingsDialog::onLowerCaseClicked);
-    connect(ui->digitsCheckBox, &QCheckBox::clicked, this, &SettingsDialog::onDigitsClicked);
-    connect(ui->symbolsCheckBox, &QCheckBox::clicked, this, &SettingsDialog::onSymbolsClicked);
+    connect(ui->upperCaseCheckBox, &QCheckBox::clicked, [this](bool checked) {
+        auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
+        passwords_.at(type)->useUpperCase = checked;
+    });
+    connect(ui->lowerCaseCheckBox, &QCheckBox::clicked, [this](bool checked) {
+        auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
+        passwords_.at(type)->useLowerCase = checked;
+    });
+    connect(ui->digitsCheckBox, &QCheckBox::clicked, [this](bool checked) {
+        auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
+        passwords_.at(type)->useDigits = checked;
+    });
+    connect(ui->symbolsCheckBox, &QCheckBox::clicked, [this](bool checked) {
+        auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
+        passwords_.at(type)->useSymbols = checked;
+    });
 }
 
 SettingsDialog::~SettingsDialog() {
-    delete ui;
 }
 
 void SettingsDialog::showEvent(QShowEvent *event) {
@@ -67,10 +81,23 @@ void SettingsDialog::setupColorButton(Settings::Color color, QPushButton *button
     }
 }
 
+void SettingsDialog::setupFontButtons() {
+    auto textFont = Settings::getFont(Settings::FontType::TEXT);
+    ui->textFontEdit->setText(QString("%1, %2").arg(textFont.family()).arg(textFont.pointSize()));
+    connect(ui->textFontButton, &QPushButton::clicked,
+            [this]() { onFontButtonClicked(Settings::FontType::TEXT, ui->textFontEdit); });
+
+    auto menuFont = Settings::getFont(Settings::FontType::MENU);
+    ui->menuFontEdit->setText(QString("%1, %2").arg(menuFont.family()).arg(menuFont.pointSize()));
+    connect(ui->menuFontButton, &QPushButton::clicked,
+            [this]() { onFontButtonClicked(Settings::FontType::MENU, ui->menuFontEdit); });
+}
+
 void SettingsDialog::done(int code) {
     if (code == QDialog::Accepted) {
         Settings::setColors(colors_);
         Settings::setPasswordOptions(passwords_);
+        Settings::setFonts(fonts_);
     } else {
         // Reset controls to current settings
         setupColorButtons(false);
@@ -110,22 +137,12 @@ void SettingsDialog::onPasswordLengthSelected(int index) {
     passwords_.at(type)->length = length;
 }
 
-void SettingsDialog::onUpperCaseClicked(bool checked) {
-    auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-    passwords_.at(type)->useUpperCase = checked;
-}
-
-void SettingsDialog::onLowerCaseClicked(bool checked) {
-    auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-    passwords_.at(type)->useLowerCase = checked;
-}
-
-void SettingsDialog::onDigitsClicked(bool checked) {
-    auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-    passwords_.at(type)->useDigits = checked;
-}
-
-void SettingsDialog::onSymbolsClicked(bool checked) {
-    auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-    passwords_.at(type)->useSymbols = checked;
+void SettingsDialog::onFontButtonClicked(Settings::FontType fontType, QLineEdit *fontEdit) {
+    auto font = Settings::getFont(fontType);
+    bool ok;
+    font = QFontDialog::getFont(&ok, font, parentWidget());
+    if (ok) {
+        fontEdit->setText(font.family() + " " + QString::number(font.pointSize()));
+        fonts_[fontType] = std::make_shared<QFont>(font);
+    }
 }

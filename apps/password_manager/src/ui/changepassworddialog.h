@@ -26,10 +26,6 @@ class ChangePasswordDialog : public QDialog {
   private:
     void setEditBackground(bool disabled);
 
-  private slots:
-    void on_passwordEdit_textChanged(const QString &text);
-    void on_repeatEdit_textChanged(const QString &text);
-
   private:
     std::unique_ptr<Ui::ChangePasswordDialog> ui;
 

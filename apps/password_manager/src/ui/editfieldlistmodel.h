@@ -17,7 +17,7 @@ class EditFieldListModel : public QAbstractItemModel {
     static constexpr int FIELD_TABLE_VALUE_COLUMN = 2;
 
   public:
-    explicit EditFieldListModel(QObject *parent = nullptr);
+    explicit EditFieldListModel(QObject *parent);
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 

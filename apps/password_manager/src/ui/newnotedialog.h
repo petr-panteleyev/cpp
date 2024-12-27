@@ -5,6 +5,7 @@
 #define NEWNOTEDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui {
 class NewNoteDialog;
@@ -16,13 +17,13 @@ class NewNoteDialog : public QDialog {
     Q_OBJECT
 
   public:
-    explicit NewNoteDialog(QWidget *parent = nullptr);
+    explicit NewNoteDialog(QWidget *parent);
     ~NewNoteDialog();
 
     std::shared_ptr<Card> note() const;
 
   private:
-    Ui::NewNoteDialog *ui;
+    std::unique_ptr<Ui::NewNoteDialog> ui;
 };
 
 #endif // NEWNOTEDIALOG_H

@@ -125,7 +125,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="16"/>
+        <location filename="mainwindow.cpp" line="15"/>
         <source>Password Generator</source>
         <translation>Генератор паролей</translation>
     </message>

@@ -10,7 +10,7 @@ class Field;
 
 class FieldTableItemModel : public QAbstractItemModel {
   public:
-    explicit FieldTableItemModel(QObject *parent = nullptr) : QAbstractItemModel{parent} {};
+    explicit FieldTableItemModel(QObject *parent) : QAbstractItemModel{parent} {};
 
     void setItems(const std::vector<std::shared_ptr<Field>> &items) {
         beginResetModel();

@@ -5,6 +5,7 @@
 #define NEWCARDDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui {
 class NewCardDialog;
@@ -21,15 +22,11 @@ class NewCardDialog : public QDialog {
 
     std::shared_ptr<Card> card() const;
 
-  private slots:
-    void on_typeComboBox_currentIndexChanged(int index);
+  private:
+    void onTypeComboBoxCurrentIndexChanged(int index);
 
   private:
-    void initTypeComboBox();
-    void initPictureComboBox();
-
-  private:
-    Ui::NewCardDialog *ui;
+    std::unique_ptr<Ui::NewCardDialog> ui;
 };
 
 #endif // NEWCARDDIALOG_H

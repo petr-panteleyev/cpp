@@ -20,7 +20,7 @@ class ImportDialog : public QDialog {
     Q_OBJECT
 
   public:
-    explicit ImportDialog(QWidget *parent = nullptr);
+    explicit ImportDialog(QWidget *parent);
     ~ImportDialog();
 
     void setup(const std::vector<std::shared_ptr<ImportRecord>> &toImport);
@@ -33,11 +33,11 @@ class ImportDialog : public QDialog {
     void onContextMenuAboutToShow();
 
   private:
-    Ui::ImportDialog *ui;
+    const std::unique_ptr<Ui::ImportDialog> ui;
 
-    const std::unique_ptr<ImportRecordTableModel> model_;
-    const std::unique_ptr<QMenu> contextMenu_;
-    const std::unique_ptr<QAction> actionToggleApproval_;
+    ImportRecordTableModel *model_;
+    QMenu *contextMenu_;
+    QAction *actionToggleApproval_;
 };
 
 #endif // IMPORTDIALOG_H

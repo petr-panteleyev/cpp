@@ -102,7 +102,7 @@
         <translation>Новая...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="283"/>
+        <location filename="mainwindow.cpp" line="278"/>
         <source>About Sapper</source>
         <translation>О Сапёре</translation>
     </message>
@@ -123,12 +123,12 @@
 <context>
     <name>ScoreBoardItemModel</name>
     <message>
-        <location filename="score/scoreboarditemmodel.cpp" line="17"/>
+        <location filename="score/scoreboarditemmodel.cpp" line="16"/>
         <source>Time</source>
         <translation>Время</translation>
     </message>
     <message>
-        <location filename="score/scoreboarditemmodel.cpp" line="18"/>
+        <location filename="score/scoreboarditemmodel.cpp" line="17"/>
         <source>Date</source>
         <translation>Дата</translation>
     </message>

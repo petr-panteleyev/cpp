@@ -9,14 +9,11 @@
 #include "fieldvalueeditdelegate.h"
 #include "generator.h"
 #include "picture.h"
-#include "qnamespace.h"
 #include "qthelpers.h"
 #include "settings.h"
 #include "timeutil.h"
 #include "ui_cardeditdialog.h"
 #include <QMessageBox>
-
-using std::make_unique;
 
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTES = 1;
@@ -36,13 +33,13 @@ class NotEmptyValidator : public QValidator {
 };
 
 CardEditDialog::CardEditDialog(QWidget *parent)
-    : QDialog(parent), ui(make_unique<Ui::CardEditDialog>()), model_{make_unique<EditFieldListModel>(this)},
-      fieldAddAction_{tr("Add"), this}, fieldDeleteAction_{tr("Delete"), this}, fieldUpAction_{tr("Up"), this},
-      fieldDownAction_{tr("Down"), this}, fieldGenerateAction_(tr("Generate"), this)
-
-{
+    : QDialog(parent), ui(std::make_unique<Ui::CardEditDialog>()), model_{new EditFieldListModel{this}},
+      fieldAddAction_{new QAction{tr("Add"), this}}, fieldDeleteAction_{new QAction{tr("Delete"), this}},
+      fieldUpAction_{new QAction{tr("Up"), this}}, fieldDownAction_{new QAction{tr("Down"), this}},
+      fieldGenerateAction_(new QAction{tr("Generate"), this}), fieldTableContextMenu_{new QMenu{this}} {
     ui->setupUi(this);
 
+    setupActions();
     setupFieldTable();
     setupFieldTableContextMenu();
 
@@ -79,16 +76,33 @@ void CardEditDialog::setCard(const Card &card) {
     }
 }
 
+void CardEditDialog::setupActions() {
+    fieldAddAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+    connect(fieldAddAction_, &QAction::triggered, this, &CardEditDialog::onAddField);
+
+    fieldDeleteAction_->setShortcut(QKeySequence(Qt::Key_Delete));
+    connect(fieldDeleteAction_, &QAction::triggered, this, &CardEditDialog::onDeleteField);
+
+    fieldGenerateAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+    connect(fieldGenerateAction_, &QAction::triggered, this, &CardEditDialog::onGenerate);
+
+    fieldUpAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Up));
+    connect(fieldUpAction_, &QAction::triggered, this, &CardEditDialog::onFieldUp);
+
+    fieldDownAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Down));
+    connect(fieldDownAction_, &QAction::triggered, this, &CardEditDialog::onFieldDown);
+}
+
 void CardEditDialog::setupFieldTable() {
     auto t = ui->fieldsTable;
 
     QtHelpers::addActions(
-        t, {&fieldAddAction_, &fieldDeleteAction_, &fieldGenerateAction_, &fieldUpAction_, &fieldDownAction_});
+        t, {fieldAddAction_, fieldDeleteAction_, fieldGenerateAction_, fieldUpAction_, fieldDownAction_});
 
-    t->setModel(model_.get());
+    t->setModel(model_);
     t->setEditTriggers(QAbstractItemView::DoubleClicked);
-    t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_TYPE_COLUMN, new FieldValueEditDelegate());
-    t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_VALUE_COLUMN, new FieldValueEditDelegate());
+    t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_TYPE_COLUMN, new FieldValueEditDelegate(this));
+    t->setItemDelegateForColumn(EditFieldListModel::FIELD_TABLE_VALUE_COLUMN, new FieldValueEditDelegate(this));
 
     connect(t->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &CardEditDialog::fieldTableCurrentRowChanged);
@@ -100,21 +114,8 @@ void CardEditDialog::setupFieldTable() {
 }
 
 void CardEditDialog::setupFieldTableContextMenu() {
-    fieldAddAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
-    fieldDeleteAction_.setShortcut(QKeySequence(Qt::Key_Delete));
-    fieldGenerateAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
-    fieldUpAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Up));
-    fieldDownAction_.setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Down));
-
-    QtHelpers::addActions(&fieldTableContextMenu_,
-                          {&fieldAddAction_, &fieldDeleteAction_, nullptr, &fieldGenerateAction_, nullptr,
-                           &fieldUpAction_, &fieldDownAction_});
-
-    connect(&fieldAddAction_, &QAction::triggered, this, &CardEditDialog::onAddField);
-    connect(&fieldDeleteAction_, &QAction::triggered, this, &CardEditDialog::onDeleteField);
-    connect(&fieldUpAction_, &QAction::triggered, this, &CardEditDialog::onFieldUp);
-    connect(&fieldDownAction_, &QAction::triggered, this, &CardEditDialog::onFieldDown);
-    connect(&fieldGenerateAction_, &QAction::triggered, this, &CardEditDialog::onGenerate);
+    QtHelpers::addActions(fieldTableContextMenu_, {fieldAddAction_, fieldDeleteAction_, nullptr, fieldGenerateAction_,
+                                                   nullptr, fieldUpAction_, fieldDownAction_});
 
     connect(ui->fieldsTable, &QTableView::customContextMenuRequested, this,
             &CardEditDialog::fieldTableContextMenuRequested);
@@ -194,7 +195,7 @@ void CardEditDialog::fieldTableContextMenuRequested(QPoint pos) {
     if (!index.isValid()) {
         return;
     }
-    fieldTableContextMenu_.popup(ui->fieldsTable->viewport()->mapToGlobal(pos));
+    fieldTableContextMenu_->popup(ui->fieldsTable->viewport()->mapToGlobal(pos));
 }
 
 void CardEditDialog::fieldTableCurrentRowChanged(const QModelIndex &current, const QModelIndex &) {
@@ -202,7 +203,7 @@ void CardEditDialog::fieldTableCurrentRowChanged(const QModelIndex &current, con
         return;
     }
     auto field = model_->at(current.row());
-    fieldUpAction_.setEnabled(current.row() != 0);
-    fieldDownAction_.setEnabled(current.row() != model_->rowCount() - 1);
-    fieldGenerateAction_.setEnabled(GENERATOR_OPTIONS.contains(field->type().ordinal()));
+    fieldUpAction_->setEnabled(current.row() != 0);
+    fieldDownAction_->setEnabled(current.row() != model_->rowCount() - 1);
+    fieldGenerateAction_->setEnabled(GENERATOR_OPTIONS.contains(field->type().ordinal()));
 }

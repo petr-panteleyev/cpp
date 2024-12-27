@@ -6,12 +6,11 @@
 #include "timeutil.h"
 #include "ui_newnotedialog.h"
 
-NewNoteDialog::NewNoteDialog(QWidget *parent) : QDialog(parent), ui(new Ui::NewNoteDialog) {
+NewNoteDialog::NewNoteDialog(QWidget *parent) : QDialog(parent), ui{std::make_unique<Ui::NewNoteDialog>()} {
     ui->setupUi(this);
 }
 
 NewNoteDialog::~NewNoteDialog() {
-    delete ui;
 }
 
 std::shared_ptr<Card> NewNoteDialog::note() const {

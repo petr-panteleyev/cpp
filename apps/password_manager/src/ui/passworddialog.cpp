@@ -4,17 +4,17 @@
 #include "passworddialog.h"
 #include "ui_passworddialog.h"
 
-PasswordDialog::PasswordDialog(QWidget *parent) : QDialog(parent), ui(new Ui::PasswordDialog) {
+PasswordDialog::PasswordDialog(QWidget *parent) : QDialog{parent}, ui{std::make_unique<Ui::PasswordDialog>()} {
     ui->setupUi(this);
 }
 
 PasswordDialog::~PasswordDialog() {
-    delete ui;
 }
 
 void PasswordDialog::setFileName(const QString &fileName) {
     ui->fileLabel->setText(fileName);
     ui->passwordEdit->setText("");
+    ui->passwordEdit->setFocus();
 }
 
 const QString PasswordDialog::getFileName() const {

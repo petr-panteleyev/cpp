@@ -4,6 +4,7 @@
 target_sources(password_manager PRIVATE
     importaction.h
     importrecord.h
+    importrecord.cpp
     importutil.h
     importutil.cpp
     importdialog.h

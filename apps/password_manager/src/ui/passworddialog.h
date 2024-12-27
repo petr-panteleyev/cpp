@@ -5,6 +5,7 @@
 #define PASSWORDDIALOG_H
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui {
 class PasswordDialog;
@@ -31,7 +32,7 @@ class PasswordDialog : public QDialog {
     }
 
   private:
-    Ui::PasswordDialog *ui;
+    std::unique_ptr<Ui::PasswordDialog> ui;
 
     Mode mode_;
 };

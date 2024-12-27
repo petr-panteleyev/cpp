@@ -6,6 +6,7 @@
 
 #include "boardsize.h"
 #include <QDialog>
+#include <memory>
 
 namespace Ui {
 class BoardSizeDialog;
@@ -15,19 +16,13 @@ class BoardSizeDialog final : public QDialog {
     Q_OBJECT
 
   public:
-    explicit BoardSizeDialog(QWidget *parent = nullptr);
+    explicit BoardSizeDialog(QWidget *parent);
     ~BoardSizeDialog();
 
     BoardSize boardSize() const;
 
   private:
-    void adjustMinesSlider();
-    void onWidthValueChanged(int);
-    void onHeightValueChanged(int);
-    void onMinesValueChanged(int);
-
-  private:
-    Ui::BoardSizeDialog *ui;
+    std::unique_ptr<Ui::BoardSizeDialog> ui;
 };
 
 #endif // BOARDSIZEDIALOG_H

@@ -4,6 +4,16 @@
 
 Monorepo with C++ sources.
 
+## Applications
+
++ [Password Generator](./apps/password_generator)
++ [Password Manager](./apps/password_manager)
++ [Sapper](./apps/sapper)
+
+## Libraries
+
++ [pwdgen](./libs/pwdgen)
+
 ## Build
 
 Requirements:
@@ -31,14 +41,3 @@ Application targets:
 ```sh
 ctest --preset Debug
 ```
-
-
-## Applications
-
-+ [Password Generator](./apps/password_generator)
-+ [Password Manager](./apps/password_manager)
-+ [Sapper](./apps/sapper)
-
-## Libraries
-
-+ [pwdgen](./libs/pwdgen)

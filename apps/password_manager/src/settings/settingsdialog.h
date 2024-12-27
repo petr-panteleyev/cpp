@@ -4,12 +4,15 @@
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
+#include "fonttype.h"
 #include "settings.h"
 #include <QDialog>
 
 namespace Ui {
 class SettingsDialog;
 }
+
+class QLineEdit;
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
@@ -29,18 +32,18 @@ class SettingsDialog : public QDialog {
     void setupColorButtons(bool connectSignal);
     void setupColorButton(Settings::Color color, QPushButton *button, bool connectSignal);
 
+    void setupFontButtons();
+
     void onPasswordTypeSelected(int index);
     void onPasswordLengthSelected(int index);
-    void onUpperCaseClicked(bool checked);
-    void onLowerCaseClicked(bool checked);
-    void onDigitsClicked(bool checked);
-    void onSymbolsClicked(bool checked);
+    void onFontButtonClicked(Settings::FontType fontType, QLineEdit *fontEdit);
 
   private:
-    Ui::SettingsDialog *ui;
+    std::unique_ptr<Ui::SettingsDialog> ui;
 
     Settings::ColorMap colors_;
     Settings::PasswordTypePtrMap passwords_;
+    Settings::FontPtrMap fonts_;
 };
 
 #endif // SETTINGSDIALOG_H

@@ -4,12 +4,16 @@
 #ifndef IMPORTUTIL_H
 #define IMPORTUTIL_H
 
-#include "importrecord.h"
+#include <memory>
+#include <vector>
+
+class Card;
+class ImportRecord;
 
 namespace ImportUtil {
 
-ImportRecordVec calculateImport(const std::vector<std::shared_ptr<Card>> &existing,
-                                const std::vector<std::shared_ptr<Card>> &toImport);
+std::vector<std::shared_ptr<ImportRecord>> calculateImport(const std::vector<std::shared_ptr<Card>> &existing,
+                                                           const std::vector<std::shared_ptr<Card>> &toImport);
 
 } // namespace ImportUtil
 

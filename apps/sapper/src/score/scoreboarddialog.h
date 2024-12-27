@@ -31,7 +31,7 @@ class ScoreBoardDialog : public QDialog {
     std::vector<BoardSize> boardSizes_;
 
     std::unique_ptr<Ui::ScoreBoardDialog> ui;
-    std::unique_ptr<ScoreBoardItemModel> model_;
+    ScoreBoardItemModel *model_;
 };
 
 #endif // SCOREBOARDDIALOG_H

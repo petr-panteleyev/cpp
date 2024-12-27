@@ -53,7 +53,7 @@ class Card final {
   private:
     const CardClass &cardClass_;
     QUuid uuid_;
-    PictureRef picture_;
+    std::reference_wrapper<const Picture> picture_;
     QString name_;
     unsigned long modified_;
     QString note_;

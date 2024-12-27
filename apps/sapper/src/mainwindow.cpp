@@ -3,17 +3,15 @@
 
 #include "mainwindow.h"
 #include "boardsize.h"
+#include "boardsizedialog.h"
 #include "buttoneventfilter.h"
 #include "cell.h"
 #include "pictures.h"
-#include "qcolor.h"
-#include "qgridlayout.h"
-#include "qmessagebox.h"
-#include "qnamespace.h"
 #include "scoreboarddialog.h"
 #include "settings.h"
 #include "ui_mainwindow.h"
 #include "version.h"
+#include <QMessageBox>
 #include <QMouseEvent>
 
 static constexpr int CELL_SIZE{40};
@@ -39,9 +37,11 @@ static std::array<QColor, 9> NUMBER_COLORS{
     QColor::fromRgb(165, 42, 42), QColor::fromRgb(0x00, 0x80, 0x80), QColorConstants::Black, QColorConstants::Gray};
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), game_{*this}, eventFilter_{this}, boardSize_{BoardSize::BIG},
-      buttonFont_{"Mine-Sweeper", 14, QFont::Medium}, lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
-      scoreBoardDialog_{this, scoreBoard_}, boardSizeDialog_{this} {
+    : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, game_{*this}, eventFilter_{this},
+      boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
+      lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
+      scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}},
+      boardSizeDialog_{new BoardSizeDialog{this}} {
     ui->setupUi(this);
 
     scoreBoard_.load();
@@ -72,15 +72,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onHelpAbout);
-    connect(&boardSizeDialog_, &QDialog::accepted, [this]() { newGame(boardSizeDialog_.boardSize()); });
-    connect(ui->actionNewCustomGame, &QAction::triggered, this, &MainWindow::onNewCustomGame);
+    connect(boardSizeDialog_, &QDialog::accepted, [this]() { newGame(boardSizeDialog_->boardSize()); });
+    connect(ui->actionNewCustomGame, &QAction::triggered, [this]() { boardSizeDialog_->show(); });
 
     setupGameMenu();
     newGame(Settings::getLastBoardSize());
 }
 
 MainWindow::~MainWindow() {
-    delete ui;
 }
 
 void MainWindow::setupGameMenu() {
@@ -94,8 +93,8 @@ void MainWindow::setupGameMenu() {
     buildCustomGameMenu();
 
     connect(ui->actionResults, &QAction::triggered, [this]() {
-        scoreBoardDialog_.setup();
-        scoreBoardDialog_.show();
+        scoreBoardDialog_->setup();
+        scoreBoardDialog_->show();
     });
 }
 
@@ -218,8 +217,8 @@ void MainWindow::renderSuccess() {
     buildCustomGameMenu();
 
     if (top) {
-        scoreBoardDialog_.setup();
-        scoreBoardDialog_.show();
+        scoreBoardDialog_->setup();
+        scoreBoardDialog_->show();
     }
 }
 
@@ -248,10 +247,6 @@ void MainWindow::renderFailure(int clickPoint) {
             }
         }
     }
-}
-
-void MainWindow::onNewCustomGame() {
-    boardSizeDialog_.show();
 }
 
 void MainWindow::buildCustomGameMenu() {

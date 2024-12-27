@@ -83,7 +83,7 @@ const Picture Picture::YAHOO{"YAHOO", "yahoo.png"};
 const Picture Picture::YANDEX{"YANDEX", "yandex.png"};
 
 template <>
-const std::vector<PictureRef> Common::EnumClass<Picture>::values_{
+const std::vector<std::reference_wrapper<const Picture>> Common::EnumClass<Picture>::values_{
     cref(Picture::AIRPLANE),    cref(Picture::AMAZON),    cref(Picture::AMEX),      cref(Picture::APPLE),
     cref(Picture::AUTO),        cref(Picture::BANK),      cref(Picture::BITBUCKET), cref(Picture::CD),
     cref(Picture::CHESS),       cref(Picture::CHROME),    cref(Picture::CITI),      cref(Picture::COMPUTER),
@@ -108,7 +108,7 @@ const CardClass CardClass::CARD{"CARD"};
 const CardClass CardClass::NOTE{"NOTE"};
 
 template <>
-const std::vector<CardClassRef> Common::EnumClass<CardClass>::values_{
+const std::vector<std::reference_wrapper<const CardClass>> Common::EnumClass<CardClass>::values_{
     cref(CardClass::CARD),
     cref(CardClass::NOTE),
 };
@@ -149,7 +149,7 @@ const CreditCardType CreditCardType::VISA("VISA", "VISA", Picture::VISA);
 const CreditCardType CreditCardType::OTHER("OTHER", "Other", Picture::CREDIT_CARD);
 
 template <>
-const std::vector<CreditCardTypeRef> Common::EnumClass<CreditCardType>::values_{
+const std::vector<std::reference_wrapper<const CreditCardType>> Common::EnumClass<CreditCardType>::values_{
     cref(CreditCardType::AMEX),       cref(CreditCardType::DINERS), cref(CreditCardType::JCB),
     cref(CreditCardType::MASTERCARD), cref(CreditCardType::MIR),    cref(CreditCardType::PAYPAL),
     cref(CreditCardType::UNION_PAY),  cref(CreditCardType::VISA),   cref(CreditCardType::OTHER),

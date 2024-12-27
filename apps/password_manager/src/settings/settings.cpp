@@ -3,13 +3,17 @@
 
 #include "settings.h"
 #include "generator.h"
+#include <QFont>
 #include <QSettings>
+#include <unordered_map>
 
 namespace Settings {
 
 static const QString COLOR_GROUP{"colors"};
 static const QString SETTING_CURRENT_FILE{"currentFile"};
 static const QString OPEN_LINKS_WITH_DOUBLE_CLICK{"openLinksWithDoubleClick"};
+
+static const QString FONT_GROUP{"fonts"};
 
 static const QString PASSWORDS_GROUP{"passwords"};
 static const QString PASSWORD_LENGTH{"length"};
@@ -22,6 +26,11 @@ static const std::unordered_map<Color, QString> COLOR_NAMES{
     {Color::FieldName, "fieldName"},       {Color::FieldValue, "fieldValue"},
     {Color::ImportAdd, "importAdd"},       {Color::ImportReplace, "importReplace"},
     {Color::ImportDelete, "importDelete"}, {Color::ImportRestore, "importRestore"},
+};
+
+static const std::unordered_map<FontType, QString> FONT_NAMES{
+    {FontType::TEXT, "text"},
+    {FontType::MENU, "menu"},
 };
 
 static const ColorMap DEFAULT_COLORS{
@@ -137,6 +146,26 @@ PasswordTypePtrMap getAllPasswordOptions() {
 bool getOpenLinkWithDoubleClick() {
     QSettings settings;
     return settings.value(OPEN_LINKS_WITH_DOUBLE_CLICK, true).toBool();
+}
+
+void setFonts(const FontPtrMap &fonts) {
+    QSettings settings;
+    settings.beginGroup(FONT_GROUP);
+    for (const auto &f : fonts) {
+        settings.setValue(FONT_NAMES.at(f.first), f.second->toString());
+    }
+    settings.endGroup();
+}
+
+const QFont getFont(FontType type) {
+    QSettings settings;
+    settings.beginGroup(FONT_GROUP);
+
+    auto str = settings.value(FONT_NAMES.at(type), "System").toString();
+    QFont font;
+    font.fromString(str);
+    settings.endGroup();
+    return font;
 }
 
 } // namespace Settings

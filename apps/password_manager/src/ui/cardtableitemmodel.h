@@ -10,7 +10,7 @@ class Card;
 
 class CardTableItemModel : public QAbstractItemModel {
   public:
-    explicit CardTableItemModel(QObject *parent = nullptr) : QAbstractItemModel{parent} {};
+    explicit CardTableItemModel(QObject *parent) : QAbstractItemModel{parent} {};
 
     void setItems(const std::vector<std::shared_ptr<Card>> &items) {
         beginResetModel();

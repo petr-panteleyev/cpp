@@ -3,6 +3,7 @@
 
 target_sources(password_manager PRIVATE
     passwordtype.h
+    fonttype.h
     settings.h
     settings.cpp
     settingsdialog.h

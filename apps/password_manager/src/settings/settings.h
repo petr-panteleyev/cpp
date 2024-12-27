@@ -4,10 +4,14 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "fonttype.h"
 #include "generator.h"
 #include "passwordtype.h"
 #include <QColor>
 #include <QString>
+#include <unordered_map>
+
+class QFont;
 
 namespace Settings {
 
@@ -24,8 +28,8 @@ enum class Color {
 };
 
 using ColorMap = std::unordered_map<Color, QColor>;
-
 using PasswordTypePtrMap = std::unordered_map<PasswordType, std::shared_ptr<pwdgen::PasswordGeneratorOptions>>;
+using FontPtrMap = std::unordered_map<FontType, std::shared_ptr<QFont>>;
 
 void setColors(const ColorMap &colors);
 QColor getColor(Color type);
@@ -35,6 +39,9 @@ pwdgen::PasswordGeneratorOptions getPasswordOptions(PasswordType type);
 PasswordTypePtrMap getAllPasswordOptions();
 
 bool getOpenLinkWithDoubleClick();
+
+void setFonts(const FontPtrMap &fonts);
+const QFont getFont(FontType type);
 
 } // namespace Settings
 

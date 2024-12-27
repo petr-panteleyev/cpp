@@ -11,18 +11,9 @@
 #include "translations.h"
 #include "ui_newcarddialog.h"
 
-NewCardDialog::NewCardDialog(QWidget *parent) : QDialog(parent), ui(new Ui::NewCardDialog) {
-    ui->setupUi(this);
+namespace {
 
-    initTypeComboBox();
-    initPictureComboBox();
-}
-
-NewCardDialog::~NewCardDialog() {
-    delete ui;
-}
-
-void NewCardDialog::initTypeComboBox() {
+void initTypeComboBox(std::unique_ptr<Ui::NewCardDialog> &ui) {
     for (const RecordType &type : RecordType::values()) {
         ui->typeComboBox->addItem(type.picture().icon(), Translations::translate(type), type.ordinal());
         if (type == RecordType::PASSWORD) {
@@ -31,13 +22,27 @@ void NewCardDialog::initTypeComboBox() {
     }
 }
 
-void NewCardDialog::initPictureComboBox() {
+void initPictureComboBox(std::unique_ptr<Ui::NewCardDialog> &ui) {
     for (const Picture &picture : Picture::values()) {
         ui->pictureComboBox->addItem(picture.icon(), "", picture.ordinal());
         if (picture == Picture::GENERIC) {
             ui->pictureComboBox->setCurrentIndex(ui->pictureComboBox->count() - 1);
         }
     }
+}
+
+} // namespace
+
+NewCardDialog::NewCardDialog(QWidget *parent) : QDialog{parent}, ui{std::make_unique<Ui::NewCardDialog>()} {
+    ui->setupUi(this);
+
+    ::initTypeComboBox(ui);
+    ::initPictureComboBox(ui);
+
+    connect(ui->typeComboBox, &QComboBox::currentIndexChanged, this, &NewCardDialog::onTypeComboBoxCurrentIndexChanged);
+}
+
+NewCardDialog::~NewCardDialog() {
 }
 
 std::shared_ptr<Card> NewCardDialog::card() const {
@@ -59,7 +64,7 @@ std::shared_ptr<Card> NewCardDialog::card() const {
     return std::make_shared<Card>(picture, ui->titleEdit->text(), TimeUtil::currentTimeMillis(), fields);
 }
 
-void NewCardDialog::on_typeComboBox_currentIndexChanged(int index) {
+void NewCardDialog::onTypeComboBoxCurrentIndexChanged(int index) {
     if (index == -1) {
         return;
     }

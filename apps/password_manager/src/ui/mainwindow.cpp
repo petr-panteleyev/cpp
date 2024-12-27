@@ -14,6 +14,7 @@
 #include "fieldtableitemmodel.h"
 #include "fieldtablesortfiltermodel.h"
 #include "fieldtype.h"
+#include "fonttype.h"
 #include "importdialog.h"
 #include "importutil.h"
 #include "newcarddialog.h"
@@ -36,8 +37,6 @@
 
 using namespace Crypto;
 
-using std::make_unique;
-
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTE = 1;
 
@@ -53,18 +52,17 @@ Copyright &copy; 2024 Petr Panteleyev
 )";
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow{parent}, ui{make_unique<Ui::MainWindow>()}, cardModel_{make_unique<CardTableItemModel>()},
-      sortFilterModel_{std::make_unique<CardTableSortFilterModel>()}, fieldModel_{make_unique<FieldTableItemModel>()},
-      fieldFilterModel_{make_unique<FieldTableSortFilterModel>()}, copyFieldAction_{this},
-      openLinkAction_{tr("Open Link"), this}, fieldContextMenu_{make_unique<QMenu>(this)},
-      passwordDialog_{make_unique<PasswordDialog>(this)},
-      changePasswordDialog_{make_unique<ChangePasswordDialog>(this)},
-      cardEditDialog_{make_unique<CardEditDialog>(this)}, importDialog_{make_unique<ImportDialog>(this)},
-      settingsDialog_{make_unique<SettingsDialog>(this)} {
+    : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, cardModel_{new CardTableItemModel{this}},
+      sortFilterModel_{new CardTableSortFilterModel{this}}, fieldModel_{new FieldTableItemModel{this}},
+      fieldFilterModel_{new FieldTableSortFilterModel{this}}, copyFieldAction_{new QAction{this}},
+      openLinkAction_{new QAction{tr("Open Link"), this}}, fieldContextMenu_{new QMenu{this}},
+      passwordDialog_{new PasswordDialog{this}}, changePasswordDialog_{new ChangePasswordDialog{this}},
+      cardEditDialog_{new CardEditDialog{this}}, importDialog_{new ImportDialog{this}},
+      settingsDialog_{new SettingsDialog{this}} {
     ui->setupUi(this);
 
-    sortFilterModel_->setSourceModel(cardModel_.get());
-    ui->cardListView->setModel(sortFilterModel_.get());
+    sortFilterModel_->setSourceModel(cardModel_);
+    ui->cardListView->setModel(sortFilterModel_);
 
     sortFilterModel_->sort(0);
 
@@ -77,8 +75,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->cardListView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Field Table
-    fieldFilterModel_->setSourceModel(fieldModel_.get());
-    ui->fieldTable->setModel(fieldFilterModel_.get());
+    fieldFilterModel_->setSourceModel(fieldModel_);
+    ui->fieldTable->setModel(fieldFilterModel_);
+    ui->fieldTable->setStyleSheet("QTableView::item { border:0px; padding: 3px; }");
 
     auto fieldTableHeader = ui->fieldTable->horizontalHeader();
     assert(fieldTableHeader != nullptr);
@@ -97,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabIcon(TAB_NOTE, Picture::NOTE.icon());
 
     // Field context menu
-    QtHelpers::addActions(fieldContextMenu_.get(), {&copyFieldAction_, &openLinkAction_});
+    QtHelpers::addActions(fieldContextMenu_, {copyFieldAction_, openLinkAction_});
 
     auto selectionModel = ui->cardListView->selectionModel();
     connect(selectionModel, &QItemSelectionModel::currentChanged, this, &MainWindow::onCurrentCardChanged);
@@ -127,13 +126,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionImport, &QAction::triggered, this, &MainWindow::onActionImport);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::onActionSettings);
 
-    connect(&copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
-    connect(&openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
+    connect(copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
+    connect(openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
 
     connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
-    connect(ui->menuTools, &QMenu::aboutToShow, this, &MainWindow::onToolsMenuAboutToShow);
 
-    connect(passwordDialog_.get(), &QDialog::accepted, this, &MainWindow::onPasswordDialogAccepted);
+    connect(passwordDialog_, &QDialog::accepted, this, &MainWindow::onPasswordDialogAccepted);
+
+    connect(this, &MainWindow::currentFileNameChanged, [this](const auto &text) {
+        QtHelpers::enableActions(!text.isEmpty(), {ui->actionNewCard, ui->actionNewNote, ui->actionImport,
+                                                   ui->actionExport, ui->actionChangePassword, ui->actionPurge});
+        updateWindowTitle();
+    });
+
+    updateFonts();
 }
 
 MainWindow::~MainWindow() {
@@ -166,17 +172,15 @@ void MainWindow::onPasswordDialogAccepted() {
 
 void MainWindow::continueOpen(const QString &fileName, const QString &password) {
     try {
-        std::vector<std::shared_ptr<Card>> cards;
-        loadRecords(fileName, password, cards);
+        auto cards = loadRecords(fileName, password);
 
         cardModel_->setItems(cards);
         if (cardModel_->rowCount() > 0) {
             ui->cardListView->setCurrentIndex(sortFilterModel_->index(0, 0));
         }
 
-        currentFileName_ = fileName;
+        setProperty("currentFileName", fileName);
         currentPassword_ = password;
-        updateWindowTitle();
 
         Settings::setCurrentFile(currentFileName_);
     } catch (const PasswordManagerException &ex) {
@@ -260,16 +264,16 @@ void MainWindow::onFieldTableContextMenuRequested(QPoint pos) {
     auto sourceIndex = fieldFilterModel_->mapToSource(index);
     auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
 
-    copyFieldAction_.setText(tr("Copy") + " \"" + field->name() + "\"");
-    copyFieldAction_.setData(field->getValueAsString());
-    openLinkAction_.setData(field->getValueAsString());
+    copyFieldAction_->setText(tr("Copy") + " \"" + field->name() + "\"");
+    copyFieldAction_->setData(field->getValueAsString());
+    openLinkAction_->setData(field->getValueAsString());
     fieldContextMenu_->popup(ui->fieldTable->viewport()->mapToGlobal(pos));
 
-    openLinkAction_.setVisible(field->type() == FieldType::LINK);
+    openLinkAction_->setVisible(field->type() == FieldType::LINK);
 }
 
 void MainWindow::onCopyField() {
-    auto fieldText = copyFieldAction_.data().toString();
+    auto fieldText = copyFieldAction_->data().toString();
     auto clipboard = QGuiApplication::clipboard();
     if (clipboard != nullptr) {
         clipboard->setText(fieldText);
@@ -277,7 +281,7 @@ void MainWindow::onCopyField() {
 }
 
 void MainWindow::onOpenLink() {
-    auto urlText = openLinkAction_.data().toString();
+    auto urlText = openLinkAction_->data().toString();
     QDesktopServices::openUrl(QUrl(urlText));
 }
 
@@ -398,18 +402,14 @@ void MainWindow::onActionNew() {
 
     auto password = changePasswordDialog_->password();
 
-    currentFileName_ = fileName;
+    setProperty("currentFileName", fileName);
     currentPassword_ = password;
 
     cardModel_->setItems({});
     writeFile();
-    updateWindowTitle();
 }
 
 void MainWindow::onEditMenuAboutToShow() {
-    bool fileOpened = !currentFileName_.isEmpty();
-    QtHelpers::enableActions(fileOpened, {ui->actionNewCard, ui->actionNewNote});
-
     bool hasCurrentCard = false;
     auto index = currentIndex();
     if (index.isValid()) {
@@ -425,12 +425,6 @@ void MainWindow::onEditMenuAboutToShow() {
         ui->actionDelete->setText(card->active() ? tr("Delete") : tr("Finally Delete"));
         ui->actionFavorite->setChecked(card->favorite());
     }
-}
-
-void MainWindow::onToolsMenuAboutToShow() {
-    bool fileOpened = !currentFileName_.isEmpty();
-    QtHelpers::enableActions(fileOpened,
-                             {ui->actionImport, ui->actionExport, ui->actionChangePassword, ui->actionPurge});
 }
 
 void MainWindow::updateWindowTitle() {
@@ -536,8 +530,7 @@ void MainWindow::onActionImport() {
 
 void MainWindow::continueImport(const QString &fileName, const QString &password) {
     try {
-        std::vector<std::shared_ptr<Card>> toImport;
-        loadRecords(fileName, password, toImport);
+        auto toImport = loadRecords(fileName, password);
 
         auto importRecords = ImportUtil::calculateImport(cardModel_->data(), toImport);
         if (importRecords.empty()) {
@@ -563,8 +556,7 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
     }
 }
 
-void MainWindow::loadRecords(const QString &fileName, const QString &password,
-                             std::vector<std::shared_ptr<Card>> &result) {
+std::vector<std::shared_ptr<Card>> MainWindow::loadRecords(const QString &fileName, const QString &password) {
     QFile file{fileName};
     if (!file.open(QIODevice::ReadOnly)) {
         throw PasswordManagerException("File cannot be opened!");
@@ -583,10 +575,30 @@ void MainWindow::loadRecords(const QString &fileName, const QString &password,
         }
         file.close();
 
+        std::vector<std::shared_ptr<Card>> result;
         Serializer::deserialize(doc, result);
+        return result;
     }
 }
 
 void MainWindow::onActionSettings() {
-    settingsDialog_->show();
+    // settingsDialog_->show();
+    settingsDialog_->exec();
+    updateFonts();
+}
+
+void MainWindow::updateFonts() {
+    auto textFont = Settings::getFont(Settings::FontType::TEXT);
+    ui->cardListView->setFont(textFont);
+    ui->fieldTable->setFont(textFont);
+
+    auto menuFont = Settings::getFont(Settings::FontType::MENU);
+
+    ui->menubar->setFont(menuFont);
+    for (auto a : ui->menubar->actions()) {
+        auto menu = a->menu();
+        if (menu != nullptr) {
+            menu->setFont(menuFont);
+        }
+    }
 }

@@ -6,16 +6,13 @@
 
 #include "enumclass.h"
 
-class CardClass;
-using CardClassRef = std::reference_wrapper<const CardClass>;
-
 class CardClass final : public Common::EnumClass<CardClass> {
   public:
     static const CardClass CARD;
     static const CardClass NOTE;
 
   private:
-    CardClass(const std::string &name) : EnumClass{name} {}
+    explicit CardClass(const std::string &name) noexcept : EnumClass{name} {}
 };
 
 #endif // CARDCLASS_H

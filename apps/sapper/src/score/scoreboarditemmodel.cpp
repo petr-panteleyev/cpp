@@ -2,7 +2,6 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboarditemmodel.h"
-#include "qnamespace.h"
 
 ScoreBoardItemModel::ScoreBoardItemModel(QObject *parent, const ScoreBoard &scoreBoard) : QAbstractItemModel(parent) {
 }

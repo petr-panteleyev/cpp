@@ -3,14 +3,14 @@
 
 #include "importdialog.h"
 #include "importrecordtablemodel.h"
-#include "qkeysequence.h"
-#include "qnamespace.h"
 #include "ui_importdialog.h"
 #include <QMenu>
 
+using std::make_unique;
+
 ImportDialog::ImportDialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::ImportDialog), model_{std::make_unique<ImportRecordTableModel>()},
-      contextMenu_{std::make_unique<QMenu>(this)}, actionToggleApproval_{std::make_unique<QAction>(this)} {
+    : QDialog{parent}, ui{make_unique<Ui::ImportDialog>()}, model_{new ImportRecordTableModel{this}},
+      contextMenu_{new QMenu{this}}, actionToggleApproval_{new QAction{tr("Skip"), this}} {
     ui->setupUi(this);
 
     setupTableView();
@@ -18,11 +18,10 @@ ImportDialog::ImportDialog(QWidget *parent)
 }
 
 ImportDialog::~ImportDialog() {
-    delete ui;
 }
 
 void ImportDialog::setupTableView() {
-    ui->tableView->setModel(model_.get());
+    ui->tableView->setModel(model_);
 
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -35,14 +34,13 @@ void ImportDialog::setupTableView() {
 
 void ImportDialog::setupContextMenu() {
     actionToggleApproval_->setCheckable(true);
-    actionToggleApproval_->setText(tr("Skip"));
     actionToggleApproval_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
-    connect(actionToggleApproval_.get(), &QAction::toggled, this, &ImportDialog::onToggleApproval);
+    connect(actionToggleApproval_, &QAction::toggled, this, &ImportDialog::onToggleApproval);
 
-    this->addAction(actionToggleApproval_.get());
-    contextMenu_->addAction(actionToggleApproval_.get());
+    this->addAction(actionToggleApproval_);
+    contextMenu_->addAction(actionToggleApproval_);
 
-    connect(contextMenu_.get(), &QMenu::aboutToShow, this, &ImportDialog::onContextMenuAboutToShow);
+    connect(contextMenu_, &QMenu::aboutToShow, this, &ImportDialog::onContextMenuAboutToShow);
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &ImportDialog::onContextMenuRequested);
 }
 

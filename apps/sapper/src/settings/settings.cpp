@@ -2,7 +2,6 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "settings.h"
-#include "qsettings.h"
 #include <QSettings>
 
 namespace Settings {

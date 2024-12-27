@@ -2,21 +2,18 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboarddialog.h"
-#include "qcombobox.h"
 #include "scoreboard.h"
 #include "scoreboarditemmodel.h"
 #include "ui_scoreboarddialog.h"
-#include <memory>
-
-using std::make_unique;
+#include <QComboBox>
 
 ScoreBoardDialog::ScoreBoardDialog(QWidget *parent, const ScoreBoard &scoreBoard)
-    : QDialog(parent), scoreBoard_{scoreBoard}, ui(make_unique<Ui::ScoreBoardDialog>()),
-      model_{make_unique<ScoreBoardItemModel>(this, scoreBoard_)} {
+    : QDialog{parent}, scoreBoard_{scoreBoard}, ui(std::make_unique<Ui::ScoreBoardDialog>()),
+      model_{new ScoreBoardItemModel{this, scoreBoard_}} {
 
     ui->setupUi(this);
 
-    ui->scoreTableView->setModel(model_.get());
+    ui->scoreTableView->setModel(model_);
     ui->scoreTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->scoreTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
