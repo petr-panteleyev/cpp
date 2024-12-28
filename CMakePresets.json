@@ -7,43 +7,57 @@
     },
     "configurePresets": [
         {
-            "name": "Debug",
+            "name": "debug",
             "displayName": "Debug Configuration",
             "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/debug",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             },
             "environment": {}
         },
         {
-            "name": "Release",
+            "name": "release",
             "displayName": "Release Configuration",
             "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/release",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/build/install",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
-            },
-            "environment": {}
+            }
         }
     ],
     "buildPresets": [
         {
-            "name": "Debug",
+            "name": "debug",
             "displayName": "All - Debug",
-            "configurePreset": "Debug"
+            "configurePreset": "debug"
         },
         {
-            "name": "Release",
+            "name": "release",
             "displayName": "All - Release",
-            "configurePreset": "Release",
+            "configurePreset": "release",
             "cleanFirst": true
+        },
+        {
+            "name": "install",
+            "configurePreset": "release",
+            "targets": ["install"]
+        },
+        {
+            "name": "lupdate",
+            "configurePreset": "debug",
+            "targets": [
+                "password_generator_lupdate",
+                "password_manager_lupdate",
+                "sapper_lupdate"
+            ]
         }
     ],
     "testPresets": [
         {
-            "name": "Debug",
-            "configurePreset": "Debug"
+            "name": "debug",
+            "configurePreset": "debug"
         }
     ]
 }

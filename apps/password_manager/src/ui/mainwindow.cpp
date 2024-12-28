@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, cardModel_{new CardTableItemModel{this}},
       sortFilterModel_{new CardTableSortFilterModel{this}}, fieldModel_{new FieldTableItemModel{this}},
       fieldFilterModel_{new FieldTableSortFilterModel{this}}, copyFieldAction_{new QAction{this}},
-      openLinkAction_{new QAction{tr("Open Link"), this}}, fieldContextMenu_{new QMenu{this}},
+      openLinkAction_{new QAction{tr("Open Link"), this}}, fieldContextMenu_{new QMenu{this}}, currentFileName_{""},
       passwordDialog_{new PasswordDialog{this}}, changePasswordDialog_{new ChangePasswordDialog{this}},
       cardEditDialog_{new CardEditDialog{this}}, importDialog_{new ImportDialog{this}},
       settingsDialog_{new SettingsDialog{this}} {
@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->searchField, &QLineEdit::textChanged, this, &MainWindow::onSearchFieldTextChanged);
 
-    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::onActionExit);
+    connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onActionOpen);
     connect(ui->actionFilter, &QAction::triggered, this, &MainWindow::onActionFilter);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onActionAbout);
@@ -124,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionEdit, &QAction::triggered, this, &MainWindow::onActionEdit);
     connect(ui->actionExport, &QAction::triggered, this, &MainWindow::onActionExport);
     connect(ui->actionImport, &QAction::triggered, this, &MainWindow::onActionImport);
-    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::onActionSettings);
+    connect(ui->actionSettings, &QAction::triggered, [this]() { settingsDialog_->show(); });
 
     connect(copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
     connect(openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
@@ -132,10 +132,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
 
     connect(passwordDialog_, &QDialog::accepted, this, &MainWindow::onPasswordDialogAccepted);
+    connect(settingsDialog_, &QDialog::accepted, [this]() { updateFonts(); });
 
-    connect(this, &MainWindow::currentFileNameChanged, [this](const auto &text) {
-        QtHelpers::enableActions(!text.isEmpty(), {ui->actionNewCard, ui->actionNewNote, ui->actionImport,
-                                                   ui->actionExport, ui->actionChangePassword, ui->actionPurge});
+    currentFileName_.subscribe([this](const QString &, const QString &newValue) {
+        QtHelpers::enableActions(!newValue.isEmpty(), {ui->actionNewCard, ui->actionNewNote, ui->actionImport,
+                                                       ui->actionExport, ui->actionChangePassword, ui->actionPurge});
         updateWindowTitle();
     });
 
@@ -179,10 +180,10 @@ void MainWindow::continueOpen(const QString &fileName, const QString &password) 
             ui->cardListView->setCurrentIndex(sortFilterModel_->index(0, 0));
         }
 
-        setProperty("currentFileName", fileName);
+        currentFileName_ = fileName;
         currentPassword_ = password;
 
-        Settings::setCurrentFile(currentFileName_);
+        Settings::setCurrentFile(currentFileName_.get());
     } catch (const PasswordManagerException &ex) {
         QMessageBox::critical(this, tr("Critical Error"), ex.message());
     } catch (const CryptoException &ex) {
@@ -239,10 +240,6 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemS
 void MainWindow::onActionShowDeletedToggled(bool checked) {
     sortFilterModel_->setShowDeleted(checked);
     scrollToCurrentCard();
-}
-
-void MainWindow::onActionExit() {
-    close();
 }
 
 void MainWindow::onFieldTableDoubleClicked(const QModelIndex &index) {
@@ -402,7 +399,7 @@ void MainWindow::onActionNew() {
 
     auto password = changePasswordDialog_->password();
 
-    setProperty("currentFileName", fileName);
+    currentFileName_ = fileName;
     currentPassword_ = password;
 
     cardModel_->setItems({});
@@ -429,15 +426,15 @@ void MainWindow::onEditMenuAboutToShow() {
 
 void MainWindow::updateWindowTitle() {
     auto title = tr("Password Manager");
-    if (currentFileName_.isEmpty()) {
+    if (currentFileName_.get().isEmpty()) {
         setWindowTitle(title);
     } else {
-        setWindowTitle(title + " - " + currentFileName_);
+        setWindowTitle(title + " - " + currentFileName_.get());
     }
 }
 
 void MainWindow::onActionChangePassword() {
-    changePasswordDialog_->reset(currentFileName_);
+    changePasswordDialog_->reset(currentFileName_.get());
     if (changePasswordDialog_->exec() != QDialog::Accepted) {
         return;
     }
@@ -579,12 +576,6 @@ std::vector<std::shared_ptr<Card>> MainWindow::loadRecords(const QString &fileNa
         Serializer::deserialize(doc, result);
         return result;
     }
-}
-
-void MainWindow::onActionSettings() {
-    // settingsDialog_->show();
-    settingsDialog_->exec();
-    updateFonts();
 }
 
 void MainWindow::updateFonts() {

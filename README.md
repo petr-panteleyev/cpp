@@ -24,8 +24,8 @@ Requirements:
 * GTest
 
 ```sh
-cmake . --preset <Debug | Release>
-cmake --build --preset <Debug | Release> [--target <target>]
+cmake . --preset <debug | release>
+cmake --build --preset <debug | release> [--target <target>]
 ```
 
 Application targets:
@@ -35,9 +35,9 @@ Application targets:
 
 ## Test
 
-1. Build all (no --target) for Debug
+1. Build all (no --target) for debug
 2. Execute tests
 
 ```sh
-ctest --preset Debug
+ctest --preset debug
 ```

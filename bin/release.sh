@@ -5,4 +5,4 @@ then
     TARGET="--target $1"
 fi
 
-cmake --build --preset Debug $TARGET
+cmake --build --preset release $TARGET

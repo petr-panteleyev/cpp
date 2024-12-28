@@ -41,8 +41,6 @@ qt_add_translations(password_manager
         src/ui/password_manager_ru_RU.ts
 )
 
-add_dependencies(password_manager password_manager_lupdate)
-
 target_link_libraries(password_manager PRIVATE 
     Qt6::Core
     Qt6::Widgets
@@ -65,6 +63,11 @@ set_target_properties(password_manager PROPERTIES
 )
 
 install(TARGETS password_manager
-    BUNDLE DESTINATION .
+    RUNTIME DESTINATION password_manager
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(FILES
+    resources/icon.png
+    DESTINATION password_manager
 )

@@ -4,6 +4,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "observablevalue.h"
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -27,7 +28,6 @@ class SettingsDialog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
-    Q_PROPERTY(QString currentFileName MEMBER currentFileName_ NOTIFY currentFileNameChanged)
 
   public:
     MainWindow(QWidget *parent = nullptr);
@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow {
     const QModelIndex currentIndex() const noexcept;
     std::optional<std::shared_ptr<Card>> currentCard() const noexcept;
 
-    void writeFile() const { writeFile(currentFileName_, currentPassword_); }
+    void writeFile() const { writeFile(currentFileName_.get(), currentPassword_); }
     void writeFile(const QString &fileName, const QString &password) const;
 
     void updateWindowTitle();
@@ -66,7 +66,6 @@ class MainWindow : public QMainWindow {
     void onActionChangePassword();
     void onActionDelete();
     void onActionEdit();
-    void onActionExit();
     void onActionExport();
     void onActionFilter();
     void onActionFavorite();
@@ -77,14 +76,10 @@ class MainWindow : public QMainWindow {
     void onActionOpen();
     void onActionPurge();
     void onActionRestore();
-    void onActionSettings();
     void onActionShowDeletedToggled(bool checked);
 
   private:
     static std::vector<std::shared_ptr<Card>> loadRecords(const QString &fileName, const QString &password);
-
-  signals:
-    void currentFileNameChanged(const QString &text);
 
   private:
     std::unique_ptr<Ui::MainWindow> ui;
@@ -99,7 +94,7 @@ class MainWindow : public QMainWindow {
     QAction *openLinkAction_;
     QMenu *fieldContextMenu_;
 
-    QString currentFileName_;
+    Common::ObservableValue<QString> currentFileName_;
     QString currentPassword_;
 
     // Dialogs

@@ -17,8 +17,3 @@ target_sources(pwdgen
         characterset.cpp
         generator.cpp
 )
-
-install(TARGETS pwdgen
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)

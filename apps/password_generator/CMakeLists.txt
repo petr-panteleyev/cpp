@@ -35,23 +35,18 @@ qt_add_translations(password_generator
         src/password_generator_ru.ts
 )
 
-add_dependencies(password_generator password_generator_lupdate)
-
 target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets pwdgen)
 
 target_include_directories(password_generator PRIVATE
     ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
 )
 
-set_target_properties(password_generator PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+install(TARGETS password_generator
+    RUNTIME DESTINATION password_generator
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-install(TARGETS password_generator
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install (FILES
+    resources/icon.png
+    DESTINATION password_generator
 )

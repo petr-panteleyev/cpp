@@ -49,8 +49,6 @@ qt_add_translations(sapper
         src/sapper_ru_RU.ts
 )
 
-add_dependencies(sapper sapper_lupdate)
-
 target_link_libraries(sapper PRIVATE
     Qt6::Core
     Qt6::Widgets
@@ -60,15 +58,12 @@ target_include_directories(sapper PRIVATE
   ${CMAKE_SOURCE_DIR}/include
 )
 
-set_target_properties(sapper PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+install(TARGETS sapper
+    RUNTIME DESTINATION sapper
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-install(TARGETS sapper
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install (FILES
+    resources/icon.png
+    DESTINATION sapper
 )
