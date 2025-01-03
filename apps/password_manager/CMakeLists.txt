@@ -52,6 +52,7 @@ target_link_libraries(password_manager PRIVATE
 target_include_directories(password_manager PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
+  ${CMAKE_SOURCE_DIR}/libs/common/src
 )
 
 set_target_properties(password_manager PROPERTIES

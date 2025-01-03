@@ -13,6 +13,7 @@ Monorepo with C++ sources.
 ## Libraries
 
 + [pwdgen](./libs/pwdgen)
++ [common](./libs/common)
 
 ## Build
 

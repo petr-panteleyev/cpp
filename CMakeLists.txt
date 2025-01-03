@@ -17,6 +17,7 @@ include(CTest)
 
 # Libraries
 add_subdirectory(libs/pwdgen)
+add_subdirectory(libs/common)
 
 # Applications
 add_subdirectory(apps/password_generator)
