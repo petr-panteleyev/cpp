@@ -12,7 +12,7 @@ namespace Common {
 
 template <typename T> class EnumClass {
   public:
-    unsigned           ordinal() const noexcept { return ordinal_; }
+    unsigned ordinal() const noexcept { return ordinal_; }
     const std::string &name() const noexcept { return name_; }
 
     bool operator==(const EnumClass &that) const noexcept { return this->ordinal_ == that.ordinal_; }
@@ -26,6 +26,8 @@ template <typename T> class EnumClass {
     }
 
   public:
+    virtual ~EnumClass() = default;
+
     static const std::vector<std::reference_wrapper<const T>> &values() noexcept { return values_; };
 
     static const T &valueOf(const std::string &name) {
@@ -47,7 +49,7 @@ template <typename T> class EnumClass {
     EnumClass<T>(const EnumClass<T> &&) = delete;
 
   private:
-    const unsigned    ordinal_;
+    const unsigned ordinal_;
     const std::string name_;
 
     static inline unsigned nextOrdinal_ = 0;

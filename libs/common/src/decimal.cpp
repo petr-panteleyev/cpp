@@ -154,6 +154,17 @@ Decimal::Decimal(const std::string &stringValue) : stringValue_{stringValue} {
     }
 }
 
+std::strong_ordering Decimal::operator<=>(const Decimal &that) noexcept {
+    if (scale_ == that.scale_) {
+        return signum_ * bits_ <=> that.signum_ * that.bits_;
+    }
+
+    auto maxScale = std::max(scale_, that.scale_);
+    auto normThis = normalize(*this, maxScale);
+    auto normThat = normalize(that, maxScale);
+    return signum_ * normThis <=> that.signum_ * normThat;
+}
+
 std::string Decimal::toString() const noexcept {
     if (!stringValue_.empty()) {
         return stringValue_;
