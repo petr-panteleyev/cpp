@@ -39,11 +39,13 @@ target_link_libraries(money_manager PRIVATE
     Qt6::Xml
     Qt6::Sql
     common
+    qthelpers
 )
 
 target_include_directories(money_manager PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/libs/common/src
+  ${CMAKE_SOURCE_DIR}/libs/qthelpers/src
 )
 
 install(TARGETS money_manager

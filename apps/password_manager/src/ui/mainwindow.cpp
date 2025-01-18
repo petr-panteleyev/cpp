@@ -141,6 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     updateFonts();
+    Settings::loadWindowDimensions(this);
 }
 
 MainWindow::~MainWindow() {
@@ -158,6 +159,11 @@ void MainWindow::showEvent(QShowEvent *event) {
         passwordDialog_->setFileName(fileName);
         passwordDialog_->show(PasswordDialog::Mode::OPEN);
     });
+}
+
+void MainWindow::hideEvent(QHideEvent *event) {
+    Settings::saveWindowDimensions(this);
+    QMainWindow::hideEvent(event);
 }
 
 void MainWindow::onPasswordDialogAccepted() {

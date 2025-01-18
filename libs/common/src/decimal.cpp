@@ -154,7 +154,7 @@ Decimal::Decimal(const std::string &stringValue) : stringValue_{stringValue} {
     }
 }
 
-std::strong_ordering Decimal::operator<=>(const Decimal &that) noexcept {
+std::strong_ordering Decimal::operator<=>(const Decimal &that) const noexcept {
     if (scale_ == that.scale_) {
         return signum_ * bits_ <=> that.signum_ * that.bits_;
     }

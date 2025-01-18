@@ -9,10 +9,12 @@
 #include "fieldvalueeditdelegate.h"
 #include "generator.h"
 #include "picture.h"
+#include "qnamespace.h"
 #include "qthelpers.h"
 #include "settings.h"
 #include "timeutil.h"
 #include "ui_cardeditdialog.h"
+#include <QMenu>
 #include <QMessageBox>
 
 constexpr int TAB_FIELDS = 0;
@@ -70,7 +72,7 @@ void CardEditDialog::setCard(const Card &card) {
     ui->pictureLabel->setVisible(isCard);
 
     // Picture
-    auto pictureIndex = QtHelpers::indexOfData(*ui->pictureComboBox, card.picture().ordinal());
+    auto pictureIndex = QtHelpers::indexOfData(*ui->pictureComboBox, card.picture().ordinal(), Qt::UserRole);
     if (pictureIndex != -1) {
         ui->pictureComboBox->setCurrentIndex(pictureIndex);
     }

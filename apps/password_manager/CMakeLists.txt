@@ -1,7 +1,7 @@
 # Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_manager VERSION 24.12.5 LANGUAGES CXX)
+project(password_manager VERSION 25.1.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -47,12 +47,14 @@ target_link_libraries(password_manager PRIVATE
     Qt6::Xml
     OpenSSL::Crypto
     pwdgen
+    qthelpers
 )
 
 target_include_directories(password_manager PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
-  ${CMAKE_SOURCE_DIR}/libs/common/src
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
+    ${CMAKE_SOURCE_DIR}/libs/common/src
+    ${CMAKE_SOURCE_DIR}/libs/qthelpers/src
 )
 
 set_target_properties(password_manager PROPERTIES

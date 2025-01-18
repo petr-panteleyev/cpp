@@ -3,8 +3,10 @@
 
 #include "settings.h"
 #include "generator.h"
+#include "qthelpers.h"
 #include <QFont>
 #include <QSettings>
+#include <QWidget>
 #include <unordered_map>
 
 namespace Settings {
@@ -166,6 +168,16 @@ const QFont getFont(FontType type) {
     font.fromString(str);
     settings.endGroup();
     return font;
+}
+
+void saveWindowDimensions(const QWidget *widget) {
+    QSettings settings;
+    QtHelpers::saveWindowDimensions(*widget, settings, "window");
+}
+
+void loadWindowDimensions(QWidget *widget) {
+    QSettings settings;
+    QtHelpers::loadWindowDimensions(*widget, settings, "window");
 }
 
 } // namespace Settings

@@ -32,7 +32,7 @@ class Decimal final {
         return this->bits_ == that.bits_ && this->scale_ == that.scale_ && this->signum_ == that.signum_;
     }
 
-    std::strong_ordering operator<=>(const Decimal &that) noexcept;
+    std::strong_ordering operator<=>(const Decimal &that) const noexcept;
 
     DecimalBits bits() const noexcept { return bits_; }
     int signum() const noexcept { return signum_; }

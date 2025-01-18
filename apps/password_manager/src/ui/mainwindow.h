@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow {
 
   protected:
     virtual void showEvent(QShowEvent *event) override;
+    virtual void hideEvent(QHideEvent *event) override;
 
   private:
     const QModelIndex currentIndex() const noexcept;

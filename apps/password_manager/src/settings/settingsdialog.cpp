@@ -125,7 +125,7 @@ void SettingsDialog::onPasswordTypeSelected(int index) {
     ui->digitsCheckBox->setChecked(options->useDigits);
     ui->symbolsCheckBox->setChecked(options->useSymbols);
 
-    auto lengthIndex = QtHelpers::indexOfData(*ui->passwordLengthComboBox, options->length);
+    auto lengthIndex = QtHelpers::indexOfData(*ui->passwordLengthComboBox, options->length, Qt::UserRole);
     if (lengthIndex != -1) {
         ui->passwordLengthComboBox->setCurrentIndex(lengthIndex);
     }

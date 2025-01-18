@@ -12,6 +12,7 @@
 #include <unordered_map>
 
 class QFont;
+class QWidget;
 
 namespace Settings {
 
@@ -42,6 +43,9 @@ bool getOpenLinkWithDoubleClick();
 
 void setFonts(const FontPtrMap &fonts);
 const QFont getFont(FontType type);
+
+void saveWindowDimensions(const QWidget *widget);
+void loadWindowDimensions(QWidget *widget);
 
 } // namespace Settings
 

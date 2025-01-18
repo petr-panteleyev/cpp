@@ -73,7 +73,7 @@ void NewCardDialog::onTypeComboBoxCurrentIndexChanged(int index) {
     auto &type = RecordType::valueOf(ordinal);
     auto pictureOrdinal = type.picture().ordinal();
 
-    auto pictureIndex = QtHelpers::indexOfData(*(ui->pictureComboBox), pictureOrdinal);
+    auto pictureIndex = QtHelpers::indexOfData(*(ui->pictureComboBox), pictureOrdinal, Qt::UserRole);
     if (index != -1) {
         ui->pictureComboBox->setCurrentIndex(pictureIndex);
     }
