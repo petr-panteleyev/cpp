@@ -17,6 +17,9 @@ class ContactWindow : public QMainWindow {
     explicit ContactWindow(QWidget *parent = nullptr);
     ~ContactWindow();
 
+  protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
   private:
     std::unique_ptr<Ui::ContactWindow> ui;
 

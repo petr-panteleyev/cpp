@@ -33,6 +33,7 @@ void MoneyDao::preload() {
     auto conn = dataSource_->getConnection();
     auto &connRef = *conn.get();
     cache_.setIcons(iconRepository_->getAll(connRef));
+    cache_.setCards(cardRepository_->getAll(connRef));
     cache_.setCategories(categoryRepository_->getAll(connRef));
     cache_.setAccounts(accountRepository_->getAll(connRef));
     cache_.setContacts(contactRepository_->getAll(connRef));

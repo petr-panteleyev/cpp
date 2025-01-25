@@ -7,6 +7,6 @@ IconRepository::IconRepository() : Repository{"icon"} {
 }
 
 std::shared_ptr<Icon> IconRepository::fromResultSet(const ResultSet &rs) const {
-    return std::make_shared<Icon>(rs.getQUuid("uuid"), rs.getQString("name"), rs.getBytes("bytes"),
+    return std::make_shared<Icon>(rs.getQUuid("uuid"), rs.getQString("name"), rs.getQByteArray("bytes"),
                                   rs.getLong("created"), rs.getLong("modified"));
 }

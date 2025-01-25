@@ -22,6 +22,7 @@ class Contact final : public MoneyRecord {
     const ContactType &type() const noexcept { return type_; }
     const QString &phone() const noexcept { return phone_; }
     const QString &email() const noexcept { return email_; }
+    std::optional<QUuid> iconUuid() const noexcept { return iconUuid_; }
 
   private:
     QString name_;

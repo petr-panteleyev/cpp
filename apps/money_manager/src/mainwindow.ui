@@ -119,10 +119,12 @@
     <property name="title">
      <string notr="true">Окно</string>
     </property>
+    <addaction name="actionAccountWindow"/>
+    <addaction name="actionCardWindow"/>
+    <addaction name="separator"/>
     <addaction name="actionContactWindow"/>
     <addaction name="actionCurrencyWindow"/>
     <addaction name="actionCategoryWindow"/>
-    <addaction name="actionAccountWindow"/>
    </widget>
    <widget class="QMenu" name="helpMenu">
     <property name="title">
@@ -221,6 +223,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+Up</string>
+   </property>
+  </action>
+  <action name="actionCardWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string notr="true">Карты...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
  </widget>

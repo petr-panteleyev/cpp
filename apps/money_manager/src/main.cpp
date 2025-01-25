@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
     a.setWindowIcon(QIcon(":images/icon.png"));
 
     QApplication::setOrganizationDomain("panteleyev.org");
-    QApplication::setApplicationName("Money Manager");
+    QApplication::setApplicationName("MoneyManager");
 
     MainWindow w;
     w.show();

@@ -7,6 +7,7 @@
 #include "globalcontext.h"
 #include "qnamespace.h"
 #include "qvariant.h"
+#include "settings.h"
 #include "ui_currencywindow.h"
 #include <QSortFilterProxyModel>
 
@@ -66,4 +67,9 @@ CurrencyWindow::CurrencyWindow(QWidget *parent)
 }
 
 CurrencyWindow::~CurrencyWindow() {
+}
+
+void CurrencyWindow::hideEvent(QHideEvent *event) {
+    Settings::saveWindowDimensions(this);
+    QMainWindow::hideEvent(event);
 }

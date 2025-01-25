@@ -17,6 +17,9 @@ class CurrencyWindow : public QMainWindow {
     explicit CurrencyWindow(QWidget *parent = nullptr);
     ~CurrencyWindow();
 
+  protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
   private:
     std::unique_ptr<Ui::CurrencyWindow> ui;
 

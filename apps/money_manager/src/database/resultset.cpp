@@ -116,26 +116,10 @@ std::optional<QDate> ResultSet::getNullableQDate(const QString &name) const {
     return value.isNull() ? std::nullopt : std::optional(value.toDate());
 }
 
-std::vector<std::byte> ResultSet::getBytes(int columnNumber) const {
-    return std::vector<std::byte>();
-
-    //    assert(pgResult_ != nullptr);
-    //    assert(columnNumber >= 0 && columnNumber < columns_);
-
-    //    int length = PQgetlength(pgResult_, currentRow_, columnNumber);
-    //    if (length <= 0) {
-    //        throw SqlException("Binary size <= 0");
-    //    }
-
-    //    std::vector<std::byte> result;
-    //    result.resize(length);
-
-    //    char *bytes = getValue(pgResult_, currentRow_, columnNumber);
-    //    std::memcpy(result.data(), bytes, length);
-    //    return result;
+QByteArray ResultSet::getQByteArray(int columnNumber) const {
+    return query_->value(columnNumber).toByteArray();
 }
 
-std::vector<std::byte> ResultSet::getBytes(const QString &name) const {
-    return std::vector<std::byte>();
-    //    return getBytes(getColumnNumber(name));
+QByteArray ResultSet::getQByteArray(const QString &name) const {
+    return query_->value(name).toByteArray();
 }

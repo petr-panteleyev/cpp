@@ -12,6 +12,7 @@ class MainWindow;
 }
 
 class AccountWindow;
+class CardWindow;
 class CategoryWindow;
 class ConnectDialog;
 class ConnectionProfileDialog;
@@ -25,6 +26,9 @@ class MainWindow : public QMainWindow {
   public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+  protected:
+    virtual void hideEvent(QHideEvent *event) override;
 
   private:
     void onConnect();
@@ -42,6 +46,7 @@ class MainWindow : public QMainWindow {
 
     // Windows
     AccountWindow *accountWindow_;
+    CardWindow *cardWindow_;
     CategoryWindow *categoryWindow_;
     ContactWindow *contactWindow_;
     CurrencyWindow *currencyWindow_;

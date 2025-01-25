@@ -11,6 +11,7 @@
 
 class Account;
 class Category;
+class Card;
 class Contact;
 class Currency;
 class Icon;
@@ -38,6 +39,12 @@ class DataCache {
     std::shared_ptr<Account> getAccount(int index) const { return accounts_.at(index); }
     QAbstractItemModel *getAccountItemModel() const { return accountItemModel_.get(); }
     void setAccounts(const std::vector<std::shared_ptr<Account>> &accounts);
+
+    // Card
+    std::optional<std::shared_ptr<Card>> getCard(QUuid uuid) const;
+    std::shared_ptr<Card> getCard(int index) const { return cards_.at(index); }
+    QAbstractItemModel *getCardItemModel() const { return cardItemModel_.get(); }
+    void setCards(const std::vector<std::shared_ptr<Card>> &cards);
 
     // Category
     std::optional<std::shared_ptr<Category>> getCategory(QUuid uuid) const;
@@ -69,6 +76,7 @@ class DataCache {
 
   private:
     std::vector<std::shared_ptr<Account>> accounts_;
+    std::vector<std::shared_ptr<Card>> cards_;
     std::vector<std::shared_ptr<Category>> categories_;
     std::vector<std::shared_ptr<Contact>> contacts_;
     std::vector<std::shared_ptr<Currency>> currencies_;
@@ -77,6 +85,7 @@ class DataCache {
 
     // Models
     std::unique_ptr<QAbstractItemModel> accountItemModel_;
+    std::unique_ptr<QAbstractItemModel> cardItemModel_;
     std::unique_ptr<QAbstractItemModel> categoryItemModel_;
     std::unique_ptr<QAbstractItemModel> contactItemModel_;
     std::unique_ptr<QAbstractItemModel> currencyItemModel_;

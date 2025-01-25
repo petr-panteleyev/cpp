@@ -70,6 +70,7 @@ void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &g
             widget.resize(settings.value("size").toSize());
         }
     }
+    settings.endGroup();
 
     settings.endGroup();
 }

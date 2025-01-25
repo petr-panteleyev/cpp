@@ -27,6 +27,7 @@ class Transaction final : public MoneyRecord {
     QDate transactionDate() const noexcept { return transactionDate_; }
     const TransactionType &type() const noexcept { return type_; }
     const QString &comment() const noexcept { return comment_; }
+    bool checked() const noexcept { return checked_; }
     QUuid accountDebitedUuid() const noexcept { return accountDebitedUuid_; }
     QUuid accountCreditedUuid() const noexcept { return accountCreditedUuid_; }
     const CategoryType &accountDebitedType() const noexcept { return accountDebitedType_; }

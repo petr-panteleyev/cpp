@@ -14,6 +14,13 @@ class Card final : public MoneyRecord {
                   QDate expiration, const QString &comment, bool enabled, long created, long modified);
     ~Card() = default;
 
+    QUuid accountUuid() const noexcept { return accountUuid_; };
+    const CardType &type() const noexcept { return type_; }
+    const QString &number() const noexcept { return number_; }
+    QDate expiration() const noexcept { return expiration_; }
+    const QString &comment() const noexcept { return comment_; }
+    bool enabled() const noexcept { return enabled_; }
+
   private:
     QUuid accountUuid_;
     const CardType &type_;

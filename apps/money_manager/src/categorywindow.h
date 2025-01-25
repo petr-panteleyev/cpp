@@ -17,6 +17,9 @@ class CategoryWindow : public QMainWindow {
     explicit CategoryWindow(QWidget *parent = nullptr);
     ~CategoryWindow();
 
+  protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
   private:
     std::unique_ptr<Ui::CategoryWindow> ui;
 

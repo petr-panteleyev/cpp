@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "account.h"
 #include "accountwindow.h"
+#include "cardwindow.h"
 #include "categorytype.h"
 #include "categorywindow.h"
 #include "connectdialog.h"
@@ -18,15 +19,18 @@
 #include "datasource.h"
 #include "decimal.h"
 #include "globalcontext.h"
+#include "imagecache.h"
 #include "moneydao.h"
 #include "qnamespace.h"
 #include "qsortfilterproxymodel.h"
 #include "qthelpers.h"
 #include "sqlexception.h"
 #include "transaction.h"
+#include "translation.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
+#include "settings.h"
 
 using GlobalContext::cache;
 using GlobalContext::dao;
@@ -41,25 +45,30 @@ constexpr int COLUMN_CREDIT_ACCOUNT = 3;
 constexpr int COLUMN_COUNTERPARTY = 4;
 constexpr int COLUMN_COMMENT = 5;
 constexpr int COLUMN_AMOUNT = 6;
-constexpr int COLUMN_ATTACHMENTS = 7;
+constexpr int COLUMN_CHECKED = 7;
+constexpr int COLUMN_ATTACHMENTS = 8;
 
 const QColor COLOR_DEBIT{255, 0, 0};
 const QColor COLOR_CREDIT{0, 128, 0};
 const QColor COLOR_TRANSFER{0, 0, 255};
 
-static std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
+std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
     {COLUMN_DAY, QHeaderView::ResizeToContents},           {COLUMN_TYPE, QHeaderView::ResizeToContents},
     {COLUMN_DEBIT_ACCOUNT, QHeaderView::ResizeToContents}, {COLUMN_CREDIT_ACCOUNT, QHeaderView::ResizeToContents},
     {COLUMN_COUNTERPARTY, QHeaderView::ResizeToContents},  {COLUMN_COMMENT, QHeaderView::Stretch},
-    {COLUMN_AMOUNT, QHeaderView::ResizeToContents},        {COLUMN_ATTACHMENTS, QHeaderView::ResizeToContents}};
+    {COLUMN_AMOUNT, QHeaderView::ResizeToContents},        {COLUMN_CHECKED, QHeaderView::ResizeToContents},
+    {COLUMN_ATTACHMENTS, QHeaderView::ResizeToContents}};
 
-static const std::array<QString, 12> MONTHS{"Январь", "Февраль", "Март",     "Апрель",  "Май",    "Июнь",
-                                            "Июль",   "Август",  "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+std::array<QString, 9> COLUMN_NAMES{
+    "День", "Тип", "Исходный счёт", "Счёт получателя", "Контрагент", "Комментарий", "Сумма", "", ""};
+
+const std::array<QString, 12> MONTHS{"Январь", "Февраль", "Март",     "Апрель",  "Май",    "Июнь",
+                                     "Июль",   "Август",  "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
 
 void enableActionsOnConnect(Ui::MainWindow *ui, bool connected) {
-    QtHelpers::enableActions(connected, {ui->actionAccountWindow, ui->actionCategoryWindow, ui->actionContactWindow,
-                                         ui->actionCurrencyWindow, ui->actionCurrentMonth, ui->actionNextMonth,
-                                         ui->actionPrevMonth});
+    QtHelpers::enableActions(connected, {ui->actionAccountWindow, ui->actionCardWindow, ui->actionCategoryWindow,
+                                         ui->actionContactWindow, ui->actionCurrencyWindow, ui->actionCurrentMonth,
+                                         ui->actionNextMonth, ui->actionPrevMonth});
 }
 
 void showWindow(QWidget *w) {
@@ -82,24 +91,14 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
 
     QDate date() const noexcept { return date_; }
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 8; };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_NAMES.size(); };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole) {
+        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole ||
+            section >= static_cast<int>(COLUMN_NAMES.size())) {
             return QVariant();
         }
-
-        switch (section) {
-            case COLUMN_DAY: return "День";
-            case COLUMN_TYPE: return "Тип";
-            case COLUMN_DEBIT_ACCOUNT: return "Исходный счёт";
-            case COLUMN_CREDIT_ACCOUNT: return "Счёт получателя";
-            case COLUMN_COUNTERPARTY: return "Контрагент";
-            case COLUMN_COMMENT: return "Комментарий";
-            case COLUMN_AMOUNT: return "Сумма";
-            case COLUMN_ATTACHMENTS: return "";
-            default: return QVariant();
-        }
+        return COLUMN_NAMES[section];
     }
 
     QVariant data(const QModelIndex &index, int role) const override {
@@ -118,27 +117,48 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             case COLUMN_TYPE:
                 if (role == Qt::DisplayRole) {
-                    return QString::fromStdString(tr->type().name());
+                    return Translation::translate(tr->type());
                 }
                 break;
-            case COLUMN_DEBIT_ACCOUNT:
+            case COLUMN_DEBIT_ACCOUNT: {
+                auto acc = cache().getAccount(tr->accountDebitedUuid());
+                if (!acc.has_value()) {
+                    return QVariant();
+                }
                 if (role == Qt::DisplayRole) {
-                    auto acc = cache().getAccount(tr->accountDebitedUuid());
-                    return acc.has_value() ? acc.value()->name() : "";
+                    return acc.value()->name();
+                } else if (role == Qt::DecorationRole && acc.value()->iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(acc.value()->iconUuid().value());
+                    return QIcon(QPixmap::fromImage(*image.get()));
                 }
                 break;
-            case COLUMN_CREDIT_ACCOUNT:
+            }
+            case COLUMN_CREDIT_ACCOUNT: {
+                auto acc = cache().getAccount(tr->accountCreditedUuid());
+                if (!acc.has_value()) {
+                    return QVariant();
+                }
                 if (role == Qt::DisplayRole) {
-                    auto acc = cache().getAccount(tr->accountCreditedUuid());
-                    return acc.has_value() ? acc.value()->name() : "";
+                    return acc.value()->name();
+                } else if (role == Qt::DecorationRole && acc.value()->iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(acc.value()->iconUuid().value());
+                    return QIcon(QPixmap::fromImage(*image.get()));
                 }
                 break;
-            case COLUMN_COUNTERPARTY:
+            }
+            case COLUMN_COUNTERPARTY: {
+                auto contact = cache().getContact(tr->contactUuid().value_or(QUuid()));
+                if (!contact.has_value()) {
+                    return QVariant();
+                }
                 if (role == Qt::DisplayRole) {
-                    auto contact = cache().getContact(tr->contactUuid().value_or(QUuid()));
-                    return contact.has_value() ? contact.value()->name() : "";
+                    return contact.value()->name();
+                } else if (role == Qt::DecorationRole && contact.value()->iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(contact.value()->iconUuid().value());
+                    return QIcon(QPixmap::fromImage(*image.get()));
                 }
                 break;
+            }
             case COLUMN_COMMENT:
                 if (role == Qt::DisplayRole) {
                     return tr->comment();
@@ -157,6 +177,11 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                     } else {
                         return COLOR_CREDIT;
                     }
+                }
+                break;
+            case COLUMN_CHECKED:
+                if (role == Qt::DisplayRole) {
+                    return tr->checked() ? "+" : "";
                 }
                 break;
         }
@@ -181,17 +206,17 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
 
     void setDate(QDate date) {
         date_ = date;
-        invalidateFilter();
+        invalidateRowsFilter();
     }
 
     void previousMonth() {
         date_ = date_.addMonths(-1);
-        invalidateFilter();
+        invalidateRowsFilter();
     }
 
     void nextMonth() {
         date_ = date_.addMonths(1);
-        invalidateFilter();
+        invalidateRowsFilter();
     }
 
   private:
@@ -203,8 +228,9 @@ MainWindow::MainWindow(QWidget *parent)
       profileManager_{make_unique<ConnectionProfileManager>()},
       connectionProfileDialog_{new ConnectionProfileDialog{this, profileManager_.get()}},
       connectDialog_{new ConnectDialog(this, profileManager_.get())}, accountWindow_{new AccountWindow{this}},
-      categoryWindow_{new CategoryWindow{this}}, contactWindow_{new ContactWindow{this}},
-      currencyWindow_{new CurrencyWindow{this}}, model_{make_unique<MainWindow::TransactionFilterModel>()} {
+      cardWindow_{new CardWindow{this}}, categoryWindow_{new CategoryWindow{this}},
+      contactWindow_{new ContactWindow{this}}, currencyWindow_{new CurrencyWindow{this}},
+      model_{make_unique<MainWindow::TransactionFilterModel>()} {
     ui->setupUi(this);
 
     profileManager_->loadProfiles();
@@ -257,12 +283,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // windows
     connect(ui->actionAccountWindow, &QAction::triggered, [this]() { showWindow(accountWindow_); });
+    connect(ui->actionCardWindow, &QAction::triggered, [this]() { showWindow(cardWindow_); });
     connect(ui->actionCategoryWindow, &QAction::triggered, [this]() { showWindow(categoryWindow_); });
     connect(ui->actionContactWindow, &QAction::triggered, [this]() { showWindow(contactWindow_); });
     connect(ui->actionCurrencyWindow, &QAction::triggered, [this]() { showWindow(currencyWindow_); });
 
     // dialogs
     connect(connectDialog_, &QDialog::accepted, this, &MainWindow::onConnect);
+
+    Settings::loadWindowDimensions(this);
 }
 
 MainWindow::~MainWindow() {
@@ -279,3 +308,9 @@ void MainWindow::onConnect() {
         QMessageBox::critical(this, "SQL Exception", ex.what());
     }
 }
+
+void MainWindow::hideEvent(QHideEvent *event) {
+    Settings::saveWindowDimensions(this);
+    QMainWindow::hideEvent(event);
+}
+

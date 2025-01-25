@@ -17,6 +17,9 @@ class AccountWindow : public QMainWindow {
     explicit AccountWindow(QWidget *parent = nullptr);
     ~AccountWindow();
 
+  protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
   private:
     std::unique_ptr<Ui::AccountWindow> ui;
 

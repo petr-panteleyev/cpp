@@ -3,6 +3,7 @@
 
 #include "datacache.h"
 #include "account.h"
+#include "card.h"
 #include "category.h"
 #include "contact.h"
 #include "currency.h"
@@ -45,6 +46,7 @@ class DataCacheImpl {
 
 DataCache::DataCache()
     : accountItemModel_{make_unique<MoneyRecordItemModel<Account>>(accounts_)},
+      cardItemModel_{make_unique<MoneyRecordItemModel<Card>>(cards_)},
       categoryItemModel_{make_unique<MoneyRecordItemModel<Category>>(categories_)},
       contactItemModel_{make_unique<MoneyRecordItemModel<Contact>>(contacts_)},
       currencyItemModel_{make_unique<MoneyRecordItemModel<Currency>>(currencies_)},
@@ -58,6 +60,7 @@ DataCache::~DataCache() {
 
 void DataCache::clear() {
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Account> *>(accountItemModel_.get()), accounts_);
+    pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Card> *>(cardItemModel_.get()), cards_);
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Category> *>(categoryItemModel_.get()), categories_);
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Contact> *>(contactItemModel_.get()), contacts_);
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Currency> *>(currencyItemModel_.get()), currencies_);
@@ -77,7 +80,22 @@ void DataCache::setAccounts(const std::vector<std::shared_ptr<Account>> &account
     pImpl_->setItems(reinterpret_cast<MoneyRecordItemModel<Account> *>(accountItemModel_.get()), accounts_, accounts);
 }
 
+//
+// Card
+//
+
+std::optional<std::shared_ptr<Card>> DataCache::getCard(QUuid uuid) const {
+    return pImpl_->getRecord<Card>(cards_, uuid);
+}
+
+void DataCache::setCards(const std::vector<std::shared_ptr<Card>> &cards) {
+    pImpl_->setItems(reinterpret_cast<MoneyRecordItemModel<Card> *>(cardItemModel_.get()), cards_, cards);
+}
+
+//
 // Category
+//
+
 std::optional<std::shared_ptr<Category>> DataCache::getCategory(QUuid uuid) const {
     return pImpl_->getRecord<Category>(categories_, uuid);
 }
@@ -127,6 +145,7 @@ void DataCache::setIcons(const std::vector<std::shared_ptr<Icon>> &icons) {
 //
 // Transaction
 //
+
 std::optional<std::shared_ptr<Transaction>> DataCache::getTransaction(QUuid uuid) const {
     return pImpl_->getRecord<Transaction>(transactions_, uuid);
 }

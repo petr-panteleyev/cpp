@@ -10,6 +10,7 @@
 #include <QUuid>
 #include <optional>
 #include <string>
+#include <QByteArray>
 
 class QSqlQuery;
 
@@ -53,8 +54,8 @@ class ResultSet final {
     std::optional<QDate> getNullableQDate(int columnNumber) const;
     std::optional<QDate> getNullableQDate(const QString &name) const;
 
-    std::vector<std::byte> getBytes(int columnNumber) const;
-    std::vector<std::byte> getBytes(const QString &name) const;
+    QByteArray getQByteArray(int columnNumber) const;
+    QByteArray getQByteArray(const QString &name) const;
 
     template <class E> const E &getEnum(int columnNumber) const {
         auto stringValue = getString(columnNumber);

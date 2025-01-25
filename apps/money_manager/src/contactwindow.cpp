@@ -6,6 +6,8 @@
 #include "datacache.h"
 #include "globalcontext.h"
 #include "qnamespace.h"
+#include "settings.h"
+#include "translation.h"
 #include "ui_contactwindow.h"
 #include <QSortFilterProxyModel>
 
@@ -29,7 +31,7 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
 
         switch (index.column()) {
             case 0: return contact->name();
-            case 1: return QString::fromStdString(contact->type().name());
+            case 1: return Translation::translate(contact->type());
             case 2: return contact->phone();
             case 3: return contact->email();
         }
@@ -52,4 +54,9 @@ ContactWindow::ContactWindow(QWidget *parent)
 }
 
 ContactWindow::~ContactWindow() {
+}
+
+void ContactWindow::hideEvent(QHideEvent *event) {
+    Settings::saveWindowDimensions(this);
+    QMainWindow::hideEvent(event);
 }
