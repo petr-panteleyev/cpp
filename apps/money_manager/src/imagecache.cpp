@@ -3,7 +3,6 @@
 
 #include "imagecache.h"
 #include "datacache.h"
-#include "globalcontext.h"
 #include "icon.h"
 #include <QHash>
 #include <stdexcept>
@@ -17,7 +16,7 @@ std::shared_ptr<QImage> getImage(const QUuid &uuid) {
         return IMAGES[uuid];
     }
 
-    auto icon = GlobalContext::cache().getIcon(uuid);
+    auto icon = DataCache::cache().getIcon(uuid);
     if (!icon.has_value()) {
         throw std::out_of_range("Icon does not exist");
     }

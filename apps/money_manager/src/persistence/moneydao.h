@@ -18,11 +18,15 @@ class TransactionRepository;
 
 class MoneyDao final {
   public:
-    explicit MoneyDao(DataCache &cache);
-    ~MoneyDao();
-
     void initialize(const std::shared_ptr<DataSource> &dataSource);
     void preload();
+
+  public:
+    static MoneyDao &dao();
+
+  private:
+    explicit MoneyDao(DataCache &cache);
+    ~MoneyDao();
 
   private:
     DataCache &cache_;

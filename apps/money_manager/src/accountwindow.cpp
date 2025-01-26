@@ -6,7 +6,7 @@
 #include "currency.h"
 #include "datacache.h"
 #include "decimal.h"
-#include "globalcontext.h"
+#include "mainwindow.h"
 #include "translation.h"
 #include "ui_accountwindow.h"
 #include <QSortFilterProxyModel>
@@ -16,7 +16,6 @@
 
 using Common::Decimal;
 using Common::RoundingMode;
-using GlobalContext::cache;
 using std::make_unique;
 
 namespace {
@@ -33,13 +32,16 @@ constexpr int COLUMN_COMMENT = 5;
 constexpr int COLUMN_BALANCE = 6;
 constexpr int COLUMN_WAITING = 7;
 
-std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
+constexpr int COLUMN_COUNT = COLUMN_WAITING + 1;
+
+const std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
     {COLUMN_NAME, QHeaderView::ResizeToContents},     {COLUMN_CATEGORY, QHeaderView::ResizeToContents},
     {COLUMN_CURRENCY, QHeaderView::ResizeToContents}, {COLUMN_INTEREST, QHeaderView::ResizeToContents},
     {COLUMN_CLOSING, QHeaderView::ResizeToContents},  {COLUMN_COMMENT, QHeaderView::Stretch},
     {COLUMN_BALANCE, QHeaderView::ResizeToContents},  {COLUMN_WAITING, QHeaderView::ResizeToContents}};
 
-std::array<QString, 8> COLUMN_NAMES{"Название", "Категория", "Валюта", "%%", "До", "Комментарий", "Баланс", "Ожидает"};
+const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Название", "Категория",   "Валюта", "%%",
+                                                     "До",       "Комментарий", "Баланс", "Ожидает"};
 
 } // namespace
 
@@ -48,11 +50,10 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
     explicit AccountFilterModel() {}
     ~AccountFilterModel(){};
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 8; };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole ||
-            section >= static_cast<int>(COLUMN_NAMES.size())) {
+        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole || section >= COLUMN_COUNT) {
             return QVariant();
         }
         return COLUMN_NAMES[section];
@@ -64,7 +65,7 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
         }
 
         int row = mapToSource(index).row();
-        auto account = cache().getAccount(row);
+        auto account = DataCache::cache().getAccount(row);
 
         switch (index.column()) {
             case COLUMN_NAME:
@@ -80,7 +81,7 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
             case COLUMN_CURRENCY:
                 if (role == Qt::DisplayRole) {
                     if (account->currencyUuid().has_value()) {
-                        auto currency = cache().getCurrency(account->currencyUuid().value());
+                        auto currency = DataCache::cache().getCurrency(account->currencyUuid().value());
                         return currency.has_value() ? currency.value()->symbol() : "";
                     } else {
                         return "";
@@ -139,7 +140,9 @@ AccountWindow::AccountWindow(QWidget *parent)
     : QMainWindow{parent}, ui{make_unique<Ui::AccountWindow>()}, model_{make_unique<AccountFilterModel>()} {
     ui->setupUi(this);
 
-    model_->setSourceModel(cache().getAccountItemModel());
+    getMainWindow()->setupWindowMenu(ui->menuWindow);
+
+    model_->setSourceModel(DataCache::cache().getAccountItemModel());
     ui->accountTableView->setModel(model_.get());
 
     auto header = ui->accountTableView->horizontalHeader();

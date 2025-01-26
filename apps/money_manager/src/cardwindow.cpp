@@ -6,15 +6,14 @@
 #include "card.h"
 #include "category.h"
 #include "datacache.h"
-#include "globalcontext.h"
 #include "imagecache.h"
+#include "mainwindow.h"
 #include "qnamespace.h"
 #include "settings.h"
 #include "ui_cardwindow.h"
 #include <QSortFilterProxyModel>
 #include <unordered_map>
 
-using GlobalContext::cache;
 using std::make_unique;
 
 namespace {
@@ -25,13 +24,15 @@ constexpr int COLUMN_ACCOUNT = 2;
 constexpr int COLUMN_EXPIRATION = 3;
 constexpr int COLUMN_COMMENT = 4;
 
-std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{{COLUMN_NUMBER, QHeaderView::ResizeToContents},
-                                                              {COLUMN_CATEGORY, QHeaderView::ResizeToContents},
-                                                              {COLUMN_ACCOUNT, QHeaderView::ResizeToContents},
-                                                              {COLUMN_EXPIRATION, QHeaderView::ResizeToContents},
-                                                              {COLUMN_COMMENT, QHeaderView::Stretch}};
+constexpr int COLUMN_COUNT = COLUMN_COMMENT + 1;
 
-std::array<QString, 5> COLUMN_NAMES{"Номер", "Категория", "Счёт", "До", "Комментарий"};
+std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
+    {COLUMN_NUMBER, QHeaderView::ResizeToContents},  {COLUMN_CATEGORY, QHeaderView::ResizeToContents},
+    {COLUMN_ACCOUNT, QHeaderView::ResizeToContents}, {COLUMN_EXPIRATION, QHeaderView::ResizeToContents},
+    {COLUMN_COMMENT, QHeaderView::Stretch},
+};
+
+std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Номер", "Категория", "Счёт", "До", "Комментарий"};
 
 } // namespace
 
@@ -40,11 +41,10 @@ class CardWindow::CardFilterModel final : public QSortFilterProxyModel {
     explicit CardFilterModel() {}
     ~CardFilterModel(){};
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 5; };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole ||
-            section >= static_cast<int>(COLUMN_NAMES.size())) {
+        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole || section >= COLUMN_COUNT) {
             return QVariant();
         }
         return COLUMN_NAMES[section];
@@ -56,13 +56,13 @@ class CardWindow::CardFilterModel final : public QSortFilterProxyModel {
         }
 
         int row = mapToSource(index).row();
-        auto card = cache().getCard(row);
+        auto card = DataCache::cache().getCard(row);
 
-        auto account = cache().getAccount(card->accountUuid());
+        auto account = DataCache::cache().getAccount(card->accountUuid());
         if (!account.has_value()) {
             return QVariant();
         }
-        auto category = cache().getCategory((*account)->categoryUuid());
+        auto category = DataCache::cache().getCategory((*account)->categoryUuid());
         if (!category.has_value()) {
             return QVariant();
         }
@@ -109,7 +109,9 @@ CardWindow::CardWindow(QWidget *parent)
     : QMainWindow{parent}, ui{make_unique<Ui::CardWindow>()}, model_{make_unique<CardFilterModel>()} {
     ui->setupUi(this);
 
-    model_->setSourceModel(cache().getCardItemModel());
+    getMainWindow()->setupWindowMenu(ui->menuWindow);
+
+    model_->setSourceModel(DataCache::cache().getCardItemModel());
     ui->cardTableView->setModel(model_.get());
 
     auto header = ui->cardTableView->horizontalHeader();
@@ -118,6 +120,8 @@ CardWindow::CardWindow(QWidget *parent)
     }
 
     connect(ui->actionClose, &QAction::triggered, [this]() { close(); });
+
+    Settings::loadWindowDimensions(this);
 }
 
 CardWindow::~CardWindow() {

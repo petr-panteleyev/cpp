@@ -10,6 +10,8 @@ namespace Ui {
 class CardWindow;
 }
 
+class MainWindow;
+
 class CardWindow : public QMainWindow {
     Q_OBJECT
 
@@ -19,6 +21,9 @@ class CardWindow : public QMainWindow {
 
   protected:
     virtual void hideEvent(QHideEvent *event) override;
+
+  private:
+    MainWindow *getMainWindow() const { return reinterpret_cast<MainWindow *>(parent()); };
 
   private:
     std::unique_ptr<Ui::CardWindow> ui;

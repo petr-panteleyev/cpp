@@ -18,22 +18,17 @@
 #include "datacache.h"
 #include "datasource.h"
 #include "decimal.h"
-#include "globalcontext.h"
 #include "imagecache.h"
 #include "moneydao.h"
-#include "qnamespace.h"
-#include "qsortfilterproxymodel.h"
 #include "qthelpers.h"
+#include "settings.h"
 #include "sqlexception.h"
 #include "transaction.h"
 #include "translation.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
-#include "settings.h"
 
-using GlobalContext::cache;
-using GlobalContext::dao;
 using std::make_unique;
 
 namespace {
@@ -48,18 +43,20 @@ constexpr int COLUMN_AMOUNT = 6;
 constexpr int COLUMN_CHECKED = 7;
 constexpr int COLUMN_ATTACHMENTS = 8;
 
+constexpr int COLUMN_COUNT = COLUMN_ATTACHMENTS + 1;
+
 const QColor COLOR_DEBIT{255, 0, 0};
 const QColor COLOR_CREDIT{0, 128, 0};
 const QColor COLOR_TRANSFER{0, 0, 255};
 
-std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
+const std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
     {COLUMN_DAY, QHeaderView::ResizeToContents},           {COLUMN_TYPE, QHeaderView::ResizeToContents},
     {COLUMN_DEBIT_ACCOUNT, QHeaderView::ResizeToContents}, {COLUMN_CREDIT_ACCOUNT, QHeaderView::ResizeToContents},
     {COLUMN_COUNTERPARTY, QHeaderView::ResizeToContents},  {COLUMN_COMMENT, QHeaderView::Stretch},
     {COLUMN_AMOUNT, QHeaderView::ResizeToContents},        {COLUMN_CHECKED, QHeaderView::ResizeToContents},
     {COLUMN_ATTACHMENTS, QHeaderView::ResizeToContents}};
 
-std::array<QString, 9> COLUMN_NAMES{
+const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{
     "День", "Тип", "Исходный счёт", "Счёт получателя", "Контрагент", "Комментарий", "Сумма", "", ""};
 
 const std::array<QString, 12> MONTHS{"Январь", "Февраль", "Март",     "Апрель",  "Май",    "Июнь",
@@ -91,11 +88,10 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
 
     QDate date() const noexcept { return date_; }
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_NAMES.size(); };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole ||
-            section >= static_cast<int>(COLUMN_NAMES.size())) {
+        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole || section >= COLUMN_COUNT) {
             return QVariant();
         }
         return COLUMN_NAMES[section];
@@ -107,7 +103,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
         }
 
         int row = mapToSource(index).row();
-        auto tr = cache().getTransaction(row);
+        auto tr = DataCache::cache().getTransaction(row);
 
         switch (index.column()) {
             case COLUMN_DAY:
@@ -121,7 +117,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 }
                 break;
             case COLUMN_DEBIT_ACCOUNT: {
-                auto acc = cache().getAccount(tr->accountDebitedUuid());
+                auto acc = DataCache::cache().getAccount(tr->accountDebitedUuid());
                 if (!acc.has_value()) {
                     return QVariant();
                 }
@@ -134,7 +130,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             }
             case COLUMN_CREDIT_ACCOUNT: {
-                auto acc = cache().getAccount(tr->accountCreditedUuid());
+                auto acc = DataCache::cache().getAccount(tr->accountCreditedUuid());
                 if (!acc.has_value()) {
                     return QVariant();
                 }
@@ -147,7 +143,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             }
             case COLUMN_COUNTERPARTY: {
-                auto contact = cache().getContact(tr->contactUuid().value_or(QUuid()));
+                auto contact = DataCache::cache().getContact(tr->contactUuid().value_or(QUuid()));
                 if (!contact.has_value()) {
                     return QVariant();
                 }
@@ -189,8 +185,8 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
     }
 
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
-        auto leftTr = cache().getTransaction(left.row());
-        auto rightTr = cache().getTransaction(right.row());
+        auto leftTr = DataCache::cache().getTransaction(left.row());
+        auto rightTr = DataCache::cache().getTransaction(right.row());
 
         if (leftTr->transactionDate() == rightTr->transactionDate()) {
             return leftTr->created() < rightTr->created();
@@ -200,7 +196,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
     }
 
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {
-        auto trDate = cache().getTransaction(sourceRow)->transactionDate();
+        auto trDate = DataCache::cache().getTransaction(sourceRow)->transactionDate();
         return trDate.month() == date_.month() && trDate.year() == date_.year();
     }
 
@@ -223,19 +219,24 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
     QDate date_;
 };
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow{parent}, ui{make_unique<Ui::MainWindow>()}, connected_{false},
+MainWindow::MainWindow()
+    : QMainWindow{nullptr}, ui{make_unique<Ui::MainWindow>()}, connected_{false},
       profileManager_{make_unique<ConnectionProfileManager>()},
       connectionProfileDialog_{new ConnectionProfileDialog{this, profileManager_.get()}},
-      connectDialog_{new ConnectDialog(this, profileManager_.get())}, accountWindow_{new AccountWindow{this}},
-      cardWindow_{new CardWindow{this}}, categoryWindow_{new CategoryWindow{this}},
-      contactWindow_{new ContactWindow{this}}, currencyWindow_{new CurrencyWindow{this}},
+      connectDialog_{new ConnectDialog(this, profileManager_.get())},
       model_{make_unique<MainWindow::TransactionFilterModel>()} {
     ui->setupUi(this);
 
+    // Initializing child windows here to make actions available
+    accountWindow_ = new AccountWindow{this};
+    cardWindow_ = new CardWindow{this};
+    categoryWindow_ = new CategoryWindow{this};
+    contactWindow_ = new ContactWindow{this};
+    currencyWindow_ = new CurrencyWindow{this};
+
     profileManager_->loadProfiles();
 
-    model_->setSourceModel(cache().getTransactionItemModel());
+    model_->setSourceModel(DataCache::cache().getTransactionItemModel());
     ui->transactionTableView->setModel(model_.get());
 
     model_->sort(COLUMN_DAY, Qt::DescendingOrder);
@@ -301,8 +302,8 @@ void MainWindow::onConnect() {
     try {
         auto profile = connectDialog_->profile();
         auto ds = profile->createDataSource();
-        dao().initialize(ds);
-        dao().preload();
+        MoneyDao::dao().initialize(ds);
+        MoneyDao::dao().preload();
         connected_ = true;
     } catch (const SqlException &ex) {
         QMessageBox::critical(this, "SQL Exception", ex.what());
@@ -314,3 +315,7 @@ void MainWindow::hideEvent(QHideEvent *event) {
     QMainWindow::hideEvent(event);
 }
 
+void MainWindow::setupWindowMenu(QMenu *menu) {
+    QtHelpers::addActions(menu, {ui->actionAccountWindow, ui->actionCardWindow, nullptr, ui->actionContactWindow,
+                                 ui->actionCurrencyWindow, ui->actionCategoryWindow});
+}

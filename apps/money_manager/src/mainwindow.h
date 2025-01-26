@@ -24,8 +24,10 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow();
     ~MainWindow();
+
+    void setupWindowMenu(QMenu *menu);
 
   protected:
     virtual void hideEvent(QHideEvent *event) override;

@@ -164,6 +164,9 @@
    <property name="text">
     <string>Контакты...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
   </action>
   <action name="actionCurrencyWindow">
    <property name="enabled">
@@ -172,6 +175,9 @@
    <property name="text">
     <string>Валюты...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
   </action>
   <action name="actionCategoryWindow">
    <property name="enabled">
@@ -179,6 +185,9 @@
    </property>
    <property name="text">
     <string>Категории...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
    </property>
   </action>
   <action name="actionAccountWindow">

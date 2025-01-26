@@ -17,8 +17,6 @@ target_sources(money_manager PRIVATE
     currencywindow.h
     currencywindow.cpp
     currencywindow.ui
-    globalcontext.h
-    globalcontext.cpp
     imagecache.h
     imagecache.cpp
     main.cpp

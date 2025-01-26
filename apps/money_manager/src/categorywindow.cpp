@@ -4,23 +4,34 @@
 #include "categorywindow.h"
 #include "category.h"
 #include "datacache.h"
-#include "globalcontext.h"
-#include "qnamespace.h"
+#include "mainwindow.h"
 #include "settings.h"
 #include "translation.h"
 #include "ui_categorywindow.h"
 #include <QSortFilterProxyModel>
 #include <algorithm>
 
-using GlobalContext::cache;
 using std::make_unique;
 
-class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
-  public:
-    static constexpr int COLUMN_NAME = 0;
-    static constexpr int COLUMN_TYPE = 1;
-    static constexpr int COLUMN_COMMENT = 2;
+namespace {
 
+constexpr int COLUMN_NAME = 0;
+constexpr int COLUMN_TYPE = 1;
+constexpr int COLUMN_COMMENT = 2;
+
+constexpr int COLUMN_COUNT = COLUMN_COMMENT + 1;
+
+const std::unordered_map<int, QHeaderView::ResizeMode> RESIZE_MODES{
+    {COLUMN_NAME, QHeaderView::ResizeToContents},
+    {COLUMN_TYPE, QHeaderView::ResizeToContents},
+    {COLUMN_COMMENT, QHeaderView::Stretch},
+};
+
+const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Название", "Тип", "Комментарий"};
+
+} // namespace
+
+class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
   public:
     explicit CategoryFilterModel() : typeOrdinal_{-1}, nameFilter_{} {}
     ~CategoryFilterModel(){};
@@ -35,19 +46,13 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
         invalidateRowsFilter();
     }
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 3; };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
-        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole) {
+        if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole || section >= COLUMN_COUNT) {
             return QVariant();
         }
-
-        switch (section) {
-            case COLUMN_NAME: return "Название";
-            case COLUMN_TYPE: return "Тип";
-            case COLUMN_COMMENT: return "Комментарий";
-            default: return QVariant();
-        }
+        return COLUMN_NAMES[section];
     }
 
     QVariant data(const QModelIndex &index, int role) const override {
@@ -56,7 +61,7 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
         }
 
         int row = mapToSource(index).row();
-        auto category = cache().getCategory(row);
+        auto category = DataCache::cache().getCategory(row);
 
         switch (index.column()) {
             case COLUMN_NAME: return category->name();
@@ -72,8 +77,8 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
             return false;
         }
 
-        auto leftCategory = cache().getCategory(left.row());
-        auto rightCategory = cache().getCategory(right.row());
+        auto leftCategory = DataCache::cache().getCategory(left.row());
+        auto rightCategory = DataCache::cache().getCategory(right.row());
 
         switch (left.column()) {
             case COLUMN_NAME: return leftCategory->name() < rightCategory->name();
@@ -88,7 +93,7 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
             return true;
         }
 
-        auto category = cache().getCategory(sourceRow);
+        auto category = DataCache::cache().getCategory(sourceRow);
 
         bool accept = true;
         if (typeOrdinal_ != -1) {
@@ -109,13 +114,15 @@ CategoryWindow::CategoryWindow(QWidget *parent)
     : QMainWindow{parent}, ui{make_unique<Ui::CategoryWindow>()}, model_{make_unique<CategoryFilterModel>()} {
     ui->setupUi(this);
 
-    model_->setSourceModel(cache().getCategoryItemModel());
+    getMainWindow()->setupWindowMenu(ui->menuWindow);
+
+    model_->setSourceModel(DataCache::cache().getCategoryItemModel());
     ui->categoryTableView->setModel(model_.get());
 
     auto header = ui->categoryTableView->horizontalHeader();
-    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(2, QHeaderView::Stretch);
+    for (const auto &entry : RESIZE_MODES) {
+        header->setSectionResizeMode(entry.first, entry.second);
+    }
 
     ui->typeComboBox->addItem("Все типы", -1);
     ui->typeComboBox->insertSeparator(1);
@@ -125,15 +132,17 @@ CategoryWindow::CategoryWindow(QWidget *parent)
     connect(ui->typeComboBox, &QComboBox::currentIndexChanged, [this](int index) {
         int ordinal = ui->typeComboBox->currentData().toInt();
         model_->setTypeOrdinal(ordinal);
-        ui->categoryTableView->resizeColumnToContents(CategoryFilterModel::COLUMN_TYPE);
+        ui->categoryTableView->resizeColumnToContents(COLUMN_TYPE);
     });
 
     connect(ui->filterEdit, &QLineEdit::textChanged, [this](const auto &text) {
         model_->setNameFilter(text);
-        ui->categoryTableView->resizeColumnToContents(CategoryFilterModel::COLUMN_NAME);
+        ui->categoryTableView->resizeColumnToContents(COLUMN_NAME);
     });
 
     connect(ui->actionClose, &QAction::triggered, [this]() { close(); });
+
+    Settings::loadWindowDimensions(this);
 }
 
 CategoryWindow::~CategoryWindow() {

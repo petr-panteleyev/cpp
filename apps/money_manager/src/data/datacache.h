@@ -28,12 +28,8 @@ class DataCacheImpl;
 
 class DataCache {
   public:
-    DataCache();
-    ~DataCache();
-
     void clear();
 
-  public:
     // Account
     std::optional<std::shared_ptr<Account>> getAccount(QUuid uuid) const;
     std::shared_ptr<Account> getAccount(int index) const { return accounts_.at(index); }
@@ -73,6 +69,13 @@ class DataCache {
     std::shared_ptr<Transaction> getTransaction(int index) const { return transactions_.at(index); }
     QAbstractItemModel *getTransactionItemModel() const { return transactionItemModel_.get(); }
     void setTransactions(const std::vector<std::shared_ptr<Transaction>> &transactions);
+
+  public:
+    static DataCache &cache();
+
+  private:
+    DataCache();
+    ~DataCache();
 
   private:
     std::vector<std::shared_ptr<Account>> accounts_;

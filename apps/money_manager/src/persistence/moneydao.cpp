@@ -24,6 +24,11 @@ MoneyDao::MoneyDao(DataCache &cache)
 MoneyDao::~MoneyDao() {
 }
 
+MoneyDao &MoneyDao::dao() {
+    static MoneyDao moneyDao{DataCache::cache()};
+    return moneyDao;
+}
+
 void MoneyDao::initialize(const std::shared_ptr<DataSource> &dataSource) {
     dataSource_ = dataSource;
     cache_.clear();

@@ -65,7 +65,13 @@
     </property>
     <addaction name="actionClose"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Окно</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuWindow"/>
   </widget>
   <action name="actionClose">
    <property name="text">

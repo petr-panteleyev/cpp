@@ -58,6 +58,11 @@ DataCache::DataCache()
 DataCache::~DataCache() {
 }
 
+DataCache &DataCache::cache() {
+    static DataCache dataCache;
+    return dataCache;
+}
+
 void DataCache::clear() {
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Account> *>(accountItemModel_.get()), accounts_);
     pImpl_->clear(reinterpret_cast<MoneyRecordItemModel<Card> *>(cardItemModel_.get()), cards_);
