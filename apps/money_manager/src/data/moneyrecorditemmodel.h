@@ -1,3 +1,6 @@
+//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
+
 #ifndef MONEYRECORDITEMMODE_H
 #define MONEYRECORDITEMMODE_H
 

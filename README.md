@@ -14,6 +14,7 @@ Monorepo with C++ sources.
 
 + [pwdgen](./libs/pwdgen)
 + [common](./libs/common)
++ [qthelpers](./libs/qthelpers)
 
 ## Build
 
