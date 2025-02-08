@@ -16,7 +16,7 @@ class DatabaseConnection final {
   public:
     ~DatabaseConnection();
 
-    std::shared_ptr<PreparedStatement> prepareStatement(const QString &sql);
+    std::unique_ptr<PreparedStatement> prepareStatement(const QString &sql);
 
   private:
     explicit DatabaseConnection(const QString &name) noexcept;

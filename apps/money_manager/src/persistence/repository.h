@@ -17,9 +17,9 @@ template <class R>
 class Repository {
 
   public:
-    std::vector<std::shared_ptr<R>> getAll(DatabaseConnection &conn) {
+    std::vector<std::unique_ptr<R>> getAll(DatabaseConnection &conn) {
         auto st = conn.prepareStatement("SELECT * FROM " + tableName_);
-        std::vector<std::shared_ptr<R>> result;
+        std::vector<std::unique_ptr<R>> result;
         auto rs = st->executeQuery();
         while (rs->next()) {
             result.push_back(fromResultSet(*rs.get()));
@@ -31,7 +31,7 @@ class Repository {
     explicit Repository(const QString &tableName) : tableName_{tableName} {}
     virtual ~Repository() = default;
 
-    virtual std::shared_ptr<R> fromResultSet(const ResultSet &rs) const = 0;
+    virtual std::unique_ptr<R> fromResultSet(const ResultSet &rs) const = 0;
 
   private:
     QString tableName_;

@@ -13,7 +13,7 @@ class CurrencyRepository final : public Repository<Currency> {
     ~CurrencyRepository() = default;
 
   protected:
-    virtual std::shared_ptr<Currency> fromResultSet(const ResultSet &rs) const override;
+    virtual std::unique_ptr<Currency> fromResultSet(const ResultSet &rs) const override;
 };
 
 #endif // CURRENCYREPOSITORY_H

@@ -11,6 +11,7 @@
 #include "datasource.h"
 #include "iconrepository.h"
 #include "transactionrepository.h"
+#include <QSqlQuery>
 
 using std::make_unique;
 
@@ -29,8 +30,8 @@ MoneyDao &MoneyDao::dao() {
     return moneyDao;
 }
 
-void MoneyDao::initialize(const std::shared_ptr<DataSource> &dataSource) {
-    dataSource_ = dataSource;
+void MoneyDao::initialize(std::unique_ptr<DataSource> &&dataSource) {
+    dataSource_ = std::move(dataSource);
     cache_.clear();
 }
 

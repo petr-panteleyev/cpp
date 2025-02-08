@@ -14,7 +14,7 @@ class DataSource final {
     explicit DataSource(const QString &server, int port, const QString &user, const QString &password,
                         const QString &database, const QString &schema);
 
-    std::shared_ptr<DatabaseConnection> getConnection();
+    std::unique_ptr<DatabaseConnection> getConnection();
 
   private:
     QString server_;

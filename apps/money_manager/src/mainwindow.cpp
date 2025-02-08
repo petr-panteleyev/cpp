@@ -16,10 +16,10 @@
 #include "currencywindow.h"
 #include "databaseconnection.h"
 #include "datacache.h"
-#include "datasource.h"
 #include "decimal.h"
 #include "imagecache.h"
 #include "moneydao.h"
+#include "moneyrecorditemmodel.h"
 #include "qthelpers.h"
 #include "settings.h"
 #include "sqlexception.h"
@@ -108,67 +108,61 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
         switch (index.column()) {
             case COLUMN_DAY:
                 if (role == Qt::DisplayRole) {
-                    return tr->transactionDate().toString("dd");
+                    return tr.transactionDate().toString("dd");
                 }
                 break;
             case COLUMN_TYPE:
                 if (role == Qt::DisplayRole) {
-                    return Translation::translate(tr->type());
+                    return Translation::translate(tr.type());
                 }
                 break;
             case COLUMN_DEBIT_ACCOUNT: {
-                auto acc = DataCache::cache().getAccount(tr->accountDebitedUuid());
-                if (!acc.has_value()) {
-                    return QVariant();
-                }
+                auto acc = DataCache::cache().getAccount(tr.accountDebitedUuid());
                 if (role == Qt::DisplayRole) {
-                    return acc.value()->name();
-                } else if (role == Qt::DecorationRole && acc.value()->iconUuid().has_value()) {
-                    auto image = ImageCache::getImage(acc.value()->iconUuid().value());
-                    return QIcon(QPixmap::fromImage(*image.get()));
+                    return acc.name();
+                } else if (role == Qt::DecorationRole && acc.iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(acc.iconUuid().value());
+                    return QIcon(QPixmap::fromImage(image));
                 }
                 break;
             }
             case COLUMN_CREDIT_ACCOUNT: {
-                auto acc = DataCache::cache().getAccount(tr->accountCreditedUuid());
-                if (!acc.has_value()) {
-                    return QVariant();
-                }
+                auto acc = DataCache::cache().getAccount(tr.accountCreditedUuid());
                 if (role == Qt::DisplayRole) {
-                    return acc.value()->name();
-                } else if (role == Qt::DecorationRole && acc.value()->iconUuid().has_value()) {
-                    auto image = ImageCache::getImage(acc.value()->iconUuid().value());
-                    return QIcon(QPixmap::fromImage(*image.get()));
+                    return acc.name();
+                } else if (role == Qt::DecorationRole && acc.iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(acc.iconUuid().value());
+                    return QIcon(QPixmap::fromImage(image));
                 }
                 break;
             }
             case COLUMN_COUNTERPARTY: {
-                auto contact = DataCache::cache().getContact(tr->contactUuid().value_or(QUuid()));
-                if (!contact.has_value()) {
+                if (!tr.contactUuid().has_value()) {
                     return QVariant();
                 }
+                auto contact = DataCache::cache().getContact(tr.contactUuid().value());
                 if (role == Qt::DisplayRole) {
-                    return contact.value()->name();
-                } else if (role == Qt::DecorationRole && contact.value()->iconUuid().has_value()) {
-                    auto image = ImageCache::getImage(contact.value()->iconUuid().value());
-                    return QIcon(QPixmap::fromImage(*image.get()));
+                    return contact.name();
+                } else if (role == Qt::DecorationRole && contact.iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(contact.iconUuid().value());
+                    return QIcon(QPixmap::fromImage(image));
                 }
                 break;
             }
             case COLUMN_COMMENT:
                 if (role == Qt::DisplayRole) {
-                    return tr->comment();
+                    return tr.comment();
                 }
                 break;
             case COLUMN_AMOUNT:
                 if (role == Qt::DisplayRole) {
-                    return QString::fromStdString(tr->amount().setScale(2, Common::RoundingMode::HALF_UP).toString());
+                    return QString::fromStdString(tr.amount().setScale(2, Common::RoundingMode::HALF_UP).toString());
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::ForegroundRole) {
-                    if (tr->accountCreditedType() == CategoryType::EXPENSES) {
+                    if (tr.accountCreditedType() == CategoryType::EXPENSES) {
                         return COLOR_DEBIT;
-                    } else if (tr->accountCreditedType() == tr->accountDebitedType()) {
+                    } else if (tr.accountCreditedType() == tr.accountDebitedType()) {
                         return COLOR_TRANSFER;
                     } else {
                         return COLOR_CREDIT;
@@ -177,7 +171,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             case COLUMN_CHECKED:
                 if (role == Qt::DisplayRole) {
-                    return tr->checked() ? "+" : "";
+                    return tr.checked() ? "+" : "";
                 }
                 break;
         }
@@ -188,15 +182,15 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
         auto leftTr = DataCache::cache().getTransaction(left.row());
         auto rightTr = DataCache::cache().getTransaction(right.row());
 
-        if (leftTr->transactionDate() == rightTr->transactionDate()) {
-            return leftTr->created() < rightTr->created();
+        if (leftTr.transactionDate() == rightTr.transactionDate()) {
+            return leftTr.created() < rightTr.created();
         } else {
-            return leftTr->transactionDate() < rightTr->transactionDate();
+            return leftTr.transactionDate() < rightTr.transactionDate();
         }
     }
 
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {
-        auto trDate = DataCache::cache().getTransaction(sourceRow)->transactionDate();
+        auto trDate = DataCache::cache().getTransaction(sourceRow).transactionDate();
         return trDate.month() == date_.month() && trDate.year() == date_.year();
     }
 
@@ -300,9 +294,8 @@ MainWindow::~MainWindow() {
 
 void MainWindow::onConnect() {
     try {
-        auto profile = connectDialog_->profile();
-        auto ds = profile->createDataSource();
-        MoneyDao::dao().initialize(ds);
+        const auto &profile = connectDialog_->profile();
+        MoneyDao::dao().initialize(profile.createDataSource());
         MoneyDao::dao().preload();
         connected_ = true;
     } catch (const SqlException &ex) {

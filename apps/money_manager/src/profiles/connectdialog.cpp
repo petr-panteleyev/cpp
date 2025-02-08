@@ -16,7 +16,7 @@ ConnectDialog::ConnectDialog(QWidget *parent, ConnectionProfileManager *profileM
 ConnectDialog::~ConnectDialog() {
 }
 
-std::shared_ptr<ConnectionProfile> ConnectDialog::profile() const {
+const ConnectionProfile &ConnectDialog::profile() const {
     auto index = ui->profilesComboBox->currentIndex();
     return profileManager_->profile(index);
 }

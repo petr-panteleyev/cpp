@@ -13,7 +13,7 @@ class CardRepository final : public Repository<Card> {
     ~CardRepository() = default;
 
   protected:
-    virtual std::shared_ptr<Card> fromResultSet(const ResultSet &rs) const override;
+    virtual std::unique_ptr<Card> fromResultSet(const ResultSet &rs) const override;
 };
 
 #endif // CARDREPOSITORY_H

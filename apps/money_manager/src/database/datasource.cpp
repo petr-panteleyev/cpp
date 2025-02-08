@@ -23,7 +23,7 @@ DataSource::DataSource(const QString &server, int port, const QString &user, con
     : server_{server}, port_{port}, user_{user}, password_{password}, database_{database}, schema_{schema} {
 }
 
-std::shared_ptr<DatabaseConnection> DataSource::getConnection() {
+std::unique_ptr<DatabaseConnection> DataSource::getConnection() {
     auto connName = "conn" + QString::number(++connectionCounter);
     auto db = QSqlDatabase::addDatabase("QPSQL", connName);
     db.setHostName(server_);
@@ -43,5 +43,5 @@ std::shared_ptr<DatabaseConnection> DataSource::getConnection() {
     }
 
     db.setNumericalPrecisionPolicy(QSql::HighPrecision);
-    return std::shared_ptr<DatabaseConnection>(new DatabaseConnection(connName));
+    return std::unique_ptr<DatabaseConnection>(new DatabaseConnection(connName));
 }

@@ -5,6 +5,7 @@
 #include "currency.h"
 #include "datacache.h"
 #include "mainwindow.h"
+#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "ui_currencywindow.h"
 #include <QSortFilterProxyModel>
@@ -48,8 +49,8 @@ class CurrencyWindow::CurrencyFilterModel final : public QSortFilterProxyModel {
 
         auto currency = DataCache::cache().getCurrency(mapToSource(index).row());
         switch (index.column()) {
-            case COLUMN_NAME: return currency->symbol();
-            case COLUMN_DESCRIPTION: return currency->description();
+            case COLUMN_NAME: return currency.symbol();
+            case COLUMN_DESCRIPTION: return currency.description();
         }
 
         return QVariant();

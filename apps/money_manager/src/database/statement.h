@@ -4,16 +4,14 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
-#include <memory>
-
 class DatabaseConnection;
 
 class Statement {
   public:
-    explicit Statement(const std::shared_ptr<DatabaseConnection> &connection) noexcept;
+    explicit Statement(const DatabaseConnection &connection) noexcept;
 
   private:
-    std::shared_ptr<DatabaseConnection> connection_;
+    const DatabaseConnection &connection_;
 };
 
 #endif // STATEMENT_H

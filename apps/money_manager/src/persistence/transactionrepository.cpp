@@ -8,8 +8,8 @@
 TransactionRepository::TransactionRepository() : Repository("transaction") {
 }
 
-std::shared_ptr<Transaction> TransactionRepository::fromResultSet(const ResultSet &rs) const {
-    return std::make_shared<Transaction>(
+std::unique_ptr<Transaction> TransactionRepository::fromResultSet(const ResultSet &rs) const {
+    return std::make_unique<Transaction>(
         rs.getQUuid("uuid"), rs.getDecimal("amount"), rs.getDecimal("credit_amount"), rs.getQDate("transaction_date"),
         rs.getEnum<TransactionType>("type"), rs.getQString("comment"), rs.getBoolean("checked"),
         rs.getQUuid("acc_debited_uuid"), rs.getQUuid("acc_credited_uuid"), rs.getEnum<CategoryType>("acc_debited_type"),

@@ -4,13 +4,12 @@
 #ifndef IMAGECACHE_H
 #define IMAGECACHE_H
 
-#include <QImage>
-#include <QUuid>
-#include <memory>
+class QImage;
+class QUuid;
 
 namespace ImageCache {
 
-std::shared_ptr<QImage> getImage(const QUuid &uuid);
+const QImage &getImage(const QUuid &uuid);
 
 }
 

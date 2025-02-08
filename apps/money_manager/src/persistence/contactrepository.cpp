@@ -6,8 +6,8 @@
 ContactRepository::ContactRepository() : Repository{"contact"} {
 }
 
-std::shared_ptr<Contact> ContactRepository::fromResultSet(const ResultSet &rs) const {
-    return std::make_shared<Contact>(
+std::unique_ptr<Contact> ContactRepository::fromResultSet(const ResultSet &rs) const {
+    return std::make_unique<Contact>(
         rs.getQUuid("uuid"), rs.getQString("name"), rs.getEnum<ContactType>("type"), rs.getQString("phone"),
         rs.getQString("mobile"), rs.getQString("email"), rs.getQString("web"), rs.getQString("comment"),
         rs.getQString("street"), rs.getQString("city"), rs.getQString("country"), rs.getQString("zip"),

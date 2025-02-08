@@ -8,8 +8,10 @@
 #include "databaseconnection.h"
 #include "datasource.h"
 #include "preparedstatement.h"
+#include "resultset.h"
 #include "sqlexception.h"
 #include "ui_connectionprofiledialog.h"
+#include <QSqlQuery>
 
 using std::make_unique;
 
@@ -17,11 +19,10 @@ namespace {
 
 int counter = 0;
 
-std::shared_ptr<ConnectionProfile> buildProfile(const std::unique_ptr<Ui::ConnectionProfileDialog> &ui) {
-    int port = ui->portEdit->text().toInt();
-    return std::make_shared<ConnectionProfile>(ui->profileNameEdit->text(), ui->serverEdit->text(), port,
-                                               ui->userEdit->text(), ui->passwordEdit->text(), ui->databaseEdit->text(),
-                                               ui->schemaEdit->text());
+std::unique_ptr<ConnectionProfile> buildProfile(const Ui::ConnectionProfileDialog &ui) {
+    int port = ui.portEdit->text().toInt();
+    return make_unique<ConnectionProfile>(ui.profileNameEdit->text(), ui.serverEdit->text(), port, ui.userEdit->text(),
+                                          ui.passwordEdit->text(), ui.databaseEdit->text(), ui.schemaEdit->text());
 }
 
 } // namespace
@@ -49,7 +50,7 @@ ConnectionProfileDialog::~ConnectionProfileDialog() {
 
 void ConnectionProfileDialog::onNewButton() {
     profileManager_->getModel()->add(
-        std::make_shared<ConnectionProfile>(QString("Profile%1").arg(++counter), "postgres", "money"));
+        make_unique<ConnectionProfile>(QString("Profile%1").arg(++counter), "postgres", "money"));
 }
 
 void ConnectionProfileDialog::onDeleteButton() {
@@ -60,14 +61,14 @@ void ConnectionProfileDialog::onCurrentProfileChanged(const QModelIndex &current
         return;
     }
     const auto &p = profileManager_->getModel()->at(current.row());
-    ui->profileNameEdit->setText(p->name());
-    ui->serverEdit->setText(p->host());
-    ui->portEdit->setText(QString::number(p->port()));
-    ui->databaseEdit->setText(p->database());
-    ui->userEdit->setText(p->user());
-    ui->passwordEdit->setText(p->password());
-    ui->databaseEdit->setText(p->database());
-    ui->schemaEdit->setText(p->schema());
+    ui->profileNameEdit->setText(p.name());
+    ui->serverEdit->setText(p.host());
+    ui->portEdit->setText(QString::number(p.port()));
+    ui->databaseEdit->setText(p.database());
+    ui->userEdit->setText(p.user());
+    ui->passwordEdit->setText(p.password());
+    ui->databaseEdit->setText(p.database());
+    ui->schemaEdit->setText(p.schema());
 
     ui->testResultLabel->setText("");
 }
@@ -78,11 +79,8 @@ void ConnectionProfileDialog::onSaveButton() {
         return;
     }
 
-    profileManager_->getModel()->set(index, buildProfile(ui));
-
-    std::vector<std::shared_ptr<ConnectionProfile>> newProfiles =
-        ConnectionProfileManager::copy(profileManager_->getModel()->profiles());
-    profileManager_->setProfiles(newProfiles);
+    profileManager_->getModel()->set(index, buildProfile(*ui.get()));
+    profileManager_->setProfiles(ConnectionProfileManager::copy(profileManager_->getModel()->profiles()));
     profileManager_->saveProfiles();
 }
 
@@ -92,7 +90,7 @@ void ConnectionProfileDialog::onTestButton() {
         return;
     }
 
-    auto profile = buildProfile(ui);
+    auto profile = buildProfile(*ui.get());
     auto ds = profile->createDataSource();
     try {
         auto conn = ds->getConnection();

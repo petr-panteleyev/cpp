@@ -21,7 +21,7 @@ class ConnectDialog : public QDialog {
     explicit ConnectDialog(QWidget *parent, ConnectionProfileManager *profileManager);
     ~ConnectDialog();
 
-    std::shared_ptr<ConnectionProfile> profile() const;
+    const ConnectionProfile &profile() const;
 
   private:
     std::unique_ptr<Ui::ConnectDialog> ui;

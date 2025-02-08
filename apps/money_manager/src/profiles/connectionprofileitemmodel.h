@@ -16,11 +16,11 @@ class ConnectionProfileItemModel : public QAbstractItemModel {
     explicit ConnectionProfileItemModel(ConnectionProfileManager *profileManager);
     ~ConnectionProfileItemModel();
 
-    const std::shared_ptr<ConnectionProfile> &at(int row) const { return profiles_.at(row); }
-    void add(const std::shared_ptr<ConnectionProfile> &profile);
-    void set(const QModelIndex &index, const std::shared_ptr<ConnectionProfile> &profile);
-    const std::vector<std::shared_ptr<ConnectionProfile>> &profiles() const noexcept { return profiles_; }
-    void setProfiles(const std::vector<std::shared_ptr<ConnectionProfile>> &profiles);
+    const ConnectionProfile &at(int row) const { return *profiles_.at(row); }
+    void add(std::unique_ptr<ConnectionProfile> &&profile);
+    void set(const QModelIndex &index, std::unique_ptr<ConnectionProfile> &&profile);
+    const std::vector<std::unique_ptr<ConnectionProfile>> &profiles() const noexcept { return profiles_; }
+    void setProfiles(std::vector<std::unique_ptr<ConnectionProfile>> &&profiles);
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
         return createIndex(row, column);
@@ -33,7 +33,7 @@ class ConnectionProfileItemModel : public QAbstractItemModel {
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
   private:
-    std::vector<std::shared_ptr<ConnectionProfile>> profiles_;
+    std::vector<std::unique_ptr<ConnectionProfile>> profiles_;
 };
 
 #endif // CONNECTIONPROFILEITEMMODEL_H

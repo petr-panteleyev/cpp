@@ -18,6 +18,6 @@ ConnectionProfile::ConnectionProfile(const ConnectionProfile &profile)
       password_{profile.password_}, database_{profile.database_}, schema_{profile.schema_} {
 }
 
-std::shared_ptr<DataSource> ConnectionProfile::createDataSource() const noexcept {
-    return std::make_shared<DataSource>(host_, port_, user_, password_, database_, schema_);
+std::unique_ptr<DataSource> ConnectionProfile::createDataSource() const noexcept {
+    return std::make_unique<DataSource>(host_, port_, user_, password_, database_, schema_);
 }

@@ -9,30 +9,30 @@
 ConnectionProfileItemModel::ConnectionProfileItemModel(ConnectionProfileManager *profileManager)
     : QAbstractItemModel{nullptr} {
 
-    auto existing = profileManager->profiles();
+    const auto &existing = profileManager->profiles();
     profiles_.reserve(existing.size());
     for (const auto &p : existing) {
-        profiles_.push_back(std::shared_ptr<ConnectionProfile>(new ConnectionProfile{*p.get()}));
+        profiles_.push_back(std::unique_ptr<ConnectionProfile>(new ConnectionProfile{*p.get()}));
     }
 }
 
 ConnectionProfileItemModel::~ConnectionProfileItemModel() {
 }
 
-void ConnectionProfileItemModel::setProfiles(const std::vector<std::shared_ptr<ConnectionProfile>> &profiles) {
+void ConnectionProfileItemModel::setProfiles(std::vector<std::unique_ptr<ConnectionProfile>> &&profiles) {
     beginResetModel();
-    profiles_ = profiles;
+    profiles_ = std::move(profiles);
     endResetModel();
 }
 
-void ConnectionProfileItemModel::add(const std::shared_ptr<ConnectionProfile> &profile) {
+void ConnectionProfileItemModel::add(std::unique_ptr<ConnectionProfile> &&profile) {
     beginInsertRows(QModelIndex(), profiles_.size(), profiles_.size());
-    profiles_.push_back(profile);
+    profiles_.push_back(std::move(profile));
     endInsertRows();
 }
 
-void ConnectionProfileItemModel::set(const QModelIndex &index, const std::shared_ptr<ConnectionProfile> &profile) {
-    profiles_[index.row()] = profile;
+void ConnectionProfileItemModel::set(const QModelIndex &index, std::unique_ptr<ConnectionProfile> &&profile) {
+    profiles_[index.row()] = std::move(profile);
     emit dataChanged(index, index);
 }
 

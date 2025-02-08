@@ -20,7 +20,8 @@ const QString SCHEMA{"schema"};
 
 } // namespace
 
-ConnectionProfileManager::ConnectionProfileManager() : model_{std::make_unique<ConnectionProfileItemModel>(this)} {
+ConnectionProfileManager::ConnectionProfileManager()
+    : defaultProfile_{nullptr}, model_{std::make_unique<ConnectionProfileItemModel>(this)} {
 }
 
 ConnectionProfileManager::~ConnectionProfileManager() {
@@ -51,22 +52,25 @@ void ConnectionProfileManager::loadProfiles() {
     auto size = settings.beginReadArray(PROFILES_ARRAY);
     for (auto i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        auto profile = std::make_shared<ConnectionProfile>(
+        profiles_.emplace_back(std::make_unique<ConnectionProfile>(
             settings.value(NAME).toString(), settings.value(HOST).toString(), settings.value(PORT).toInt(),
             settings.value(USER).toString(), settings.value(PASSWORD).toString(), settings.value(DATABASE).toString(),
-            settings.value(SCHEMA).toString());
-        profiles_.push_back(profile);
+            settings.value(SCHEMA).toString()));
     }
     settings.endArray();
     model_->setProfiles(copy(profiles_));
 }
 
-std::vector<std::shared_ptr<ConnectionProfile>>
-ConnectionProfileManager::copy(const std::vector<std::shared_ptr<ConnectionProfile>> &profiles) noexcept {
-    std::vector<std::shared_ptr<ConnectionProfile>> copy;
+void ConnectionProfileManager::setProfiles(std::vector<std::unique_ptr<ConnectionProfile>> &&profiles) {
+    profiles_ = std::move(profiles);
+}
+
+std::vector<std::unique_ptr<ConnectionProfile>>
+ConnectionProfileManager::copy(const std::vector<std::unique_ptr<ConnectionProfile>> &profiles) noexcept {
+    std::vector<std::unique_ptr<ConnectionProfile>> copy;
     copy.reserve(profiles.size());
     for (const auto &p : profiles) {
-        copy.push_back(std::shared_ptr<ConnectionProfile>(new ConnectionProfile(*p.get())));
+        copy.push_back(std::unique_ptr<ConnectionProfile>(new ConnectionProfile(*p.get())));
     }
     return copy;
 }

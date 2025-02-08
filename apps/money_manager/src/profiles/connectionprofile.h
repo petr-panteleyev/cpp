@@ -22,7 +22,7 @@ class ConnectionProfile final {
     const QString &database() const noexcept { return database_; }
     const QString &schema() const noexcept { return schema_; }
 
-    std::shared_ptr<DataSource> createDataSource() const noexcept;
+    std::unique_ptr<DataSource> createDataSource() const noexcept;
 
   private:
     QString name_;

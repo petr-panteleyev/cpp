@@ -8,6 +8,7 @@
 #include "datacache.h"
 #include "imagecache.h"
 #include "mainwindow.h"
+#include "moneyrecorditemmodel.h"
 #include "qnamespace.h"
 #include "settings.h"
 #include "ui_cardwindow.h"
@@ -58,45 +59,39 @@ class CardWindow::CardFilterModel final : public QSortFilterProxyModel {
         int row = mapToSource(index).row();
         auto card = DataCache::cache().getCard(row);
 
-        auto account = DataCache::cache().getAccount(card->accountUuid());
-        if (!account.has_value()) {
-            return QVariant();
-        }
-        auto category = DataCache::cache().getCategory((*account)->categoryUuid());
-        if (!category.has_value()) {
-            return QVariant();
-        }
+        auto account = DataCache::cache().getAccount(card.accountUuid());
+        auto category = DataCache::cache().getCategory(account.categoryUuid());
 
         switch (index.column()) {
             case COLUMN_NUMBER:
                 if (role == Qt::DisplayRole) {
-                    return card->number();
+                    return card.number();
                 }
                 break;
             case COLUMN_CATEGORY:
                 if (role == Qt::DisplayRole) {
-                    return (*category)->name();
-                } else if (role == Qt::DecorationRole && (*category)->iconUuid().has_value()) {
-                    auto image = ImageCache::getImage((*category)->iconUuid().value());
-                    return QIcon(QPixmap::fromImage(*image.get()));
+                    return category.name();
+                } else if (role == Qt::DecorationRole && category.iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(category.iconUuid().value());
+                    return QIcon(QPixmap::fromImage(image));
                 }
                 break;
             case COLUMN_ACCOUNT:
                 if (role == Qt::DisplayRole) {
-                    return (*account)->name();
-                } else if (role == Qt::DecorationRole && (*account)->iconUuid().has_value()) {
-                    auto image = ImageCache::getImage((*account)->iconUuid().value());
-                    return QIcon(QPixmap::fromImage(*image.get()));
+                    return account.name();
+                } else if (role == Qt::DecorationRole && account.iconUuid().has_value()) {
+                    auto image = ImageCache::getImage(account.iconUuid().value());
+                    return QIcon(QPixmap::fromImage(image));
                 }
                 break;
             case COLUMN_EXPIRATION:
                 if (role == Qt::DisplayRole) {
-                    return card->expiration().toString("MM/yy");
+                    return card.expiration().toString("MM/yy");
                 }
                 break;
             case COLUMN_COMMENT:
                 if (role == Qt::DisplayRole) {
-                    return card->comment();
+                    return card.comment();
                 }
                 break;
         }

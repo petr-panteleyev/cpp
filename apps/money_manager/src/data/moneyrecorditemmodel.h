@@ -8,27 +8,27 @@
 
 class MoneyRecord;
 
-template <class R>
-    requires std::derived_from<R, MoneyRecord>
 class MoneyRecordItemModel final : public QAbstractItemModel {
     friend class DataCacheImpl;
+    friend class DataCache;
 
   public:
-    explicit MoneyRecordItemModel(const std::vector<std::shared_ptr<R>> &data) : data_{data} {};
+    explicit MoneyRecordItemModel() : size_{0} {};
     ~MoneyRecordItemModel() = default;
 
-    QModelIndex index(int row, int column, const QModelIndex &parent = TOP_LEVEL) const override {
+    void setSize(int size) noexcept { size_ = size; }
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
         return createIndex(row, column);
     }
-    QModelIndex parent(const QModelIndex &index) const override { return TOP_LEVEL; };
+    QModelIndex parent(const QModelIndex &index) const override { return QModelIndex(); };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override { return QVariant(); };
 
-    int rowCount(const QModelIndex &parent = TOP_LEVEL) const override { return data_.size(); };
-    int columnCount(const QModelIndex &parent = TOP_LEVEL) const override { return 100; };
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override { return size_; };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override { return 100; };
 
   private:
-    const std::vector<std::shared_ptr<R>> &data_;
-    static inline QModelIndex TOP_LEVEL = QModelIndex();
+    int size_;
 };
 
 #endif // MONEYRECORDITEMMODE_H

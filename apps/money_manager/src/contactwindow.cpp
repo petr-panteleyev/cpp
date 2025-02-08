@@ -5,6 +5,7 @@
 #include "contact.h"
 #include "datacache.h"
 #include "mainwindow.h"
+#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "translation.h"
 #include "ui_contactwindow.h"
@@ -65,10 +66,10 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
         auto contact = DataCache::cache().getContact(row);
 
         switch (index.column()) {
-            case COLUMN_NAME: return contact->name();
-            case COLUMN_TYPE: return Translation::translate(contact->type());
-            case COLUMN_PHONE: return contact->phone();
-            case COLUMN_EMAIL: return contact->email();
+            case COLUMN_NAME: return contact.name();
+            case COLUMN_TYPE: return Translation::translate(contact.type());
+            case COLUMN_PHONE: return contact.phone();
+            case COLUMN_EMAIL: return contact.email();
         }
 
         return QVariant();
@@ -83,10 +84,10 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
         auto rightContact = DataCache::cache().getContact(right.row());
 
         switch (left.column()) {
-            case COLUMN_NAME: return leftContact->name() < rightContact->name();
-            case COLUMN_TYPE: return leftContact->type().ordinal() < rightContact->type().ordinal();
-            case COLUMN_PHONE: return leftContact->phone() < rightContact->phone();
-            case COLUMN_EMAIL: return leftContact->email() < rightContact->email();
+            case COLUMN_NAME: return leftContact.name() < rightContact.name();
+            case COLUMN_TYPE: return leftContact.type().ordinal() < rightContact.type().ordinal();
+            case COLUMN_PHONE: return leftContact.phone() < rightContact.phone();
+            case COLUMN_EMAIL: return leftContact.email() < rightContact.email();
         }
         return false;
     }
@@ -100,10 +101,10 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
 
         bool accept = true;
         if (typeOrdinal_ != -1) {
-            accept = accept && contact->type().ordinal() == static_cast<unsigned>(typeOrdinal_);
+            accept = accept && contact.type().ordinal() == static_cast<unsigned>(typeOrdinal_);
         }
         if (!nameFilter_.isEmpty()) {
-            accept = accept & contact->name().contains(nameFilter_, Qt::CaseInsensitive);
+            accept = accept & contact.name().contains(nameFilter_, Qt::CaseInsensitive);
         }
         return accept;
     }

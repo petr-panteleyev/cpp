@@ -4,27 +4,28 @@
 #include "imagecache.h"
 #include "datacache.h"
 #include "icon.h"
-#include <QHash>
-#include <stdexcept>
+#include <QImage>
+#include <QUuid>
+#include <algorithm>
+#include <memory>
+#include <vector>
 
 namespace ImageCache {
 
-static QHash<QUuid, std::shared_ptr<QImage>> IMAGES;
+static std::vector<std::pair<QUuid, std::unique_ptr<QImage>>> IMAGES;
 
-std::shared_ptr<QImage> getImage(const QUuid &uuid) {
-    if (IMAGES.contains(uuid)) {
-        return IMAGES[uuid];
+const QImage &getImage(const QUuid &uuid) {
+    auto found = std::find_if(IMAGES.begin(), IMAGES.end(), [&uuid](const auto &pair) { return pair.first == uuid; });
+    if (found != IMAGES.end()) {
+        return *found->second;
     }
 
     auto icon = DataCache::cache().getIcon(uuid);
-    if (!icon.has_value()) {
-        throw std::out_of_range("Icon does not exist");
-    }
+    auto image = new QImage();
+    image->loadFromData(icon.bytes());
+    IMAGES.emplace_back(std::pair(uuid, std::unique_ptr<QImage>(image)));
 
-    auto image = std::make_shared<QImage>();
-    image->loadFromData(icon.value()->bytes());
-    IMAGES[uuid] = image;
-    return image;
+    return *image;
 }
 
 } // namespace ImageCache

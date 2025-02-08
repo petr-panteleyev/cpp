@@ -13,7 +13,7 @@ class AccountRepository final : public Repository<Account> {
     ~AccountRepository() = default;
 
   protected:
-    virtual std::shared_ptr<Account> fromResultSet(const ResultSet &rs) const override;
+    virtual std::unique_ptr<Account> fromResultSet(const ResultSet &rs) const override;
 };
 
 #endif // ACCOUNTREPOSITORY_H

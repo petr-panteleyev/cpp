@@ -6,7 +6,6 @@
 
 #include <memory>
 
-class DatabaseConnection;
 class ResultSet;
 class QSqlQuery;
 
@@ -14,14 +13,13 @@ class PreparedStatement {
     friend class DatabaseConnection;
 
   public:
-    std::shared_ptr<ResultSet> executeQuery() const;
+    std::unique_ptr<ResultSet> executeQuery() const;
 
   private:
-    explicit PreparedStatement(DatabaseConnection *connection, const std::shared_ptr<QSqlQuery> &query) noexcept;
+    explicit PreparedStatement(std::unique_ptr<QSqlQuery> &&query) noexcept;
 
   private:
-    DatabaseConnection* connection_;
-    std::shared_ptr<QSqlQuery> query_;
+    std::unique_ptr<QSqlQuery> query_;
 };
 
 #endif // PREPAREDSTATEMENT_H

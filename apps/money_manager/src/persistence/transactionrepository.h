@@ -13,7 +13,7 @@ class TransactionRepository final : public Repository<Transaction> {
     ~TransactionRepository() = default;
 
   protected:
-    virtual std::shared_ptr<Transaction> fromResultSet(const ResultSet &rs) const override;
+    virtual std::unique_ptr<Transaction> fromResultSet(const ResultSet &rs) const override;
 };
 
 #endif // TRANSACTIONREPOSITORY_H

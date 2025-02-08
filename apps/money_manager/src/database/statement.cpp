@@ -3,7 +3,5 @@
 
 #include "statement.h"
 
-Statement::Statement(const std::shared_ptr<DatabaseConnection> &connection) noexcept : connection_{connection}
-{
-
+Statement::Statement(const DatabaseConnection &connection) noexcept : connection_{connection} {
 }

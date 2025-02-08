@@ -5,6 +5,7 @@
 #include "category.h"
 #include "datacache.h"
 #include "mainwindow.h"
+#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "translation.h"
 #include "ui_categorywindow.h"
@@ -64,9 +65,9 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
         auto category = DataCache::cache().getCategory(row);
 
         switch (index.column()) {
-            case COLUMN_NAME: return category->name();
-            case COLUMN_TYPE: return Translation::translate(category->type());
-            case COLUMN_COMMENT: return category->comment();
+            case COLUMN_NAME: return category.name();
+            case COLUMN_TYPE: return Translation::translate(category.type());
+            case COLUMN_COMMENT: return category.comment();
         }
 
         return QVariant();
@@ -81,8 +82,8 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
         auto rightCategory = DataCache::cache().getCategory(right.row());
 
         switch (left.column()) {
-            case COLUMN_NAME: return leftCategory->name() < rightCategory->name();
-            case COLUMN_TYPE: return leftCategory->type().ordinal() < rightCategory->type().ordinal();
+            case COLUMN_NAME: return leftCategory.name() < rightCategory.name();
+            case COLUMN_TYPE: return leftCategory.type().ordinal() < rightCategory.type().ordinal();
             case COLUMN_COMMENT: return false;
         }
         return false;
@@ -97,10 +98,10 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
 
         bool accept = true;
         if (typeOrdinal_ != -1) {
-            accept = accept && category->type().ordinal() == static_cast<unsigned>(typeOrdinal_);
+            accept = accept && category.type().ordinal() == static_cast<unsigned>(typeOrdinal_);
         }
         if (!nameFilter_.isEmpty()) {
-            accept = accept & category->name().contains(nameFilter_, Qt::CaseInsensitive);
+            accept = accept & category.name().contains(nameFilter_, Qt::CaseInsensitive);
         }
         return accept;
     }

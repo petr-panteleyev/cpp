@@ -25,14 +25,14 @@ DatabaseConnection::~DatabaseConnection() {
     QSqlDatabase::removeDatabase(name_);
 }
 
-std::shared_ptr<PreparedStatement> DatabaseConnection::prepareStatement(const QString &sql) {
+std::unique_ptr<PreparedStatement> DatabaseConnection::prepareStatement(const QString &sql) {
     auto db = QSqlDatabase::database(name_);
 
-    auto query = std::make_shared<QSqlQuery>(db);
+    auto query = std::make_unique<QSqlQuery>(db);
     query->prepare(sql);
     if (query->lastError().isValid()) {
         throw SqlException(query->lastError().text().toStdString());
     }
 
-    return std::shared_ptr<PreparedStatement>(new PreparedStatement(this, query));
+    return std::unique_ptr<PreparedStatement>(new PreparedStatement(std::move(query)));
 }

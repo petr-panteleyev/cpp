@@ -16,7 +16,7 @@ class QSqlQuery;
 
 class ResultSet final {
   public:
-    ResultSet(const std::shared_ptr<QSqlQuery> &query) noexcept;
+    ResultSet(QSqlQuery &query) noexcept;
     ~ResultSet();
 
     bool next() noexcept;
@@ -67,7 +67,7 @@ class ResultSet final {
     }
 
   private:
-    const std::shared_ptr<QSqlQuery> &query_;
+    QSqlQuery &query_;
     int currentRow_;
     int rows_;
     int columns_;

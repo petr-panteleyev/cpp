@@ -18,7 +18,7 @@ class TransactionRepository;
 
 class MoneyDao final {
   public:
-    void initialize(const std::shared_ptr<DataSource> &dataSource);
+    void initialize(std::unique_ptr<DataSource> &&dataSource);
     void preload();
 
   public:
@@ -31,7 +31,7 @@ class MoneyDao final {
   private:
     DataCache &cache_;
 
-    std::shared_ptr<DataSource> dataSource_;
+    std::unique_ptr<DataSource> dataSource_;
 
     std::unique_ptr<AccountRepository> accountRepository_;
     std::unique_ptr<CardRepository> cardRepository_;
