@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow {
 
   private:
     const QModelIndex currentIndex() const noexcept;
-    std::optional<std::shared_ptr<Card>> currentCard() const noexcept;
+    const Card *currentCard() const;
 
     void writeFile() const { writeFile(currentFileName_.get(), currentPassword_); }
     void writeFile(const QString &fileName, const QString &password) const;
@@ -80,7 +80,7 @@ class MainWindow : public QMainWindow {
     void onActionShowDeletedToggled(bool checked);
 
   private:
-    static std::vector<std::shared_ptr<Card>> loadRecords(const QString &fileName, const QString &password);
+    static std::vector<Card> loadRecords(const QString &fileName, const QString &password);
 
   private:
     std::unique_ptr<Ui::MainWindow> ui;

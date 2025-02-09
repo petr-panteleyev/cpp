@@ -6,6 +6,7 @@
 #include "contacttype.h"
 #include "transactiontype.h"
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 
 namespace Translation {
@@ -45,28 +46,28 @@ static const std::unordered_map<unsigned, QString> CONTACT_TYPE_TRANSLATION{
     {ContactType::EMPLOYER.ordinal(), "Работодатель"}, {ContactType::SERVICE.ordinal(), "Услуга"},
 };
 
-const QString &translate(const CategoryType &type) {
-    if (!CATEGORY_TYPE_TRANSLATION.contains(type.ordinal())) {
-        throw std::out_of_range("No transalation for " + type.name());
+const QString &translateCategoryType(unsigned type) {
+    if (!CATEGORY_TYPE_TRANSLATION.contains(type)) {
+        throw std::out_of_range("No CategoryType transalation for " + std::to_string(type));
     }
 
-    return CATEGORY_TYPE_TRANSLATION.at(type.ordinal());
+    return CATEGORY_TYPE_TRANSLATION.at(type);
 }
 
-const QString &translate(const ContactType &type) {
-    if (!CONTACT_TYPE_TRANSLATION.contains(type.ordinal())) {
-        throw std::out_of_range("No transalation for " + type.name());
+const QString &translateContactType(unsigned type) {
+    if (!CONTACT_TYPE_TRANSLATION.contains(type)) {
+        throw std::out_of_range("No ContactType transalation for " + std::to_string(type));
     }
 
-    return CONTACT_TYPE_TRANSLATION.at(type.ordinal());
+    return CONTACT_TYPE_TRANSLATION.at(type);
 }
 
-const QString &translate(const TransactionType &type) {
-    if (!TRANSACTION_TYPE_TRANSLATION.contains(type.ordinal())) {
-        throw std::out_of_range("No transalation for " + type.name());
+const QString &translateTransactionType(unsigned type) {
+    if (!TRANSACTION_TYPE_TRANSLATION.contains(type)) {
+        throw std::out_of_range("No TransactionType transalation for " + std::to_string(type));
     }
 
-    return TRANSACTION_TYPE_TRANSLATION.at(type.ordinal());
+    return TRANSACTION_TYPE_TRANSLATION.at(type);
 }
 
 } // namespace Translation

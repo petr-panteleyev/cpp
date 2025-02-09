@@ -29,14 +29,14 @@ enum class Color {
 };
 
 using ColorMap = std::unordered_map<Color, QColor>;
-using PasswordTypePtrMap = std::unordered_map<PasswordType, std::shared_ptr<pwdgen::PasswordGeneratorOptions>>;
-using FontPtrMap = std::unordered_map<FontType, std::shared_ptr<QFont>>;
+using PasswordTypePtrMap = std::unordered_map<PasswordType, std::unique_ptr<pwdgen::PasswordGeneratorOptions>>;
+using FontPtrMap = std::unordered_map<FontType, QFont>;
 
 void setColors(const ColorMap &colors);
 QColor getColor(Color type);
 
 void setPasswordOptions(const PasswordTypePtrMap &passwords);
-pwdgen::PasswordGeneratorOptions getPasswordOptions(PasswordType type);
+std::unique_ptr<pwdgen::PasswordGeneratorOptions> getPasswordOptions(PasswordType type);
 PasswordTypePtrMap getAllPasswordOptions();
 
 bool getOpenLinkWithDoubleClick();

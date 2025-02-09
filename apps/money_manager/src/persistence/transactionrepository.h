@@ -13,7 +13,8 @@ class TransactionRepository final : public Repository<Transaction> {
     ~TransactionRepository() = default;
 
   protected:
-    virtual std::unique_ptr<Transaction> fromResultSet(const ResultSet &rs) const override;
+    virtual Transaction fromResultSet(const ResultSet &rs) const override;
+    virtual void fromResultSet(const ResultSet &rs, std::vector<Transaction> &result) const override;
 };
 
 #endif // TRANSACTIONREPOSITORY_H

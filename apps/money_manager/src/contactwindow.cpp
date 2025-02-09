@@ -67,7 +67,7 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
 
         switch (index.column()) {
             case COLUMN_NAME: return contact.name();
-            case COLUMN_TYPE: return Translation::translate(contact.type());
+            case COLUMN_TYPE: return Translation::translateContactType(contact.type());
             case COLUMN_PHONE: return contact.phone();
             case COLUMN_EMAIL: return contact.email();
         }
@@ -85,7 +85,7 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
 
         switch (left.column()) {
             case COLUMN_NAME: return leftContact.name() < rightContact.name();
-            case COLUMN_TYPE: return leftContact.type().ordinal() < rightContact.type().ordinal();
+            case COLUMN_TYPE: return leftContact.type() < rightContact.type();
             case COLUMN_PHONE: return leftContact.phone() < rightContact.phone();
             case COLUMN_EMAIL: return leftContact.email() < rightContact.email();
         }
@@ -101,7 +101,7 @@ class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
 
         bool accept = true;
         if (typeOrdinal_ != -1) {
-            accept = accept && contact.type().ordinal() == static_cast<unsigned>(typeOrdinal_);
+            accept = accept && contact.type() == static_cast<unsigned>(typeOrdinal_);
         }
         if (!nameFilter_.isEmpty()) {
             accept = accept & contact.name().contains(nameFilter_, Qt::CaseInsensitive);
@@ -131,7 +131,7 @@ ContactWindow::ContactWindow(QWidget *parent)
     ui->typeComboBox->addItem("Все типы", -1);
     ui->typeComboBox->insertSeparator(1);
     std::for_each(ContactType::values().begin(), ContactType::values().end(), [this](const ContactType &type) {
-        ui->typeComboBox->addItem(Translation::translate(type), static_cast<int>(type.ordinal()));
+        ui->typeComboBox->addItem(Translation::translateContactType(type.ordinal()), static_cast<int>(type.ordinal()));
     });
     connect(ui->typeComboBox, &QComboBox::currentIndexChanged, [this](int index) {
         int ordinal = ui->typeComboBox->currentData().toInt();

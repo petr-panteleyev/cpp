@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "editfieldlistmodel.h"
@@ -27,7 +27,7 @@ QVariant EditFieldListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
     }
 
-    auto field = fields_.at(index.row());
+    const auto field = at(index.row());
 
     switch (index.column()) {
         case FIELD_TABLE_NAME_COLUMN: {
@@ -76,33 +76,38 @@ Qt::ItemFlags EditFieldListModel::flags(const QModelIndex &index) const {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
+void EditFieldListModel::setFields(const std::vector<Field> &fields) {
+    beginResetModel();
+    fields_ = fields;
+    endResetModel();
+}
+
 void EditFieldListModel::addField() {
-    beginInsertRows(TOP_LEVEL, fields_.size(), fields_.size());
-    auto field = std::make_shared<Field>(FieldType::STRING, "Field", "");
-    fields_.push_back(field);
+    beginInsertRows(QModelIndex(), fields_.size(), fields_.size());
+    fields_.emplace_back(FieldType::STRING, "Field", "");
     endInsertRows();
 }
 
 void EditFieldListModel::deleteField(int row) {
-    beginRemoveRows(TOP_LEVEL, row, row);
+    beginRemoveRows(QModelIndex(), row, row);
     fields_.erase(std::next(fields_.begin(), row));
     endRemoveRows();
 }
 
 void EditFieldListModel::moveUp(int row) {
-    beginMoveRows(TOP_LEVEL, row, row, TOP_LEVEL, row - 1);
+    beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1);
     std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row - 1));
     endMoveRows();
 }
 
 void EditFieldListModel::moveDown(int row) {
-    beginMoveRows(TOP_LEVEL, row, row, TOP_LEVEL, row + 2);
+    beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2);
     std::iter_swap(std::next(fields_.begin(), row), std::next(fields_.begin(), row + 1));
     endMoveRows();
 }
 
-void EditFieldListModel::setFieldValue(int row, const std::shared_ptr<Field> &field, const QVariant &value) {
-    field->setValue(value);
+void EditFieldListModel::setFieldValue(int row, const QVariant &value) {
+    std::next(fields_.begin(), row)->setValue(value);
     auto updateIndex = index(row, FIELD_TABLE_VALUE_COLUMN);
     emit dataChanged(updateIndex, updateIndex, {Qt::EditRole});
 }

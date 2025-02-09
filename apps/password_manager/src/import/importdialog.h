@@ -1,7 +1,5 @@
-/*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-*/
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef IMPORTDIALOG_H
 #define IMPORTDIALOG_H
@@ -9,6 +7,7 @@
 #include "importrecord.h"
 #include <QDialog>
 #include <memory>
+#include <vector>
 
 namespace Ui {
 class ImportDialog;
@@ -23,7 +22,8 @@ class ImportDialog : public QDialog {
     explicit ImportDialog(QWidget *parent);
     ~ImportDialog();
 
-    void setup(const std::vector<std::shared_ptr<ImportRecord>> &toImport);
+    void setup(const std::vector<ImportRecord> &toImport);
+    std::vector<ImportRecord> records() const;
 
   private:
     void setupTableView();

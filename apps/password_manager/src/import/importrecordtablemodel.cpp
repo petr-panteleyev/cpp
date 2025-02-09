@@ -1,9 +1,8 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "importrecordtablemodel.h"
 #include "card.h"
-#include "importrecord.h"
 #include "settings.h"
 #include "translations.h"
 #include <QDate>
@@ -30,20 +29,20 @@ QVariant ImportRecordTableModel::data(const QModelIndex &index, int role) const 
         return QVariant();
     }
 
-    auto record = data_.at(index.row());
+    const auto &record = records_.at(index.row());
 
     if (role == Qt::BackgroundRole) {
-        return !ACTION_COLORS.contains(record->action()) || !record->approved()
+        return !ACTION_COLORS.contains(record.action()) || !record.approved()
                    ? WHITE
-                   : Settings::getColor(ACTION_COLORS[record->action()]);
+                   : Settings::getColor(ACTION_COLORS[record.action()]);
     } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
-            case COLUMN_TITLE: return record->cardToImport()->name();
+            case COLUMN_TITLE: return record.cardToImport()->name();
             case COLUMN_UPDATED: {
-                auto dateTime = QDateTime::fromMSecsSinceEpoch(record->cardToImport()->modified());
+                auto dateTime = QDateTime::fromMSecsSinceEpoch(record.cardToImport()->modified());
                 return dateTime.toString("dd.MM.yyyy HH:mm:ss");
             }
-            case COLUMN_ACTION: return Translations::translate(record->effectiveAction());
+            case COLUMN_ACTION: return Translations::translate(record.effectiveAction());
         }
     } else if (role == Qt::TextAlignmentRole) {
         return COLUMN_ALIGNMENT.at(index.column());
@@ -53,8 +52,8 @@ QVariant ImportRecordTableModel::data(const QModelIndex &index, int role) const 
 }
 
 void ImportRecordTableModel::toggleApproval(int row) {
-    auto record = data_.at(row);
-    record->toggleApproval();
+    auto &record = records_.at(row);
+    record.toggleApproval();
     auto updatedIndex = index(row, COLUMN_ACTION);
     emit dataChanged(updatedIndex, updatedIndex, {Qt::DisplayRole});
 }

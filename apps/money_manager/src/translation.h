@@ -6,15 +6,11 @@
 
 #include <QString>
 
-class CategoryType;
-class ContactType;
-class TransactionType;
-
 namespace Translation {
 
-const QString &translate(const CategoryType &type);
-const QString &translate(const ContactType &type);
-const QString &translate(const TransactionType &type);
+const QString &translateCategoryType(unsigned type);
+const QString &translateContactType(unsigned type);
+const QString &translateTransactionType(unsigned type);
 
 } // namespace Translation
 

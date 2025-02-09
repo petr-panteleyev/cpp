@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "fieldtableitemmodel.h"
@@ -10,12 +10,18 @@
 
 static const QString MASK = "*****";
 
+void FieldTableItemModel::setItems(const std::vector<Field> &items) {
+    beginResetModel();
+    items_ = items;
+    endResetModel();
+}
+
 QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || (std::size_t)index.row() >= items_.size()) {
         return QVariant();
     }
 
-    auto field = items_.at(index.row());
+    const auto field = fieldAtIndex(index.row());
 
     switch (index.column()) {
         case 0: {
@@ -48,7 +54,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void FieldTableItemModel::toggleMasking(const QModelIndex &index, const std::shared_ptr<Field> &field) {
-    field->toggleShow();
+void FieldTableItemModel::toggleMasking(const QModelIndex &index, Field &field) {
+    field.toggleShow();
     emit dataChanged(index, index, {Qt::DisplayRole});
 }

@@ -15,7 +15,7 @@ class Card final : public MoneyRecord {
     ~Card() = default;
 
     QUuid accountUuid() const noexcept { return accountUuid_; };
-    const CardType &type() const noexcept { return type_; }
+    const CardType &type() const noexcept { return CardType::valueOf(type_); }
     const QString &number() const noexcept { return number_; }
     QDate expiration() const noexcept { return expiration_; }
     const QString &comment() const noexcept { return comment_; }
@@ -23,7 +23,7 @@ class Card final : public MoneyRecord {
 
   private:
     QUuid accountUuid_;
-    const CardType &type_;
+    unsigned type_;
     QString number_;
     QDate expiration_;
     QString comment_;

@@ -13,7 +13,8 @@ class ContactRepository final : public Repository<Contact> {
     ~ContactRepository() = default;
 
   protected:
-    virtual std::unique_ptr<Contact> fromResultSet(const ResultSet &rs) const override;
+    virtual Contact fromResultSet(const ResultSet &rs) const override;
+    virtual void fromResultSet(const ResultSet &rs, std::vector<Contact> &result) const override;
 };
 
 #endif // CONTACTREPOSITORY_H

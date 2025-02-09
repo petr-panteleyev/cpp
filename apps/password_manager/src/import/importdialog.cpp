@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "importdialog.h"
@@ -44,8 +44,12 @@ void ImportDialog::setupContextMenu() {
     connect(ui->tableView, &QTableView::customContextMenuRequested, this, &ImportDialog::onContextMenuRequested);
 }
 
-void ImportDialog::setup(const std::vector<std::shared_ptr<ImportRecord>> &toImport) {
-    model_->setItems(toImport);
+void ImportDialog::setup(const std::vector<ImportRecord> &toImport) {
+    model_->setRecords(toImport);
+}
+
+std::vector<ImportRecord> ImportDialog::records() const {
+    return model_->records();
 }
 
 void ImportDialog::onContextMenuRequested(QPoint pos) {

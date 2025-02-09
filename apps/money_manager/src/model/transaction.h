@@ -25,26 +25,26 @@ class Transaction final : public MoneyRecord {
 
     Common::Decimal amount() const noexcept { return amount_; }
     QDate transactionDate() const noexcept { return transactionDate_; }
-    const TransactionType &type() const noexcept { return type_; }
+    unsigned type() const noexcept { return type_; }
     const QString &comment() const noexcept { return comment_; }
     bool checked() const noexcept { return checked_; }
     QUuid accountDebitedUuid() const noexcept { return accountDebitedUuid_; }
     QUuid accountCreditedUuid() const noexcept { return accountCreditedUuid_; }
-    const CategoryType &accountDebitedType() const noexcept { return accountDebitedType_; }
-    const CategoryType &accountCreditedType() const noexcept { return accountCreditedType_; }
+    unsigned accountDebitedType() const noexcept { return accountDebitedType_; }
+    unsigned accountCreditedType() const noexcept { return accountCreditedType_; }
     std::optional<QUuid> contactUuid() const noexcept { return contactUuid_; }
 
   private:
     Common::Decimal amount_;
     Common::Decimal creditAmount_;
     QDate transactionDate_;
-    const TransactionType &type_;
+    unsigned type_;
     QString comment_;
     bool checked_;
     QUuid accountDebitedUuid_;
     QUuid accountCreditedUuid_;
-    const CategoryType &accountDebitedType_;
-    const CategoryType &accountCreditedType_;
+    unsigned accountDebitedType_;
+    unsigned accountCreditedType_;
     QUuid accountDebitedCategoryUuid_;
     QUuid accountCreditedCategoryUuid_;
     std::optional<QUuid> contactUuid_;

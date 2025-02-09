@@ -1,20 +1,25 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CARDTABLEITEMMODEL_H
 #define CARDTABLEITEMMODEL_H
 
 #include <QAbstractItemModel>
-
-class Card;
+#include "card.h"
 
 class CardTableItemModel : public QAbstractItemModel {
   public:
     explicit CardTableItemModel(QObject *parent) : QAbstractItemModel{parent} {};
 
-    void setItems(const std::vector<std::shared_ptr<Card>> &items) {
+    void setItems(std::vector<Card> &items) {
         beginResetModel();
         data_ = items;
+        endResetModel();
+    }
+
+    void clearItems() {
+        beginResetModel();
+        data_.clear();
         endResetModel();
     }
 
@@ -28,20 +33,20 @@ class CardTableItemModel : public QAbstractItemModel {
     }
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    const std::shared_ptr<Card> cardAtIndex(int index) const { return data_.at(index); }
+    const Card &cardAtIndex(int index) const { return data_.at(index); }
 
-    void replace(int row, const std::shared_ptr<Card> &card);
-    void addOrReplace(const std::shared_ptr<Card> &card);
-    void add(const std::shared_ptr<Card> &card);
+    void replace(int row, const Card &card);
+    void addOrReplace(const Card &card);
+    void add(const Card &card);
     void deleteCard(int row);
     void purgeInactive();
 
-    const std::vector<std::shared_ptr<Card>> &data() const noexcept { return data_; }
+    const std::vector<Card> &data() const noexcept { return data_; }
 
   private:
     static inline const QModelIndex parent_index = QModelIndex();
 
-    std::vector<std::shared_ptr<Card>> data_;
+    std::vector<Card> data_;
 };
 
 #endif // CARDTABLEITEMMODEL_H

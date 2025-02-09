@@ -2,8 +2,6 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "newcarddialog.h"
-#include "card.h"
-#include "field.h"
 #include "picture.h"
 #include "qthelpers.h"
 #include "recordtype.h"
@@ -45,23 +43,22 @@ NewCardDialog::NewCardDialog(QWidget *parent) : QDialog{parent}, ui{std::make_un
 NewCardDialog::~NewCardDialog() {
 }
 
-std::shared_ptr<Card> NewCardDialog::card() const {
+Card NewCardDialog::card() const {
     auto typeOrdinal = ui->typeComboBox->currentData().toUInt();
     auto &type = RecordType::valueOf(typeOrdinal);
 
     auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
     auto &picture = Picture::valueOf(pictureOrdinal);
 
-    std::vector<std::shared_ptr<Field>> fields;
+    std::vector<Field> fields;
     fields.reserve(type.fields().size());
 
     for (auto &f : type.fields()) {
-        auto translatedName = QApplication::translate("RecordType", f->name().toStdString().c_str());
-        auto newField = std::make_shared<Field>(f->type(), translatedName, f->value());
-        fields.push_back(newField);
+        auto translatedName = QApplication::translate("RecordType", f.name().toStdString().c_str());
+        fields.emplace_back(f.type(), translatedName, f.value());
     }
 
-    return std::make_shared<Card>(picture, ui->titleEdit->text(), TimeUtil::currentTimeMillis(), fields);
+    return Card(picture, ui->titleEdit->text(), TimeUtil::currentTimeMillis(), fields);
 }
 
 void NewCardDialog::onTypeComboBoxCurrentIndexChanged(int index) {

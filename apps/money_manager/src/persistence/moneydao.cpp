@@ -22,9 +22,6 @@ MoneyDao::MoneyDao(DataCache &cache)
       iconRepository_{make_unique<IconRepository>()}, transactionRepository_{make_unique<TransactionRepository>()} {
 }
 
-MoneyDao::~MoneyDao() {
-}
-
 MoneyDao &MoneyDao::dao() {
     static MoneyDao moneyDao{DataCache::cache()};
     return moneyDao;
@@ -38,11 +35,11 @@ void MoneyDao::initialize(std::unique_ptr<DataSource> &&dataSource) {
 void MoneyDao::preload() {
     auto conn = dataSource_->getConnection();
     auto &connRef = *conn.get();
-    cache_.setIcons(iconRepository_->getAll(connRef));
-    cache_.setCards(cardRepository_->getAll(connRef));
-    cache_.setCategories(categoryRepository_->getAll(connRef));
-    cache_.setAccounts(accountRepository_->getAll(connRef));
-    cache_.setContacts(contactRepository_->getAll(connRef));
-    cache_.setCurrencies(currencyRepository_->getAll(connRef));
-    cache_.setTransactions(transactionRepository_->getAll(connRef));
+    cache_.resetIcons([this, &connRef](auto &vec) { iconRepository_->getAll(connRef, vec); });
+    cache_.resetCards([this, &connRef](auto &vec) { cardRepository_->getAll(connRef, vec); });
+    cache_.resetCategories([this, &connRef](auto &vec) { categoryRepository_->getAll(connRef, vec); });
+    cache_.resetAccounts([this, &connRef](auto &vec) { accountRepository_->getAll(connRef, vec); });
+    cache_.resetContacts([this, &connRef](auto &vec) { contactRepository_->getAll(connRef, vec); });
+    cache_.resetCurrencies([this, &connRef](auto &vec) { currencyRepository_->getAll(connRef, vec); });
+    cache_.resetTransactions([this, &connRef](auto &vec) { transactionRepository_->getAll(connRef, vec); });
 }

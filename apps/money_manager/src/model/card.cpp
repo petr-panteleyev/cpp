@@ -5,6 +5,6 @@
 
 Card::Card(const QUuid &uuid, const QUuid accountUuid, const CardType &type, const QString &number, QDate expiration,
            const QString &comment, bool enabled, long created, long modified)
-    : MoneyRecord{uuid, created, modified}, accountUuid_{accountUuid}, type_{type}, number_{number},
+    : MoneyRecord{uuid, created, modified}, accountUuid_{accountUuid}, type_{type.ordinal()}, number_{number},
       expiration_{expiration}, comment_{comment}, enabled_{enabled} {
 }

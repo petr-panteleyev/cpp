@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "field.h"
@@ -9,14 +9,7 @@
 static QDate parseLocalDate(const QString &stringValue);
 
 Field::Field(const FieldType &type, const QString &name, const QVariant &value) noexcept
-    : type_{type}, name_{name}, value_{value} {
-    showContent_ = !type.masked();
-}
-
-Field::Field(const Field &f) noexcept : Field(f.type(), f.name(), f.value()) {
-}
-
-Field::~Field() {
+    : type_{type}, name_{name}, value_{value}, showContent_{!type.masked()} {
 }
 
 void Field::toggleShow() noexcept {

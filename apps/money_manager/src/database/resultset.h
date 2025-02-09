@@ -5,12 +5,12 @@
 #define RESULTSET_H
 
 #include "decimal.h"
+#include <QByteArray>
 #include <QDate>
 #include <QString>
 #include <QUuid>
 #include <optional>
 #include <string>
-#include <QByteArray>
 
 class QSqlQuery;
 
@@ -18,6 +18,8 @@ class ResultSet final {
   public:
     ResultSet(QSqlQuery &query) noexcept;
     ~ResultSet();
+
+    int rows() const noexcept { return rows_; }
 
     bool next() noexcept;
 

@@ -76,7 +76,7 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
                 break;
             case COLUMN_CATEGORY:
                 if (role == Qt::DisplayRole) {
-                    return Translation::translate(account.type());
+                    return Translation::translateCategoryType(account.type());
                 }
                 break;
             case COLUMN_CURRENCY:

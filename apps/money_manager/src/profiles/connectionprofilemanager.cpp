@@ -52,7 +52,7 @@ void ConnectionProfileManager::loadProfiles() {
     auto size = settings.beginReadArray(PROFILES_ARRAY);
     for (auto i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        profiles_.emplace_back(std::make_unique<ConnectionProfile>(
+        profiles_.push_back(std::make_unique<ConnectionProfile>(
             settings.value(NAME).toString(), settings.value(HOST).toString(), settings.value(PORT).toInt(),
             settings.value(USER).toString(), settings.value(PASSWORD).toString(), settings.value(DATABASE).toString(),
             settings.value(SCHEMA).toString()));

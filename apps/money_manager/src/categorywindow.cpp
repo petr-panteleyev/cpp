@@ -66,7 +66,7 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
 
         switch (index.column()) {
             case COLUMN_NAME: return category.name();
-            case COLUMN_TYPE: return Translation::translate(category.type());
+            case COLUMN_TYPE: return Translation::translateCategoryType(category.type());
             case COLUMN_COMMENT: return category.comment();
         }
 
@@ -83,7 +83,7 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
 
         switch (left.column()) {
             case COLUMN_NAME: return leftCategory.name() < rightCategory.name();
-            case COLUMN_TYPE: return leftCategory.type().ordinal() < rightCategory.type().ordinal();
+            case COLUMN_TYPE: return leftCategory.type() < rightCategory.type();
             case COLUMN_COMMENT: return false;
         }
         return false;
@@ -98,7 +98,7 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
 
         bool accept = true;
         if (typeOrdinal_ != -1) {
-            accept = accept && category.type().ordinal() == static_cast<unsigned>(typeOrdinal_);
+            accept = accept && category.type() == static_cast<unsigned>(typeOrdinal_);
         }
         if (!nameFilter_.isEmpty()) {
             accept = accept & category.name().contains(nameFilter_, Qt::CaseInsensitive);
@@ -128,7 +128,7 @@ CategoryWindow::CategoryWindow(QWidget *parent)
     ui->typeComboBox->addItem("Все типы", -1);
     ui->typeComboBox->insertSeparator(1);
     std::for_each(CategoryType::values().begin(), CategoryType::values().end(), [this](const CategoryType &type) {
-        ui->typeComboBox->addItem(Translation::translate(type), static_cast<int>(type.ordinal()));
+        ui->typeComboBox->addItem(Translation::translateCategoryType(type.ordinal()), static_cast<int>(type.ordinal()));
     });
     connect(ui->typeComboBox, &QComboBox::currentIndexChanged, [this](int index) {
         int ordinal = ui->typeComboBox->currentData().toInt();

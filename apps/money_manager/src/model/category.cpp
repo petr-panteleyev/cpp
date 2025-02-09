@@ -6,7 +6,7 @@
 
 Category::Category(const QUuid &uuid, const QString &name, const QString &comment, const CategoryType &type,
                    const std::optional<QUuid> &iconUuid, long created, long modified)
-    : MoneyRecord{uuid, created, modified}, name_{name}, comment_{comment}, type_{type}, iconUuid_{iconUuid} {
+    : MoneyRecord{uuid, created, modified}, name_{name}, comment_{comment}, type_{type.ordinal()}, iconUuid_{iconUuid} {
 
     if (name.isEmpty()) {
         throw std::invalid_argument("name must not be empty");

@@ -2,13 +2,12 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "resultset.h"
-#include "sqlexception.h"
 #include <QSqlQuery>
 
 using Common::Decimal;
 
 ResultSet::ResultSet(QSqlQuery &query) noexcept : query_{query}, currentRow_{-1} {
-    rows_ = query.size();
+    rows_ = query.isSelect() ? query.size() : query.numRowsAffected();
 }
 
 ResultSet::~ResultSet() {

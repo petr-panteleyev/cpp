@@ -108,7 +108,7 @@ void setPasswordOptions(const PasswordTypePtrMap &passwords) {
     settings.sync();
 }
 
-pwdgen::PasswordGeneratorOptions getPasswordOptions(PasswordType type) {
+std::unique_ptr<pwdgen::PasswordGeneratorOptions> getPasswordOptions(PasswordType type) {
     QSettings settings;
 
     auto defaults = PASSWORD_DEFAULTS.at(type);
@@ -119,27 +119,23 @@ pwdgen::PasswordGeneratorOptions getPasswordOptions(PasswordType type) {
 
     auto length = settings.value(group + PASSWORD_LENGTH, defaults.length).toInt(&isOk);
     if (!isOk) {
-        return defaults;
+        return defaults.copy();
     }
 
     auto useUpperCase = settings.value(group + PASSWORD_USE_UPPER_CASE, defaults.useUpperCase).toBool();
     auto useLowerCase = settings.value(group + PASSWORD_USE_LOWER_CASE, defaults.useLowerCase).toBool();
     auto useDigits = settings.value(group + PASSWORD_USE_DIGITS, defaults.useDigits).toBool();
     auto useSymbols = settings.value(group + PASSWORD_USE_SYMBOLS, defaults.useSymbols).toBool();
-    return pwdgen::PasswordGeneratorOptions{
-        .useUpperCase = useUpperCase,
-        .useLowerCase = useLowerCase,
-        .useDigits = useDigits,
-        .useSymbols = useSymbols,
-        .length = length,
-    };
+    return std::make_unique<pwdgen::PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols,
+                                                              length);
 }
 
 PasswordTypePtrMap getAllPasswordOptions() {
     PasswordTypePtrMap result;
 
     for (const auto &entry : PASSWORD_DEFAULTS) {
-        result[entry.first] = getPasswordOptions(entry.first).copy();
+        auto options = getPasswordOptions(entry.first);
+        result[entry.first] = std::move(options);
     }
 
     return result;
@@ -154,7 +150,7 @@ void setFonts(const FontPtrMap &fonts) {
     QSettings settings;
     settings.beginGroup(FONT_GROUP);
     for (const auto &f : fonts) {
-        settings.setValue(FONT_NAMES.at(f.first), f.second->toString());
+        settings.setValue(FONT_NAMES.at(f.first), f.second.toString());
     }
     settings.endGroup();
 }

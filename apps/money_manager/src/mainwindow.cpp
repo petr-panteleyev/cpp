@@ -14,7 +14,6 @@
 #include "contact.h"
 #include "contactwindow.h"
 #include "currencywindow.h"
-#include "databaseconnection.h"
 #include "datacache.h"
 #include "decimal.h"
 #include "imagecache.h"
@@ -113,7 +112,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             case COLUMN_TYPE:
                 if (role == Qt::DisplayRole) {
-                    return Translation::translate(tr.type());
+                    return Translation::translateTransactionType(tr.type());
                 }
                 break;
             case COLUMN_DEBIT_ACCOUNT: {
@@ -160,7 +159,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::ForegroundRole) {
-                    if (tr.accountCreditedType() == CategoryType::EXPENSES) {
+                    if (tr.accountCreditedType() == CategoryType::EXPENSES.ordinal()) {
                         return COLOR_DEBIT;
                     } else if (tr.accountCreditedType() == tr.accountDebitedType()) {
                         return COLOR_TRANSFER;

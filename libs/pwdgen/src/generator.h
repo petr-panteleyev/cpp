@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef GENERATOR_H
@@ -34,12 +34,12 @@ struct PasswordGeneratorOptions {
     bool useSymbols;
     int  length;
 
-    std::shared_ptr<PasswordGeneratorOptions> copy() const {
-        return std::make_shared<PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols, length);
+    std::unique_ptr<PasswordGeneratorOptions> copy() const {
+        return std::make_unique<PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols, length);
     }
 };
 
-using PasswordGeneratorOptionsPtr = std::shared_ptr<PasswordGeneratorOptions>;
+using PasswordGeneratorOptionsPtr = std::unique_ptr<PasswordGeneratorOptions>;
 
 constexpr PasswordGeneratorOptions PIN_OPTIONS = {false, false, true, false, 4};
 constexpr PasswordGeneratorOptions UNIX_OPTIONS = {true, true, true, true, 8};

@@ -6,7 +6,12 @@
 IconRepository::IconRepository() : Repository{"icon"} {
 }
 
-std::unique_ptr<Icon> IconRepository::fromResultSet(const ResultSet &rs) const {
-    return std::make_unique<Icon>(rs.getQUuid("uuid"), rs.getQString("name"), rs.getQByteArray("bytes"),
-                                  rs.getLong("created"), rs.getLong("modified"));
+Icon IconRepository::fromResultSet(const ResultSet &rs) const {
+    return Icon(rs.getQUuid("uuid"), rs.getQString("name"), rs.getQByteArray("bytes"), rs.getLong("created"),
+                rs.getLong("modified"));
+}
+
+void IconRepository::fromResultSet(const ResultSet &rs, std::vector<Icon> &result) const {
+    result.emplace_back(rs.getQUuid("uuid"), rs.getQString("name"), rs.getQByteArray("bytes"), rs.getLong("created"),
+                        rs.getLong("modified"));
 }

@@ -13,7 +13,8 @@ class CategoryRepository final : public Repository<Category> {
     ~CategoryRepository() = default;
 
   protected:
-    virtual std::unique_ptr<Category> fromResultSet(const ResultSet &rs) const override;
+    virtual Category fromResultSet(const ResultSet &rs) const override;
+    virtual void fromResultSet(const ResultSet &rs, std::vector<Category> &result) const override;
 };
 
 #endif // CATEGORYREPOSITORY_H

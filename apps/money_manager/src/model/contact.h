@@ -19,14 +19,14 @@ class Contact final : public MoneyRecord {
     ~Contact() = default;
 
     const QString &name() const noexcept { return name_; }
-    const ContactType &type() const noexcept { return type_; }
+    unsigned type() const noexcept { return type_; }
     const QString &phone() const noexcept { return phone_; }
     const QString &email() const noexcept { return email_; }
     std::optional<QUuid> iconUuid() const noexcept { return iconUuid_; }
 
   private:
     QString name_;
-    const ContactType &type_;
+    unsigned type_;
     QString phone_;
     QString mobile_;
     QString email_;

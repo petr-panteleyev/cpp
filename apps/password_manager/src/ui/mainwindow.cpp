@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -33,6 +33,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTimer>
+#include <iterator>
 #include <memory>
 
 using namespace Crypto;
@@ -210,23 +211,24 @@ void MainWindow::onActionOpen() {
 void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous) {
     if (current.isValid()) {
         auto sourceIndex = sortFilterModel_->mapToSource(current);
-        auto currentCard = cardModel_->cardAtIndex(sourceIndex.row());
-        fieldModel_->setItems(currentCard->fields());
+        const auto &currentCard = cardModel_->cardAtIndex(sourceIndex.row());
 
-        if (currentCard->isNote()) {
-            ui->tabWidget->setTabText(TAB_NOTE, currentCard->name());
+        fieldModel_->setItems(currentCard.fields());
+
+        if (currentCard.isNote()) {
+            ui->tabWidget->setTabText(TAB_NOTE, currentCard.name());
         } else {
-            ui->tabWidget->setTabText(TAB_FIELDS, currentCard->name());
-            ui->tabWidget->setTabIcon(TAB_FIELDS, currentCard->picture().icon());
+            ui->tabWidget->setTabText(TAB_FIELDS, currentCard.name());
+            ui->tabWidget->setTabIcon(TAB_FIELDS, currentCard.picture().icon());
             ui->tabWidget->setTabText(TAB_NOTE, tr("Note"));
         }
 
-        ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard->fields().empty());
-        ui->tabWidget->setTabVisible(TAB_NOTE, currentCard->isNote() || !currentCard->note().isEmpty());
+        ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard.fields().empty());
+        ui->tabWidget->setTabVisible(TAB_NOTE, currentCard.isNote() || !currentCard.note().isEmpty());
 
-        ui->noteViewer->setText(currentCard->note());
+        ui->noteViewer->setText(currentCard.note());
     } else {
-        fieldModel_->setItems({});
+        fieldModel_->clearItems();
         ui->noteViewer->setText("");
         ui->tabWidget->setTabText(TAB_FIELDS, "");
         ui->tabWidget->setTabIcon(TAB_FIELDS, Picture::GENERIC.icon());
@@ -255,7 +257,7 @@ void MainWindow::onFieldTableDoubleClicked(const QModelIndex &index) {
     if (field->type() == FieldType::LINK && Settings::getOpenLinkWithDoubleClick()) {
         QDesktopServices::openUrl(QUrl(field->getValueAsString()));
     } else {
-        fieldModel_->toggleMasking(sourceIndex, field);
+        fieldModel_->toggleMasking(sourceIndex, *field);
     }
 }
 
@@ -265,7 +267,7 @@ void MainWindow::onFieldTableContextMenuRequested(QPoint pos) {
         return;
     }
     auto sourceIndex = fieldFilterModel_->mapToSource(index);
-    auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
+    const auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
 
     copyFieldAction_->setText(tr("Copy") + " \"" + field->name() + "\"");
     copyFieldAction_->setData(field->getValueAsString());
@@ -309,13 +311,12 @@ void MainWindow::onActionEdit() {
         return;
     }
     auto sourceIndex = sortFilterModel_->mapToSource(currentIndex);
-    auto currentCard = cardModel_->cardAtIndex(sourceIndex.row());
+    auto &currentCard = cardModel_->cardAtIndex(sourceIndex.row());
 
-    cardEditDialog_->setCard(*currentCard);
+    cardEditDialog_->setCard(currentCard);
 
     if (cardEditDialog_->exec() == QDialog::Accepted) {
-        auto &updatedCard = cardEditDialog_->card();
-        cardModel_->replace(sourceIndex.row(), updatedCard);
+        cardModel_->replace(sourceIndex.row(), cardEditDialog_->card());
         onCurrentCardChanged(currentIndex, currentIndex);
         writeFile();
     }
@@ -326,9 +327,7 @@ void MainWindow::onActionFavorite() {
     if (!index.isValid()) {
         return;
     }
-    auto card = this->cardModel_->cardAtIndex(index.row());
-    card->toggleFavorite();
-    this->cardModel_->replace(index.row(), card);
+    this->cardModel_->replace(index.row(), this->cardModel_->cardAtIndex(index.row()).toggleFavorite());
     this->sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
@@ -343,12 +342,12 @@ const QModelIndex MainWindow::currentIndex() const noexcept {
     return this->sortFilterModel_->mapToSource(currentIndex);
 }
 
-std::optional<std::shared_ptr<Card>> MainWindow::currentCard() const noexcept {
+const Card *MainWindow::currentCard() const {
     auto index = currentIndex();
     if (!index.isValid()) {
-        return std::nullopt;
+        return nullptr;
     }
-    return std::optional(this->cardModel_->cardAtIndex(index.row()));
+    return &this->cardModel_->cardAtIndex(index.row());
 }
 
 void MainWindow::onActionNewCard() {
@@ -408,7 +407,7 @@ void MainWindow::onActionNew() {
     currentFileName_ = fileName;
     currentPassword_ = password;
 
-    cardModel_->setItems({});
+    cardModel_->clearItems();
     writeFile();
 }
 
@@ -422,11 +421,11 @@ void MainWindow::onEditMenuAboutToShow() {
     QtHelpers::enableActions(hasCurrentCard, {ui->actionEdit, ui->actionFavorite, ui->actionDelete});
 
     if (hasCurrentCard) {
-        auto card = this->cardModel_->cardAtIndex(index.row());
-        ui->actionRestore->setVisible(!card->active());
-        ui->actionRestore->setEnabled(!card->active());
-        ui->actionDelete->setText(card->active() ? tr("Delete") : tr("Finally Delete"));
-        ui->actionFavorite->setChecked(card->favorite());
+        const auto &card = this->cardModel_->cardAtIndex(index.row());
+        ui->actionRestore->setVisible(!card.active());
+        ui->actionRestore->setEnabled(!card.active());
+        ui->actionDelete->setText(card.active() ? tr("Delete") : tr("Finally Delete"));
+        ui->actionFavorite->setChecked(card.favorite());
     }
 }
 
@@ -453,18 +452,17 @@ void MainWindow::onActionDelete() {
     if (!index.isValid()) {
         return;
     }
-    auto card = cardModel_->cardAtIndex(index.row());
+    auto &card = cardModel_->cardAtIndex(index.row());
 
-    if (card->active()) {
-        auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + card->name() + "?");
+    if (card.active()) {
+        auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + card.name() + "?");
         if (result != QMessageBox::Yes) {
             return;
         }
-        card->toggleActive();
-        cardModel_->replace(index.row(), card);
+        cardModel_->replace(index.row(), card.toggleActive());
     } else {
         auto result = QMessageBox::question(this, tr("Finally Delete"),
-                                            tr("Are you sure to finally delete ") + card->name() + "?");
+                                            tr("Are you sure to finally delete ") + card.name() + "?");
         if (result != QMessageBox::Yes) {
             return;
         }
@@ -485,14 +483,12 @@ void MainWindow::onActionRestore() {
     if (!index.isValid()) {
         return;
     }
-    auto card = this->cardModel_->cardAtIndex(index.row());
-
-    if (card->active()) {
+    auto &card = this->cardModel_->cardAtIndex(index.row());
+    if (card.active()) {
         return;
     }
 
-    card->toggleActive();
-    cardModel_->replace(index.row(), card);
+    cardModel_->replace(index.row(), card.toggleActive());
     sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
@@ -541,13 +537,13 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
         } else {
             importDialog_->setup(importRecords);
             if (importDialog_->exec() == QDialog::Accepted) {
-                auto view = importRecords | std::views::filter([](const auto &rec) { return rec->approved(); }) |
-                            std::views::transform([](const auto &rec) { return rec->cardToImport(); });
+                auto processedRecords = importDialog_->records();
+                auto view = processedRecords | std::views::filter([](const auto &rec) { return rec.approved(); }) |
+                            std::views::transform([](const auto &rec) { return Card(*rec.cardToImport()); });
 
                 if (!view.empty()) {
-                    for (const auto &c : view) {
-                        cardModel_->addOrReplace(c);
-                    }
+                    std::for_each(std::make_move_iterator(view.begin()), std::make_move_iterator(view.end()),
+                                  [this](auto rec) { cardModel_->addOrReplace(std::move(rec)); });
                     writeFile();
                 }
             }
@@ -559,7 +555,7 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
     }
 }
 
-std::vector<std::shared_ptr<Card>> MainWindow::loadRecords(const QString &fileName, const QString &password) {
+std::vector<Card> MainWindow::loadRecords(const QString &fileName, const QString &password) {
     QFile file{fileName};
     if (!file.open(QIODevice::ReadOnly)) {
         throw PasswordManagerException("File cannot be opened!");
@@ -578,7 +574,7 @@ std::vector<std::shared_ptr<Card>> MainWindow::loadRecords(const QString &fileNa
         }
         file.close();
 
-        std::vector<std::shared_ptr<Card>> result;
+        std::vector<Card> result;
         Serializer::deserialize(doc, result);
         return result;
     }

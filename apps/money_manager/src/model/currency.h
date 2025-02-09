@@ -20,15 +20,15 @@ class Currency final : public MoneyRecord {
     const QString &description() const noexcept { return description_; }
 
   private:
-    const QString symbol_;
-    const QString description_;
-    const QString formatSymbol_;
-    const int formatSymbolPosition_;
-    const bool showFormatSymbol_;
-    const bool def_;
-    const Common::Decimal rate_;
-    const int direction_;
-    const bool useThousandSeparator_;
+    QString symbol_;
+    QString description_;
+    QString formatSymbol_;
+    int formatSymbolPosition_;
+    bool showFormatSymbol_;
+    bool def_;
+    Common::Decimal rate_;
+    int direction_;
+    bool useThousandSeparator_;
 };
 
 #endif // CURRENCY_H

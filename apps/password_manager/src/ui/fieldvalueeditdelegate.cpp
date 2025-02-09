@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "fieldvalueeditdelegate.h"
@@ -25,7 +25,7 @@ QWidget *FieldValueEditDelegate::createEditor(QWidget *parent, const QStyleOptio
         }
 
         case EditFieldListModel::FIELD_TABLE_VALUE_COLUMN: {
-            auto field = getModel(index)->at(index.row());
+            const auto field = getModel(index)->at(index.row());
             if (field->type() == FieldType::CARD_TYPE) {
                 auto comboBox = new QComboBox(parent);
                 for (const CreditCardType &type : CreditCardType::values()) {
@@ -42,7 +42,7 @@ QWidget *FieldValueEditDelegate::createEditor(QWidget *parent, const QStyleOptio
 }
 
 void FieldValueEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    auto field = getModel(index)->at(index.row());
+    const auto field = getModel(index)->at(index.row());
 
     switch (index.column()) {
         case EditFieldListModel::FIELD_TABLE_TYPE_COLUMN: {

@@ -24,7 +24,7 @@ class Account final : public MoneyRecord {
 
     const QString &name() const noexcept { return name_; }
     const QString &comment() const noexcept { return comment_; }
-    const CategoryType &type() const noexcept { return type_; }
+    unsigned type() const noexcept { return type_; }
     QUuid categoryUuid() const noexcept { return categoryUuid_; }
     std::optional<QUuid> currencyUuid() const noexcept { return currencyUuid_; }
     Common::Decimal interest() const noexcept { return interest_; }
@@ -40,7 +40,7 @@ class Account final : public MoneyRecord {
     Common::Decimal openingBalance_;
     Common::Decimal accountLimit_;
     Common::Decimal currencyRate_;
-    const CategoryType &type_;
+    unsigned type_;
     QUuid categoryUuid_;
     std::optional<QUuid> currencyUuid_;
     std::optional<QUuid> securityUuid_;

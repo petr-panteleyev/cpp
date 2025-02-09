@@ -17,6 +17,8 @@
 #include <QMenu>
 #include <QMessageBox>
 
+using std::make_unique;
+
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTES = 1;
 
@@ -35,7 +37,7 @@ class NotEmptyValidator : public QValidator {
 };
 
 CardEditDialog::CardEditDialog(QWidget *parent)
-    : QDialog(parent), ui(std::make_unique<Ui::CardEditDialog>()), model_{new EditFieldListModel{this}},
+    : QDialog(parent), ui(make_unique<Ui::CardEditDialog>()), model_{new EditFieldListModel{this}},
       fieldAddAction_{new QAction{tr("Add"), this}}, fieldDeleteAction_{new QAction{tr("Delete"), this}},
       fieldUpAction_{new QAction{tr("Up"), this}}, fieldDownAction_{new QAction{tr("Down"), this}},
       fieldGenerateAction_(new QAction{tr("Generate"), this}), fieldTableContextMenu_{new QMenu{this}} {
@@ -57,7 +59,7 @@ CardEditDialog::~CardEditDialog() {
 }
 
 void CardEditDialog::setCard(const Card &card) {
-    card_ = std::shared_ptr<Card>(new Card(card));
+    card_ = card;
 
     model_->setFields(card.fields());
 
@@ -131,14 +133,15 @@ void CardEditDialog::done(int code) {
             return;
         }
 
-        card_->setModified(TimeUtil::currentTimeMillis());
-        card_->setName(newName);
-        card_->setFields(model_->fields());
+        card_.setModified(TimeUtil::currentTimeMillis());
+        card_.setName(newName);
+
+        card_.setFields(model_->fields());
         // picture
         auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
-        card_->setPicture(Picture::valueOf(pictureOrdinal));
+        card_.setPicture(Picture::valueOf(pictureOrdinal));
         // note
-        card_->setNote(ui->notesEditor->toPlainText());
+        card_.setNote(ui->notesEditor->toPlainText());
     }
     QDialog::done(code);
 }
@@ -152,7 +155,7 @@ void CardEditDialog::onDeleteField() {
     if (!index.isValid()) {
         return;
     }
-    auto field = model_->at(index.row());
+    const auto field = model_->at(index.row());
 
     auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + field->name() + "?");
     if (result != QMessageBox::Yes) {
@@ -183,12 +186,12 @@ void CardEditDialog::onGenerate() {
     if (!index.isValid()) {
         return;
     }
-    auto field = model_->at(index.row());
+    const auto field = model_->at(index.row());
 
     if (GENERATOR_OPTIONS.contains(field->type().ordinal())) {
         const auto &options = Settings::getPasswordOptions(GENERATOR_OPTIONS[field->type().ordinal()]);
-        auto password = pwdgen::generate(options);
-        model_->setFieldValue(index.row(), field, QString::fromStdString(password));
+        auto password = pwdgen::generate(*options.get());
+        model_->setFieldValue(index.row(), QString::fromStdString(password));
     }
 }
 
@@ -204,7 +207,7 @@ void CardEditDialog::fieldTableCurrentRowChanged(const QModelIndex &current, con
     if (!current.isValid()) {
         return;
     }
-    auto field = model_->at(current.row());
+    const auto field = model_->at(current.row());
     fieldUpAction_->setEnabled(current.row() != 0);
     fieldDownAction_->setEnabled(current.row() != model_->rowCount() - 1);
     fieldGenerateAction_->setEnabled(GENERATOR_OPTIONS.contains(field->type().ordinal()));

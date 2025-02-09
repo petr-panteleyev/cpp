@@ -17,13 +17,13 @@ class Category final : public MoneyRecord {
 
     const QString &name() const noexcept { return name_; }
     const QString &comment() const noexcept { return comment_; }
-    const CategoryType &type() const noexcept { return type_; }
+    unsigned type() const noexcept { return type_; }
     const std::optional<QUuid> iconUuid() const noexcept { return iconUuid_; }
 
   private:
     QString name_;
     QString comment_;
-    const CategoryType &type_;
+    unsigned type_;
     std::optional<QUuid> iconUuid_;
 };
 

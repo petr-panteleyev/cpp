@@ -26,7 +26,7 @@ class MoneyDao final {
 
   private:
     explicit MoneyDao(DataCache &cache);
-    ~MoneyDao();
+    ~MoneyDao() = default;
 
   private:
     DataCache &cache_;

@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardclass.h"
@@ -11,6 +11,7 @@
 #include <QDate>
 
 using std::cref;
+using std::make_unique;
 
 // Picture
 const Picture Picture::AIRPLANE{"AIRPLANE", "airplane.png"};
@@ -160,27 +161,27 @@ const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, {});
 const RecordType RecordType::CREDIT_CARD(
     "CREDIT_CARD", Picture::CREDIT_CARD,
     {
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Card Provider"), ""),
-        std::make_shared<Field>(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "Card Provider"), ""),
+        Field(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"),
                                 CreditCardType::MIR.ordinal()),
-        std::make_shared<Field>(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"),
+        Field(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"),
                                 ""),
-        std::make_shared<Field>(FieldType::EXPIRATION_MONTH, QApplication::translate("RecordType", "Expiration Date"),
+        Field(FieldType::EXPIRATION_MONTH, QApplication::translate("RecordType", "Expiration Date"),
                                 QDate::currentDate()),
-        std::make_shared<Field>(FieldType::PIN, "PIN", ""),
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Name on Card"), ""),
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Phone Number"), ""),
-        std::make_shared<Field>(FieldType::HIDDEN, "CVC#", ""),
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
-        std::make_shared<Field>(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
+        Field(FieldType::PIN, "PIN", ""),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "Name on Card"), ""),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "Phone Number"), ""),
+        Field(FieldType::HIDDEN, "CVC#", ""),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
+        Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
     });
 const RecordType RecordType::PASSWORD(
     "PASSWORD", Picture::GENERIC,
     {
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
-        std::make_shared<Field>(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
-        std::make_shared<Field>(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
-        std::make_shared<Field>(FieldType::LINK, "URL", ""),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
+        Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
+        Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
+        Field(FieldType::LINK, "URL", ""),
     });
 
 template <>

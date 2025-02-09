@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardtableitemmodel.h"
@@ -25,23 +25,23 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
         return QVariant();
     }
 
-    auto card = data_.at(index.row());
+    const auto &card = data_.at(index.row());
 
     switch (index.column()) {
-        case 0: return role == Qt::DecorationRole ? card->picture().icon() : QVariant();
-        case 1: return role == Qt::DisplayRole ? card->name() : QVariant();
-        case 2: return role == Qt::DecorationRole ? buildAuxIconValue(*card) : QVariant();
+        case 0: return role == Qt::DecorationRole ? card.picture().icon() : QVariant();
+        case 1: return role == Qt::DisplayRole ? card.name() : QVariant();
+        case 2: return role == Qt::DecorationRole ? buildAuxIconValue(card) : QVariant();
         default: return QVariant();
     }
 }
 
-void CardTableItemModel::replace(int row, const std::shared_ptr<Card> &card) {
+void CardTableItemModel::replace(int row, const Card &card) {
     data_[row] = card;
     emit dataChanged(createIndex(row, 0), createIndex(row, 2));
 }
 
-void CardTableItemModel::addOrReplace(const std::shared_ptr<Card> &card) {
-    auto found = std::find_if(data_.begin(), data_.end(), [&card](auto &c) { return c->uuid() == card->uuid(); });
+void CardTableItemModel::addOrReplace(const Card &card) {
+    auto found = std::find_if(data_.begin(), data_.end(), [&card](const auto &c) { return c.uuid() == card.uuid(); });
     if (found != data_.end()) {
         auto row = std::distance(data_.begin(), found);
         replace(row, card);
@@ -50,7 +50,7 @@ void CardTableItemModel::addOrReplace(const std::shared_ptr<Card> &card) {
     }
 }
 
-void CardTableItemModel::add(const std::shared_ptr<Card> &card) {
+void CardTableItemModel::add(const Card &card) {
     beginInsertRows(parent_index, data_.size(), data_.size());
     data_.push_back(card);
     endInsertRows();
@@ -64,6 +64,6 @@ void CardTableItemModel::deleteCard(int row) {
 
 void CardTableItemModel::purgeInactive() {
     beginResetModel();
-    std::erase_if(data_, [](auto const &card) { return !card->active(); });
+    std::erase_if(data_, [](auto const &card) { return !card.active(); });
     endResetModel();
 }

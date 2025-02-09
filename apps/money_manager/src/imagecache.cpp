@@ -23,7 +23,7 @@ const QImage &getImage(const QUuid &uuid) {
     auto icon = DataCache::cache().getIcon(uuid);
     auto image = new QImage();
     image->loadFromData(icon.bytes());
-    IMAGES.emplace_back(std::pair(uuid, std::unique_ptr<QImage>(image)));
+    IMAGES.emplace_back(uuid, std::unique_ptr<QImage>(image));
 
     return *image;
 }

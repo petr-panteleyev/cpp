@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "serializer.h"
-#include "card.h"
 #include "cardclass.h"
 #include "creditcardtype.h"
 #include "exceptions.h"
@@ -75,7 +74,7 @@ static bool getBoolAttribute(const QDomNamedNodeMap &attributes, const QString &
     }
 }
 
-static std::shared_ptr<Field> deserializeField(const QDomElement &fieldElement) {
+static Field deserializeField(const QDomElement &fieldElement) {
     auto attrs = fieldElement.attributes();
 
     auto fieldTypeStr = getStringAttribute(attrs, ATTR_TYPE, "STRING");
@@ -86,10 +85,10 @@ static std::shared_ptr<Field> deserializeField(const QDomElement &fieldElement) 
     auto stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
     QVariant value = Field::deserialize(stringValue, fieldType);
 
-    return std::make_shared<Field>(fieldType, name, value);
+    return Field(fieldType, name, value);
 }
 
-static std::shared_ptr<Card> deserializeCard(const QDomElement &cardElement) {
+static Card deserializeCard(const QDomElement &cardElement) {
     auto attrs = cardElement.attributes();
 
     auto cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
@@ -108,13 +107,12 @@ static std::shared_ptr<Card> deserializeCard(const QDomElement &cardElement) {
     auto active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
 
     // Deserialize fields
-    std::vector<std::shared_ptr<Field>> fields;
-
     auto fieldNodes = cardElement.elementsByTagName(ELEMENT_FIELD);
+    std::vector<Field> fields;
+    fields.reserve(fieldNodes.count());
     for (auto index = 0; index < fieldNodes.count(); ++index) {
         auto fieldElement = fieldNodes.at(index).toElement();
-        auto field = deserializeField(fieldElement);
-        fields.push_back(field);
+        fields.push_back(deserializeField(fieldElement));
     }
 
     // Deserialize note
@@ -124,15 +122,15 @@ static std::shared_ptr<Card> deserializeCard(const QDomElement &cardElement) {
         note = noteNodes.at(0).toElement().text();
     }
 
-    return std::make_shared<Card>(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
+    return Card(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
 }
 
-void deserialize(const QDomDocument &doc, std::vector<std::shared_ptr<Card>> &list) {
+void deserialize(const QDomDocument &doc, std::vector<Card> &list) {
     auto recordNodes = doc.elementsByTagName("record");
+    list.reserve(recordNodes.size());
     for (auto index = 0; index < recordNodes.size(); ++index) {
         auto node = recordNodes.at(index);
-        auto card = deserializeCard(node.toElement());
-        list.push_back(card);
+        list.push_back(deserializeCard(node.toElement()));
     }
 }
 
@@ -175,8 +173,8 @@ static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
     // Fields
     if (!card.fields().empty()) {
         stream.writeStartElement(ELEMENT_FIELDS);
-        for (auto field : card.fields()) {
-            serializeField(stream, *field);
+        for (const auto &field : card.fields()) {
+            serializeField(stream, field);
         }
         stream.writeEndElement(); // Fields
     }
@@ -186,7 +184,7 @@ static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
     stream.writeEndElement();
 }
 
-void serialize(const std::vector<std::shared_ptr<Card>> &list, QByteArray &byteArray) {
+void serialize(const std::vector<Card> &list, QByteArray &byteArray) {
     QXmlStreamWriter stream{&byteArray};
 
     stream.writeStartDocument();
@@ -194,8 +192,8 @@ void serialize(const std::vector<std::shared_ptr<Card>> &list, QByteArray &byteA
     stream.writeStartElement(RECORDS);
     stream.writeAttribute(ATTR_VERSION, QString::fromStdString(Version::projectVersion));
 
-    for (auto card : list) {
-        serializeCard(stream, *card);
+    for (const auto &card : list) {
+        serializeCard(stream, card);
     }
 
     stream.writeEndElement();

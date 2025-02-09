@@ -1,9 +1,10 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef NEWCARDDIALOG_H
 #define NEWCARDDIALOG_H
 
+#include "card.h"
 #include <QDialog>
 #include <memory>
 
@@ -20,7 +21,7 @@ class NewCardDialog : public QDialog {
     explicit NewCardDialog(QWidget *parent);
     ~NewCardDialog();
 
-    std::shared_ptr<Card> card() const;
+    Card card() const;
 
   private:
     void onTypeComboBoxCurrentIndexChanged(int index);

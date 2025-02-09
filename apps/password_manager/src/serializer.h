@@ -1,20 +1,19 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
-#include <memory>
+#include "card.h"
 #include <vector>
 
 class QDomDocument;
 class QByteArray;
-class Card;
 
 namespace Serializer {
 
-void deserialize(const QDomDocument &doc, std::vector<std::shared_ptr<Card>> &list);
-void serialize(const std::vector<std::shared_ptr<Card>> &list, QByteArray &byteArray);
+void deserialize(const QDomDocument &doc, std::vector<Card> &list);
+void serialize(const std::vector<Card> &list, QByteArray &byteArray);
 
 } // namespace Serializer
 

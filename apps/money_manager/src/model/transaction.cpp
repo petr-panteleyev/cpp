@@ -14,10 +14,10 @@ Transaction::Transaction(QUuid uuid, Decimal amount, Decimal creditAmount, QDate
                          QDate statementDate, std::optional<QUuid> cardUuid, long created, long modified)
     : MoneyRecord(uuid, created, modified),
 
-      amount_{amount}, creditAmount_{creditAmount}, transactionDate_{transactionDate}, type_{type}, comment_{comment},
-      checked_{checked}, accountDebitedUuid_{accountDebitedUuid}, accountCreditedUuid_{accountCreditedUuid},
-      accountDebitedType_{accountDebitedType}, accountCreditedType_{accountCreditedType},
-      accountDebitedCategoryUuid_{accountDebitedCategoryUuid},
+      amount_{amount}, creditAmount_{creditAmount}, transactionDate_{transactionDate}, type_{type.ordinal()},
+      comment_{comment}, checked_{checked}, accountDebitedUuid_{accountDebitedUuid},
+      accountCreditedUuid_{accountCreditedUuid}, accountDebitedType_{accountDebitedType.ordinal()},
+      accountCreditedType_{accountCreditedType.ordinal()}, accountDebitedCategoryUuid_{accountDebitedCategoryUuid},
       accountCreditedCategoryUuid_{accountCreditedCategoryUuid}, contactUuid_{contactUuid},
       invoiceNumber_{invoiceNumber}, parentUuid_{parentUuid}, detailed_{detailed}, statementDate_{statementDate},
       cardUuid_{cardUuid} {

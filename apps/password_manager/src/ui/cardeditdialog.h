@@ -1,16 +1,16 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CARDEDITDIALOG_H
 #define CARDEDITDIALOG_H
 
+#include "card.h"
 #include <QDialog>
 
 namespace Ui {
 class CardEditDialog;
 }
 
-class Card;
 class EditFieldListModel;
 
 class CardEditDialog final : public QDialog {
@@ -21,7 +21,7 @@ class CardEditDialog final : public QDialog {
     ~CardEditDialog();
 
     void setCard(const Card &card);
-    const std::shared_ptr<Card> &card() const { return card_; }
+    const Card &card() const { return card_; };
 
     virtual void done(int code) override;
 
@@ -43,7 +43,7 @@ class CardEditDialog final : public QDialog {
     std::unique_ptr<Ui::CardEditDialog> ui;
     EditFieldListModel *model_;
 
-    std::shared_ptr<Card> card_;
+    Card card_;
 
     // Field table actions
     QAction *fieldAddAction_;

@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardtablesortfiltermodel.h"
@@ -38,24 +38,24 @@ int compareByName(const Card &left, const Card &right) {
 
 bool CardTableSortFilterModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
     auto model = (CardTableItemModel *)sourceModel();
-    auto leftCard = model->cardAtIndex(left.row());
-    auto rightCard = model->cardAtIndex(right.row());
+    const auto &leftCard = model->cardAtIndex(left.row());
+    const auto &rightCard = model->cardAtIndex(right.row());
 
-    auto cmp = ::compareByActive(*leftCard, *rightCard);
+    auto cmp = ::compareByActive(leftCard, rightCard);
     if (cmp == 0) {
-        cmp = ::compareByFavorite(*leftCard, *rightCard);
+        cmp = ::compareByFavorite(leftCard, rightCard);
     }
     if (cmp == 0) {
-        cmp = ::compareByName(*leftCard, *rightCard);
+        cmp = ::compareByName(leftCard, rightCard);
     }
     return cmp == -1;
 }
 
 bool CardTableSortFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
     auto model = (CardTableItemModel *)sourceModel();
-    auto card = model->cardAtIndex(sourceRow);
+    const auto &card = model->cardAtIndex(sourceRow);
 
-    if (!showDeleted_ && !card->active()) {
+    if (!showDeleted_ && !card.active()) {
         return false;
     }
 
@@ -63,5 +63,5 @@ bool CardTableSortFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex
         return true;
     }
 
-    return card->name().toLower().contains(filterText_.toLower());
+    return card.name().toLower().contains(filterText_.toLower());
 }

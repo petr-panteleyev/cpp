@@ -13,7 +13,8 @@ class IconRepository final : public Repository<Icon> {
     ~IconRepository() = default;
 
   protected:
-    virtual std::unique_ptr<Icon> fromResultSet(const ResultSet &rs) const override;
+    virtual Icon fromResultSet(const ResultSet &rs) const override;
+    virtual void fromResultSet(const ResultSet &rs, std::vector<Icon> &result) const override;
 };
 
 #endif // ICONREPOSITORY_H

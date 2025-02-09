@@ -21,7 +21,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(std::make_
     setupFontButtons();
 
     for (const auto &entry : Settings::getAllPasswordOptions()) {
-        passwords_[entry.first] = entry.second;
+        passwords_[entry.first] = entry.second->copy();
         ui->passwordTypeComboBox->addItem(Translations::translate(entry.first), QVariant::fromValue(entry.first));
     }
     connect(ui->passwordTypeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::onPasswordTypeSelected);
@@ -102,7 +102,7 @@ void SettingsDialog::done(int code) {
         // Reset controls to current settings
         setupColorButtons(false);
         for (const auto &entry : Settings::getAllPasswordOptions()) {
-            passwords_[entry.first] = entry.second;
+            passwords_[entry.first] = entry.second->copy();
         }
     }
     QDialog::done(code);
@@ -119,7 +119,7 @@ void SettingsDialog::onFieldNameColorButton(Settings::Color color, QPushButton *
 
 void SettingsDialog::onPasswordTypeSelected(int index) {
     auto type = ui->passwordTypeComboBox->itemData(index).value<Settings::PasswordType>();
-    auto options = passwords_.at(type);
+    const auto &options = passwords_.at(type);
     ui->upperCaseCheckBox->setChecked(options->useUpperCase);
     ui->lowerCaseCheckBox->setChecked(options->useLowerCase);
     ui->digitsCheckBox->setChecked(options->useDigits);
@@ -143,6 +143,6 @@ void SettingsDialog::onFontButtonClicked(Settings::FontType fontType, QLineEdit 
     font = QFontDialog::getFont(&ok, font, parentWidget());
     if (ok) {
         fontEdit->setText(font.family() + " " + QString::number(font.pointSize()));
-        fonts_[fontType] = std::make_shared<QFont>(font);
+        fonts_[fontType] = font;
     }
 }
