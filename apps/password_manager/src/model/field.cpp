@@ -46,10 +46,10 @@ QVariant Field::deserialize(const QString &str, const FieldType &type) {
     return value;
 }
 
-QVariant Field::convertValue(const FieldType &newType) const noexcept {
-    if (newType == FieldType::DATE || newType == FieldType::EXPIRATION_MONTH) {
+QVariant Field::convertValue(const FieldType &type) const noexcept {
+    if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
         return QDate::currentDate();
-    } else if (newType == FieldType::CARD_TYPE) {
+    } else if (type == FieldType::CARD_TYPE) {
         return CreditCardType::MIR.ordinal();
     } else {
         return getValueAsString();

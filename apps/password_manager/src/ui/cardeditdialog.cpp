@@ -133,15 +133,10 @@ void CardEditDialog::done(int code) {
             return;
         }
 
-        card_.setModified(TimeUtil::currentTimeMillis());
-        card_.setName(newName);
-
-        card_.setFields(model_->fields());
-        // picture
         auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
-        card_.setPicture(Picture::valueOf(pictureOrdinal));
-        // note
-        card_.setNote(ui->notesEditor->toPlainText());
+        card_ = Card(card_.cardClass(), card_.uuid(), Picture::valueOf(pictureOrdinal), newName,
+                     TimeUtil::currentTimeMillis(), ui->notesEditor->toPlainText(), card_.favorite(), card_.active(),
+                     model_->fields());
     }
     QDialog::done(code);
 }

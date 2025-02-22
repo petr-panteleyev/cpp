@@ -1,7 +1,6 @@
 //  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "cardclass.h"
 #include "creditcardtype.h"
 #include "field.h"
 #include "fieldtype.h"
@@ -11,7 +10,6 @@
 #include <QDate>
 
 using std::cref;
-using std::make_unique;
 
 // Picture
 const Picture Picture::AIRPLANE{"AIRPLANE", "airplane.png"};
@@ -104,16 +102,6 @@ const std::vector<std::reference_wrapper<const Picture>> Common::EnumClass<Pictu
     cref(Picture::WIFI),        cref(Picture::WOW),       cref(Picture::YAHOO),     cref(Picture::YANDEX),
 };
 
-// CardClass
-const CardClass CardClass::CARD{"CARD"};
-const CardClass CardClass::NOTE{"NOTE"};
-
-template <>
-const std::vector<std::reference_wrapper<const CardClass>> Common::EnumClass<CardClass>::values_{
-    cref(CardClass::CARD),
-    cref(CardClass::NOTE),
-};
-
 // FieldType
 const FieldType FieldType::STRING{"STRING"};
 const FieldType FieldType::HIDDEN{"HIDDEN", true};
@@ -162,12 +150,10 @@ const RecordType RecordType::CREDIT_CARD(
     "CREDIT_CARD", Picture::CREDIT_CARD,
     {
         Field(FieldType::STRING, QApplication::translate("RecordType", "Card Provider"), ""),
-        Field(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"),
-                                CreditCardType::MIR.ordinal()),
-        Field(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"),
-                                ""),
+        Field(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"), CreditCardType::MIR.ordinal()),
+        Field(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"), ""),
         Field(FieldType::EXPIRATION_MONTH, QApplication::translate("RecordType", "Expiration Date"),
-                                QDate::currentDate()),
+              QDate::currentDate()),
         Field(FieldType::PIN, "PIN", ""),
         Field(FieldType::STRING, QApplication::translate("RecordType", "Name on Card"), ""),
         Field(FieldType::STRING, QApplication::translate("RecordType", "Phone Number"), ""),
@@ -175,14 +161,14 @@ const RecordType RecordType::CREDIT_CARD(
         Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
         Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
     });
-const RecordType RecordType::PASSWORD(
-    "PASSWORD", Picture::GENERIC,
-    {
-        Field(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
-        Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
-        Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
-        Field(FieldType::LINK, "URL", ""),
-    });
+const RecordType
+    RecordType::PASSWORD("PASSWORD", Picture::GENERIC,
+                         {
+                             Field(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
+                             Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
+                             Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
+                             Field(FieldType::LINK, "URL", ""),
+                         });
 
 template <>
 const std::vector<RecordTypeRef> Common::EnumClass<RecordType>::values_{

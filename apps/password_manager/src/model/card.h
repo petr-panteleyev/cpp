@@ -35,7 +35,7 @@ class Card final {
     Card &operator=(const Card &) = default;
 
   public:
-    const CardClass &cardClass() const { return CardClass::valueOf(cardClass_); }
+    const CardClass &cardClass() const { return cardClass_; }
     const QUuid &uuid() const { return uuid_; }
     const Picture &picture() const { return picture_; }
     const QString &name() const { return name_; }
@@ -45,34 +45,17 @@ class Card final {
     unsigned long modified() const { return modified_; }
 
     const std::vector<Field> &fields() const { return fields_; }
-    void setFields(const std::vector<Field> &fields) { fields_ = fields; };
+    void setActive(bool active) noexcept { active_ = active; }
+    void toggleActive(bool active) noexcept { active_ = !active_; }
+    void toggleFavorite() noexcept { favorite_ = !favorite_; }
 
-    void setPicture(const Picture &picture) { picture_ = picture; }
-    void setName(const QString &name) { name_ = name; }
-    void setNote(const QString &note) { note_ = note; }
-    void setActive(bool active) { active_ = active; }
-
-    Card toggleFavorite() const noexcept {
-        auto newCard = Card(*this);
-        newCard.favorite_ = !this->favorite_;
-        return newCard;
-    }
-
-    Card toggleActive() const noexcept {
-        auto newCard = Card(*this);
-        newCard.active_ = !this->active_;
-        return newCard;
-    }
-
-    void setModified(unsigned long modified) noexcept { modified_ = modified; }
-
-    bool isCard() const noexcept { return cardClass_ == CardClass::CARD.ordinal(); }
-    bool isNote() const noexcept { return cardClass_ == CardClass::NOTE.ordinal(); }
+    bool isCard() const noexcept { return cardClass_ == CardClass::CARD; }
+    bool isNote() const noexcept { return cardClass_ == CardClass::NOTE; }
 
   private:
-    unsigned long cardClass_;
+    CardClassRef cardClass_;
     QUuid uuid_;
-    std::reference_wrapper<const Picture> picture_;
+    PictureRef picture_;
     QString name_;
     unsigned long modified_;
     QString note_;

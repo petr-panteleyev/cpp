@@ -4,8 +4,8 @@
 #ifndef CARDTABLEITEMMODEL_H
 #define CARDTABLEITEMMODEL_H
 
-#include <QAbstractItemModel>
 #include "card.h"
+#include <QAbstractItemModel>
 
 class CardTableItemModel : public QAbstractItemModel {
   public:
@@ -33,8 +33,9 @@ class CardTableItemModel : public QAbstractItemModel {
     }
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    const Card &cardAtIndex(int index) const { return data_.at(index); }
+    Card &cardAtIndex(int index) { return data_.at(index); }
 
+    void cardUpdated(int row) { emit dataChanged(createIndex(row, 0), createIndex(row, 2)); }
     void replace(int row, const Card &card);
     void addOrReplace(const Card &card);
     void add(const Card &card);

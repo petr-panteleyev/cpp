@@ -39,9 +39,8 @@ class MainWindow : public QMainWindow {
 
   private:
     const QModelIndex currentIndex() const noexcept;
-    const Card *currentCard() const;
 
-    void writeFile() const { writeFile(currentFileName_.get(), currentPassword_); }
+    void writeFile() const;
     void writeFile(const QString &fileName, const QString &password) const;
 
     void updateWindowTitle();
@@ -63,12 +62,10 @@ class MainWindow : public QMainWindow {
 
     void updateFonts();
 
-    void onActionAbout();
     void onActionChangePassword();
     void onActionDelete();
     void onActionEdit();
     void onActionExport();
-    void onActionFilter();
     void onActionFavorite();
     void onActionImport();
     void onActionNew();

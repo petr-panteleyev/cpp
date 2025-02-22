@@ -8,6 +8,7 @@
 #include "field.h"
 #include "fieldtype.h"
 #include "picture.h"
+#include "quuid.h"
 #include "version.h"
 #include <QDate>
 #include <QDomElement>
@@ -17,6 +18,7 @@
 
 namespace Serializer {
 
+static const QString WALLET{"wallet"};
 static const QString RECORDS{"records"};
 
 static const QString RECORD{"record"};
@@ -74,7 +76,7 @@ static bool getBoolAttribute(const QDomNamedNodeMap &attributes, const QString &
     }
 }
 
-static Field deserializeField(const QDomElement &fieldElement) {
+static void deserializeField(const QDomElement &fieldElement, std::vector<Field> &fields) {
     auto attrs = fieldElement.attributes();
 
     auto fieldTypeStr = getStringAttribute(attrs, ATTR_TYPE, "STRING");
@@ -85,10 +87,10 @@ static Field deserializeField(const QDomElement &fieldElement) {
     auto stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
     QVariant value = Field::deserialize(stringValue, fieldType);
 
-    return Field(fieldType, name, value);
+    fields.emplace_back(fieldType, name, value);
 }
 
-static Card deserializeCard(const QDomElement &cardElement) {
+static void deserializeCard(const QDomElement &cardElement, std::vector<Card> &cards) {
     auto attrs = cardElement.attributes();
 
     auto cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
@@ -112,7 +114,7 @@ static Card deserializeCard(const QDomElement &cardElement) {
     fields.reserve(fieldNodes.count());
     for (auto index = 0; index < fieldNodes.count(); ++index) {
         auto fieldElement = fieldNodes.at(index).toElement();
-        fields.push_back(deserializeField(fieldElement));
+        deserializeField(fieldElement, fields);
     }
 
     // Deserialize note
@@ -122,21 +124,21 @@ static Card deserializeCard(const QDomElement &cardElement) {
         note = noteNodes.at(0).toElement().text();
     }
 
-    return Card(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
+    cards.emplace_back(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
 }
 
-void deserialize(const QDomDocument &doc, std::vector<Card> &list) {
+void deserialize(const QDomDocument &doc, std::vector<Card> &cards) {
     auto recordNodes = doc.elementsByTagName("record");
-    list.reserve(recordNodes.size());
+    cards.reserve(recordNodes.size());
     for (auto index = 0; index < recordNodes.size(); ++index) {
         auto node = recordNodes.at(index);
-        list.push_back(deserializeCard(node.toElement()));
+        deserializeCard(node.toElement(), cards);
     }
 }
 
 static QString fieldValueToString(const Field &field) {
     auto value = field.value();
-    auto &type = field.type();
+    const auto &type = field.type();
 
     if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
         auto date = value.toDate();
@@ -164,7 +166,7 @@ static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
     // Attributes
     stream.writeAttribute(ATTR_RECORD_CLASS, QString::fromStdString(card.cardClass().name()));
     stream.writeAttribute(ATTR_NAME, card.name());
-    stream.writeAttribute(ATTR_UUID, card.uuid().toString());
+    stream.writeAttribute(ATTR_UUID, card.uuid().toString(QUuid::WithoutBraces));
     stream.writeAttribute(ATTR_MODIFIED, QString::number(card.modified()));
     stream.writeAttribute(ATTR_PICTURE, QString::fromStdString(card.picture().name()));
     stream.writeAttribute(ATTR_FAVORITE, card.favorite() ? "true" : "false");
@@ -176,7 +178,7 @@ static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
         for (const auto &field : card.fields()) {
             serializeField(stream, field);
         }
-        stream.writeEndElement(); // Fields
+        stream.writeEndElement();
     }
 
     // Note
@@ -189,13 +191,16 @@ void serialize(const std::vector<Card> &list, QByteArray &byteArray) {
 
     stream.writeStartDocument();
 
-    stream.writeStartElement(RECORDS);
+    stream.writeStartElement(WALLET);
     stream.writeAttribute(ATTR_VERSION, QString::fromStdString(Version::projectVersion));
+
+    stream.writeStartElement(RECORDS);
 
     for (const auto &card : list) {
         serializeCard(stream, card);
     }
 
+    stream.writeEndElement();
     stream.writeEndElement();
     stream.writeEndDocument();
 }

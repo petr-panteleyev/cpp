@@ -5,7 +5,7 @@
 
 Card::Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name,
            unsigned long modified, const QString &note, bool favorite, bool active, const std::vector<Field> &fields)
-    : cardClass_{cardClass.ordinal()}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
+    : cardClass_{cardClass}, uuid_{uuid}, picture_{picture}, name_{name}, modified_{modified}, note_{note},
       favorite_{favorite}, active_{active}, fields_{fields} {
 }
 

@@ -4,10 +4,9 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include "fieldtype.h"
 #include <QString>
 #include <QVariant>
-
-class FieldType;
 
 class Field final {
   public:
@@ -22,14 +21,14 @@ class Field final {
     const QString &name() const noexcept { return name_; }
     const QVariant &value() const noexcept { return value_; }
 
-    void setType(const FieldType &type) noexcept { type_ = type; }
+    void setType(const FieldType &type) noexcept { type_ = type; };
     void setName(const QString &name) noexcept { name_ = name; }
     void setValue(const QVariant &value) noexcept { value_ = value; }
 
     bool showContent() const noexcept { return showContent_; }
     void toggleShow() noexcept;
 
-    [[nodiscard]] QVariant convertValue(const FieldType &newType) const noexcept;
+    [[nodiscard]] QVariant convertValue(const FieldType &type) const noexcept;
 
     QString getValueAsString() const;
 
@@ -38,7 +37,7 @@ class Field final {
     static QVariant deserialize(const QString &str, const FieldType &type);
 
   private:
-    std::reference_wrapper<const FieldType> type_;
+    FieldTypeRef type_;
     QString name_;
     QVariant value_;
 

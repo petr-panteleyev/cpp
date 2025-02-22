@@ -73,7 +73,7 @@ void FieldValueEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
         case EditFieldListModel::FIELD_TABLE_TYPE_COLUMN: {
             auto comboBox = reinterpret_cast<QComboBox *>(editor);
             auto ordinal = comboBox->currentData().toUInt();
-            auto &newType = FieldType::valueOf(ordinal);
+            const auto &newType = FieldType::valueOf(ordinal);
             if (newType != field->type()) {
                 auto newValue = field->convertValue(newType);
                 field->setType(newType);

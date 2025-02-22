@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef PICTURE_H
@@ -6,6 +6,7 @@
 
 #include "enumclass.h"
 #include <QIcon>
+#include <functional>
 
 class Picture final : public Common::EnumClass<Picture> {
   public:
@@ -88,5 +89,7 @@ class Picture final : public Common::EnumClass<Picture> {
   private:
     const QString fileName_;
 };
+
+using PictureRef = std::reference_wrapper<const Picture>;
 
 #endif // PICTURE_H

@@ -49,7 +49,7 @@ static const QString ABOUT_TEXT = R"(
 <tr><td>Version:<td>%1
 <tr><td>Build Date:<td>%2
 </table>
-Copyright &copy; 2024 Petr Panteleyev
+Copyright &copy; 2024-2025 Petr Panteleyev
 )";
 
 MainWindow::MainWindow(QWidget *parent)
@@ -111,8 +111,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onActionOpen);
-    connect(ui->actionFilter, &QAction::triggered, this, &MainWindow::onActionFilter);
-    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onActionAbout);
+    connect(ui->actionFilter, &QAction::triggered, [this]() { ui->searchField->setFocus(); });
+    connect(ui->actionAbout, &QAction::triggered, [this]() {
+        auto text = QString(ABOUT_TEXT)
+                        .arg(QString::fromStdString(Version::projectVersion))
+                        .arg(QString::fromStdString(Version::buildDate));
+        QMessageBox::about(this, tr("About"), text);
+    });
     connect(ui->actionFavorite, &QAction::triggered, this, &MainWindow::onActionFavorite);
     connect(ui->actionNewCard, &QAction::triggered, this, &MainWindow::onActionNewCard);
     connect(ui->actionNewNote, &QAction::triggered, this, &MainWindow::onActionNewNote);
@@ -290,19 +295,8 @@ void MainWindow::onOpenLink() {
     QDesktopServices::openUrl(QUrl(urlText));
 }
 
-void MainWindow::onActionFilter() {
-    ui->searchField->setFocus();
-}
-
 void MainWindow::onSearchFieldTextChanged(const QString &text) {
     sortFilterModel_->setFilterText(text);
-}
-
-void MainWindow::onActionAbout() {
-    auto text = QString(ABOUT_TEXT)
-                    .arg(QString::fromStdString(Version::projectVersion))
-                    .arg(QString::fromStdString(Version::buildDate));
-    QMessageBox::about(this, tr("About"), text);
 }
 
 void MainWindow::onActionEdit() {
@@ -327,8 +321,9 @@ void MainWindow::onActionFavorite() {
     if (!index.isValid()) {
         return;
     }
-    this->cardModel_->replace(index.row(), this->cardModel_->cardAtIndex(index.row()).toggleFavorite());
-    this->sortFilterModel_->invalidate();
+    cardModel_->cardAtIndex(index.row()).toggleFavorite();
+    cardModel_->cardUpdated(index.row());
+    sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
 }
@@ -340,14 +335,6 @@ const QModelIndex MainWindow::currentIndex() const noexcept {
     }
 
     return this->sortFilterModel_->mapToSource(currentIndex);
-}
-
-const Card *MainWindow::currentCard() const {
-    auto index = currentIndex();
-    if (!index.isValid()) {
-        return nullptr;
-    }
-    return &this->cardModel_->cardAtIndex(index.row());
 }
 
 void MainWindow::onActionNewCard() {
@@ -366,6 +353,10 @@ void MainWindow::onActionNewNote() {
         cardModel_->add(dialog.note());
         writeFile();
     }
+}
+
+void MainWindow::writeFile() const {
+    writeFile(currentFileName_.get(), currentPassword_);
 }
 
 void MainWindow::writeFile(const QString &fileName, const QString &password) const {
@@ -459,7 +450,8 @@ void MainWindow::onActionDelete() {
         if (result != QMessageBox::Yes) {
             return;
         }
-        cardModel_->replace(index.row(), card.toggleActive());
+        card.setActive(false);
+        cardModel_->cardUpdated(index.row());
     } else {
         auto result = QMessageBox::question(this, tr("Finally Delete"),
                                             tr("Are you sure to finally delete ") + card.name() + "?");
@@ -488,7 +480,8 @@ void MainWindow::onActionRestore() {
         return;
     }
 
-    cardModel_->replace(index.row(), card.toggleActive());
+    card.setActive(true);
+    cardModel_->cardUpdated(index.row());
     sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
