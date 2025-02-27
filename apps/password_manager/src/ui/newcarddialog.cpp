@@ -6,14 +6,13 @@
 #include "qthelpers.h"
 #include "recordtype.h"
 #include "timeutil.h"
-#include "translations.h"
 #include "ui_newcarddialog.h"
 
 namespace {
 
 void initTypeComboBox(std::unique_ptr<Ui::NewCardDialog> &ui) {
     for (const RecordType &type : RecordType::values()) {
-        ui->typeComboBox->addItem(type.picture().icon(), Translations::translate(type), type.ordinal());
+        ui->typeComboBox->addItem(type.picture().icon(), type.translation(), type.ordinal());
         if (type == RecordType::PASSWORD) {
             ui->typeComboBox->setCurrentIndex(ui->typeComboBox->count() - 1);
         }

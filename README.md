@@ -2,24 +2,24 @@
 
 [![License](docs/license.svg)](LICENSE)
 
-Monorepo with C++ sources.
+Монорепозиторий для C++.
 
-## Applications
+## Приложения
 
 + [Password Generator](./apps/password_generator)
 + [Password Manager](./apps/password_manager)
 + [Sapper](./apps/sapper)
 
-## Libraries
+## Библиотеки
 
 + [pwdgen](./libs/pwdgen)
 + [common](./libs/common)
 + [qthelpers](./libs/qthelpers)
 
-## Build
+## Сборка
 
-Requirements:
-* gcc 10+ (C++20 compatible compiler)
+Требования:
+* gcc 10+ (C++20 совместимый компилятор)
 * cmake 3.23+
 * Qt6
 * OpenSSL
@@ -30,15 +30,15 @@ cmake . --preset <debug | release>
 cmake --build --preset <debug | release> [--target <target>]
 ```
 
-Application targets:
+Цели для сборки приложений:
 * password_generator
 * password_manager
 * sapper
 
-## Test
+## Тесты
 
-1. Build all (no --target) for debug
-2. Execute tests
+1. Собрать все (no --target) в отладочном режиме
+2. Запустить тесты
 
 ```sh
 ctest --preset debug

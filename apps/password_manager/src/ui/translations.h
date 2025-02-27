@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef TRANSLATIONS_H
@@ -16,7 +16,6 @@ namespace Translations {
 void initialize();
 
 QString translate(const FieldType &type);
-QString translate(const RecordType &type);
 QString translate(ImportAction action);
 QString translate(Settings::PasswordType type);
 

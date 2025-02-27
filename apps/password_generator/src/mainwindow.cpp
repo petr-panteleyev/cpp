@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -12,7 +12,7 @@ constexpr int DEFAULT_LENGTH_INDEX = 3;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(std::make_unique<Ui::MainWindow>()) {
     ui->setupUi(this);
 
-    this->setWindowTitle(tr("Password Generator"));
+    this->setWindowTitle("Генератор паролей");
 
     // Setup length combobox
     for (auto length : PASSWORD_LENGTH_OPTIONS) {
@@ -55,7 +55,7 @@ void MainWindow::generate(const pwdgen::PasswordGeneratorOptions &options) {
     try {
         ui->passwordEdit->setText(QString::fromStdString(pwdgen::generate(options)));
     } catch (pwdgen::PasswordGeneratorException &e) {
-        ui->passwordEdit->setText("Error");
+        ui->passwordEdit->setText("Ошибка");
     }
 }
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sapper</string>
+   <string notr="true">Сапёр</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -108,17 +108,17 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string notr="true">Файл</string>
     </property>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuGame">
     <property name="title">
-     <string>Game</string>
+     <string notr="true">Игра</string>
     </property>
     <widget class="QMenu" name="customGameMenu">
      <property name="title">
-      <string>Custom</string>
+      <string notr="true">Пользовательская</string>
      </property>
      <addaction name="actionNewCustomGame"/>
     </widget>
@@ -132,7 +132,7 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string notr="true">Справка</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
@@ -142,12 +142,12 @@
   </widget>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string notr="true">Выход</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About Sapper...</string>
+    <string notr="true">О программе...</string>
    </property>
   </action>
   <action name="actionBigGame">
@@ -167,12 +167,12 @@
   </action>
   <action name="actionResults">
    <property name="text">
-    <string>Results</string>
+    <string notr="true">Результаты</string>
    </property>
   </action>
   <action name="actionNewCustomGame">
    <property name="text">
-    <string>New...</string>
+    <string notr="true">Новая...</string>
    </property>
   </action>
  </widget>

@@ -1,30 +1,20 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
+#include "str.h"
 #include "translations.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
-#include <QLocale>
-#include <QTranslator>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setWindowIcon(QIcon(":images/icon.png"));
 
-    //a.setStyleSheet("QTableView{font: \"Courier New\";font-size:24px}");
+    // a.setStyleSheet("QTableView{font: \"Courier New\";font-size:24px}");
 
     QApplication::setOrganizationDomain("panteleyev.org");
-    QApplication::setApplicationName("Password Manager");
+    QApplication::setApplicationName(Str::APP_TITLE);
 
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "password_manager_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
-            break;
-        }
-    }
     Translations::initialize();
     MainWindow w;
     w.show();

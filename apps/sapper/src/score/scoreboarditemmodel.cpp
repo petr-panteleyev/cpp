@@ -13,8 +13,8 @@ QVariant ScoreBoardItemModel::headerData(int section, Qt::Orientation orientatio
 
     switch (section) {
         case 0: return "";
-        case 1: return tr("Time");
-        case 2: return tr("Date");
+        case 1: return "Время";
+        case 2: return "Дата";
         default: return QVariant();
     }
 }

@@ -12,6 +12,7 @@
 #include "qnamespace.h"
 #include "qthelpers.h"
 #include "settings.h"
+#include "str.h"
 #include "timeutil.h"
 #include "ui_cardeditdialog.h"
 #include <QMenu>
@@ -38,9 +39,9 @@ class NotEmptyValidator : public QValidator {
 
 CardEditDialog::CardEditDialog(QWidget *parent)
     : QDialog(parent), ui(make_unique<Ui::CardEditDialog>()), model_{new EditFieldListModel{this}},
-      fieldAddAction_{new QAction{tr("Add"), this}}, fieldDeleteAction_{new QAction{tr("Delete"), this}},
-      fieldUpAction_{new QAction{tr("Up"), this}}, fieldDownAction_{new QAction{tr("Down"), this}},
-      fieldGenerateAction_(new QAction{tr("Generate"), this}), fieldTableContextMenu_{new QMenu{this}} {
+      fieldAddAction_{new QAction{Str::ADD, this}}, fieldDeleteAction_{new QAction{Str::DELETE, this}},
+      fieldUpAction_{new QAction{"Вверх", this}}, fieldDownAction_{new QAction{"Вниз", this}},
+      fieldGenerateAction_(new QAction{"Генерировать", this}), fieldTableContextMenu_{new QMenu{this}} {
     ui->setupUi(this);
 
     setupActions();
@@ -152,7 +153,7 @@ void CardEditDialog::onDeleteField() {
     }
     const auto field = model_->at(index.row());
 
-    auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + field->name() + "?");
+    auto result = QMessageBox::question(this, Str::DELETE, "Удалить " + field->name() + "?");
     if (result != QMessageBox::Yes) {
         return;
     }

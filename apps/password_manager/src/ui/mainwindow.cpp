@@ -25,6 +25,7 @@
 #include "serializer.h"
 #include "settings.h"
 #include "settingsdialog.h"
+#include "str.h"
 #include "ui_mainwindow.h"
 #include "version.h"
 #include <QClipboard>
@@ -38,25 +39,29 @@
 
 using namespace Crypto;
 
+namespace {
+
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTE = 1;
 
-static const QString FILE_FILTERS{QApplication::translate("MainWindow", "Password Files (*.pwd);;All Files (*.*)")};
+static const QString FILE_FILTERS{"Password Files (*.pwd);;All Files (*.*)"};
 
 static const QString ABOUT_TEXT = R"(
-<h1>Password Manager</h1>
+<h1>Менеджер паролей</h1>
 <table border='0'>
-<tr><td>Version:<td>%1
-<tr><td>Build Date:<td>%2
+<tr><td>Версия:<td>%1
+<tr><td>Дата сборки:<td>%2
 </table>
 Copyright &copy; 2024-2025 Petr Panteleyev
 )";
+
+} // namespace
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, cardModel_{new CardTableItemModel{this}},
       sortFilterModel_{new CardTableSortFilterModel{this}}, fieldModel_{new FieldTableItemModel{this}},
       fieldFilterModel_{new FieldTableSortFilterModel{this}}, copyFieldAction_{new QAction{this}},
-      openLinkAction_{new QAction{tr("Open Link"), this}}, fieldContextMenu_{new QMenu{this}}, currentFileName_{""},
+      openLinkAction_{new QAction{"Открыть ссылку", this}}, fieldContextMenu_{new QMenu{this}}, currentFileName_{""},
       passwordDialog_{new PasswordDialog{this}}, changePasswordDialog_{new ChangePasswordDialog{this}},
       cardEditDialog_{new CardEditDialog{this}}, importDialog_{new ImportDialog{this}},
       settingsDialog_{new SettingsDialog{this}} {
@@ -93,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     // TabWidget
     ui->tabWidget->setTabText(TAB_FIELDS, "");
     ui->tabWidget->setTabIcon(TAB_FIELDS, Picture::GENERIC.icon());
-    ui->tabWidget->setTabText(TAB_NOTE, tr("Note"));
+    ui->tabWidget->setTabText(TAB_NOTE, Str::NOTES);
     ui->tabWidget->setTabIcon(TAB_NOTE, Picture::NOTE.icon());
 
     // Field context menu
@@ -116,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
         auto text = QString(ABOUT_TEXT)
                         .arg(QString::fromStdString(Version::projectVersion))
                         .arg(QString::fromStdString(Version::buildDate));
-        QMessageBox::about(this, tr("About"), text);
+        QMessageBox::about(this, "О программе", text);
     });
     connect(ui->actionFavorite, &QAction::triggered, this, &MainWindow::onActionFavorite);
     connect(ui->actionNewCard, &QAction::triggered, this, &MainWindow::onActionNewCard);
@@ -197,14 +202,14 @@ void MainWindow::continueOpen(const QString &fileName, const QString &password) 
 
         Settings::setCurrentFile(currentFileName_.get());
     } catch (const PasswordManagerException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), ex.message());
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, ex.message());
     } catch (const CryptoException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, QString::fromStdString(ex.message()));
     }
 }
 
 void MainWindow::onActionOpen() {
-    auto fileName = QFileDialog::getOpenFileName(this, tr("Open"), QString(), FILE_FILTERS);
+    auto fileName = QFileDialog::getOpenFileName(this, "Открыть", QString(), FILE_FILTERS);
     if (fileName.isEmpty()) {
         return;
     }
@@ -225,7 +230,7 @@ void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIn
         } else {
             ui->tabWidget->setTabText(TAB_FIELDS, currentCard.name());
             ui->tabWidget->setTabIcon(TAB_FIELDS, currentCard.picture().icon());
-            ui->tabWidget->setTabText(TAB_NOTE, tr("Note"));
+            ui->tabWidget->setTabText(TAB_NOTE, Str::NOTES);
         }
 
         ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard.fields().empty());
@@ -274,7 +279,7 @@ void MainWindow::onFieldTableContextMenuRequested(QPoint pos) {
     auto sourceIndex = fieldFilterModel_->mapToSource(index);
     const auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
 
-    copyFieldAction_->setText(tr("Copy") + " \"" + field->name() + "\"");
+    copyFieldAction_->setText(Str::COPY + " \"" + field->name() + "\"");
     copyFieldAction_->setData(field->getValueAsString());
     openLinkAction_->setData(field->getValueAsString());
     fieldContextMenu_->popup(ui->fieldTable->viewport()->mapToGlobal(pos));
@@ -369,7 +374,7 @@ void MainWindow::writeFile(const QString &fileName, const QString &password) con
 
     QFile file{fileName};
     if (!file.open(QIODevice::WriteOnly)) {
-        throw PasswordManagerException("File cannot be saved!");
+        throw PasswordManagerException("Файл не может быть сохранен.");
     }
 
     if (!password.isEmpty()) {
@@ -383,7 +388,7 @@ void MainWindow::writeFile(const QString &fileName, const QString &password) con
 }
 
 void MainWindow::onActionNew() {
-    auto fileName = QFileDialog::getSaveFileName(this, tr("New File"), QString(), FILE_FILTERS);
+    auto fileName = QFileDialog::getSaveFileName(this, "Новый файл", QString(), FILE_FILTERS);
     if (fileName.isEmpty()) {
         return;
     }
@@ -415,13 +420,13 @@ void MainWindow::onEditMenuAboutToShow() {
         const auto &card = this->cardModel_->cardAtIndex(index.row());
         ui->actionRestore->setVisible(!card.active());
         ui->actionRestore->setEnabled(!card.active());
-        ui->actionDelete->setText(card.active() ? tr("Delete") : tr("Finally Delete"));
+        ui->actionDelete->setText(card.active() ? Str::DELETE : Str::PURGE);
         ui->actionFavorite->setChecked(card.favorite());
     }
 }
 
 void MainWindow::updateWindowTitle() {
-    auto title = tr("Password Manager");
+    auto title = QString("Менеджер паролей");
     if (currentFileName_.get().isEmpty()) {
         setWindowTitle(title);
     } else {
@@ -446,15 +451,15 @@ void MainWindow::onActionDelete() {
     auto &card = cardModel_->cardAtIndex(index.row());
 
     if (card.active()) {
-        auto result = QMessageBox::question(this, tr("Delete"), tr("Are you sure to delete ") + card.name() + "?");
+        auto result = QMessageBox::question(this, Str::DELETE, "Вы уверены, что хотите удалить " + card.name() + "?");
         if (result != QMessageBox::Yes) {
             return;
         }
         card.setActive(false);
         cardModel_->cardUpdated(index.row());
     } else {
-        auto result = QMessageBox::question(this, tr("Finally Delete"),
-                                            tr("Are you sure to finally delete ") + card.name() + "?");
+        auto result =
+            QMessageBox::question(this, Str::PURGE, "Вы уверены, что хотите окончательно удалить " + card.name() + "?");
         if (result != QMessageBox::Yes) {
             return;
         }
@@ -488,7 +493,7 @@ void MainWindow::onActionRestore() {
 }
 
 void MainWindow::onActionPurge() {
-    auto result = QMessageBox::question(this, tr("Purge"), tr("Are you sure to purge all deleted items?"));
+    auto result = QMessageBox::question(this, "Очистить", "Вы уверены, что хотите очистить все удаленные записи?");
     if (result != QMessageBox::Yes) {
         return;
     }
@@ -499,7 +504,7 @@ void MainWindow::onActionPurge() {
 }
 
 void MainWindow::onActionExport() {
-    auto fileName = QFileDialog::getSaveFileName(this, tr("Export"), QString(), FILE_FILTERS);
+    auto fileName = QFileDialog::getSaveFileName(this, "Экспорт", QString(), FILE_FILTERS);
     if (fileName.isEmpty()) {
         return;
     }
@@ -512,7 +517,7 @@ void MainWindow::onActionExport() {
 }
 
 void MainWindow::onActionImport() {
-    auto fileName = QFileDialog::getOpenFileName(this, tr("Import"), QString(), FILE_FILTERS);
+    auto fileName = QFileDialog::getOpenFileName(this, Str::IMPORT, QString(), FILE_FILTERS);
     if (fileName.isEmpty()) {
         return;
     }
@@ -526,7 +531,7 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
 
         auto importRecords = ImportUtil::calculateImport(cardModel_->data(), toImport);
         if (importRecords.empty()) {
-            QMessageBox::information(this, tr("Import"), tr("No cards to import"));
+            QMessageBox::information(this, Str::IMPORT, "Нет записей для импорта");
         } else {
             importDialog_->setup(importRecords);
             if (importDialog_->exec() == QDialog::Accepted) {
@@ -542,16 +547,16 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
             }
         }
     } catch (const PasswordManagerException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), ex.message());
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, ex.message());
     } catch (const CryptoException &ex) {
-        QMessageBox::critical(this, tr("Critical Error"), QString::fromStdString(ex.message()));
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, QString::fromStdString(ex.message()));
     }
 }
 
 std::vector<Card> MainWindow::loadRecords(const QString &fileName, const QString &password) {
     QFile file{fileName};
     if (!file.open(QIODevice::ReadOnly)) {
-        throw PasswordManagerException("File cannot be opened!");
+        throw PasswordManagerException(Str::UNABLE_TO_OPEN_FILE);
     } else {
         QDomDocument doc;
 

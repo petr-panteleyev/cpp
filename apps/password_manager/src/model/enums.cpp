@@ -6,7 +6,7 @@
 #include "fieldtype.h"
 #include "picture.h"
 #include "recordtype.h"
-#include <QApplication>
+#include "str.h"
 #include <QDate>
 
 using std::cref;
@@ -145,30 +145,28 @@ const std::vector<std::reference_wrapper<const CreditCardType>> Common::EnumClas
 };
 
 // RecordType
-const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, {});
-const RecordType RecordType::CREDIT_CARD(
-    "CREDIT_CARD", Picture::CREDIT_CARD,
-    {
-        Field(FieldType::STRING, QApplication::translate("RecordType", "Card Provider"), ""),
-        Field(FieldType::CARD_TYPE, QApplication::translate("RecordType", "Card Type"), CreditCardType::MIR.ordinal()),
-        Field(FieldType::CREDIT_CARD_NUMBER, QApplication::translate("RecordType", "Card Number"), ""),
-        Field(FieldType::EXPIRATION_MONTH, QApplication::translate("RecordType", "Expiration Date"),
-              QDate::currentDate()),
-        Field(FieldType::PIN, "PIN", ""),
-        Field(FieldType::STRING, QApplication::translate("RecordType", "Name on Card"), ""),
-        Field(FieldType::STRING, QApplication::translate("RecordType", "Phone Number"), ""),
-        Field(FieldType::HIDDEN, "CVC#", ""),
-        Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
-        Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
-    });
+const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, "Пустая", {});
 const RecordType
-    RecordType::PASSWORD("PASSWORD", Picture::GENERIC,
-                         {
-                             Field(FieldType::STRING, QApplication::translate("RecordType", "System"), ""),
-                             Field(FieldType::STRING, QApplication::translate("RecordType", "Login"), ""),
-                             Field(FieldType::LONG_PASSWORD, QApplication::translate("RecordType", "Password"), ""),
-                             Field(FieldType::LINK, "URL", ""),
-                         });
+    RecordType::CREDIT_CARD("CREDIT_CARD", Picture::CREDIT_CARD, "Кредитная карта",
+                            {
+                                Field(FieldType::STRING, "Кто выпустил", ""),
+                                Field(FieldType::CARD_TYPE, "Тип карты", CreditCardType::MIR.ordinal()),
+                                Field(FieldType::CREDIT_CARD_NUMBER, "Номер карты", ""),
+                                Field(FieldType::EXPIRATION_MONTH, "Месяц окончания", QDate::currentDate()),
+                                Field(FieldType::PIN, "PIN", ""),
+                                Field(FieldType::STRING, "Имя на карте", ""),
+                                Field(FieldType::STRING, "Телефон банка", ""),
+                                Field(FieldType::HIDDEN, "CVC#", ""),
+                                Field(FieldType::STRING, Str::LOGIN, ""),
+                                Field(FieldType::LONG_PASSWORD, Str::PASSWORD, ""),
+                            });
+const RecordType RecordType::PASSWORD("PASSWORD", Picture::GENERIC, Str::PASSWORD,
+                                      {
+                                          Field(FieldType::STRING, "Система", ""),
+                                          Field(FieldType::STRING, Str::LOGIN, ""),
+                                          Field(FieldType::LONG_PASSWORD, Str::PASSWORD, ""),
+                                          Field(FieldType::LINK, "URL", ""),
+                                      });
 
 template <>
 const std::vector<RecordTypeRef> Common::EnumClass<RecordType>::values_{

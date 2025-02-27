@@ -1,9 +1,11 @@
 # Password Manager
 
-Desktop application to store passwords, credit card numbers and other sensitive information. Application uses 256-bit AES encryption.
+Приложение для хранения паролей, кредитных карт и другой секретной информации. Для шифрования используется AES-256.
 
 ![Screenshot](docs/main-window.png)
 
-## Security Considerations
+## Соображения по безопасности
 
-Application enforces security via file encryption only. Application makes no effort to counter-attacks targeted to user account, operating system or hardware including RAM.
+Приложение обеспечивает безопасность данных исключительно посредством шифрования файла.
+
+Приложение не предпринимает никаких усилий по предотращению атак на учетную запись пользователя в системе, аппаратуру и пр.

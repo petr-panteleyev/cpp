@@ -1,4 +1,4 @@
-# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
 project(sapper VERSION 24.12.2.1 LANGUAGES CXX)
@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
 qt_add_executable(sapper)
 add_subdirectory(src)
@@ -40,13 +40,6 @@ qt_add_resources(sapper "fonts"
     FILES
         resources/mine-sweeper.ttf
         resources/neat-lcd.ttf
-)
-
-qt_add_translations(sapper
-    INCLUDE_DIRECTORIES
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    TS_FILES
-        src/sapper_ru_RU.ts
 )
 
 target_link_libraries(sapper PRIVATE

@@ -1,20 +1,20 @@
-# Password Generator
+# Генератор паролей
 
-Simple password generator for desktop platforms like OS X, Linux or Windows.
+Простой генератор паролей.
 
 ![Main Window](docs/password-generator.png)
 
-## Presets
+## Варианты
 
-There are several presets called by the corresponding menu item:
+Предусмотрено несколько вариантов, доступных через главное меню:
 
-|Preset|Upper Case|Lower Case|Digits|Symbols|Length|
+|Вариант|Большие буквы|Маленькие буквы|Цифры|Символы|Длина|
 |---|---|---|---|---|---|
-|Long|X|X|X|X|32|
-|Medium|X|X|X|X|16|
+|Длинный|X|X|X|X|32|
+|Средний|X|X|X|X|16|
 |UNIX|X|X|X|X|8|
 |PIN| | |X| |4|
 
-## Ambiguous Letters
+## Неоднозначные буквы
 
-The following characters that may look confusing depending on font are excluded: 'I', 'l', 'O'.
+Следующие буквы могут выглядеть неоднозначно в зависимости от шрифта и не используются в генерации паролей: 'I', 'l', 'O'.

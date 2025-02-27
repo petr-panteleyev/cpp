@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Xml)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 
 qt_add_executable(password_manager)
@@ -32,13 +32,6 @@ qt_add_resources(password_manager "resources"
     PREFIX "/images"
     BASE "resources"
     FILES ${PASSWORD_MANAGER_RESOURCE_FILES}
-)
-
-qt_add_translations(password_manager
-    INCLUDE_DIRECTORIES
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    TS_FILES
-        src/ui/password_manager_ru_RU.ts
 )
 
 target_link_libraries(password_manager PRIVATE 

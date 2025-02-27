@@ -1,16 +1,15 @@
-# Sapper Game
-
-Yet another Sapper game.
+# Игра Сапёр
 
 ![Big Board](docs/board_big.png)
 
-## Board Sizes
+## Режимы игры
 
-Three standard board sizes:
-* 8 x 8, 10 mines
-* 16 x 16, 40 mines
-* 30 x 16, 99 mines
+Три стандартных режима:
+* 8 x 8, 10 мин
+* 16 x 16, 40 мин
+* 30 x 16, 99 мин
 
-Custom board can be from 8 x 8 up to 30 x 24 with maximum mines number equal to (w - 1) * (h - 1).
+Пользовательские режимы могут включать размер доски от 8 на 8 до 30 на 24 при максиальном количестве
+мин равном (w - 1) * (h - 1).
 
 ![Custom Game](docs/custom_game.png)

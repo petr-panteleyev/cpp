@@ -3,6 +3,7 @@
 
 #include "importdialog.h"
 #include "importrecordtablemodel.h"
+#include "str.h"
 #include "ui_importdialog.h"
 #include <QMenu>
 
@@ -10,7 +11,7 @@ using std::make_unique;
 
 ImportDialog::ImportDialog(QWidget *parent)
     : QDialog{parent}, ui{make_unique<Ui::ImportDialog>()}, model_{new ImportRecordTableModel{this}},
-      contextMenu_{new QMenu{this}}, actionToggleApproval_{new QAction{tr("Skip"), this}} {
+      contextMenu_{new QMenu{this}}, actionToggleApproval_{new QAction{Str::SKIP, this}} {
     ui->setupUi(this);
 
     setupTableView();

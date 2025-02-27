@@ -145,7 +145,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string notr="true">Файл</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
@@ -154,7 +154,7 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string notr="true">Вид</string>
     </property>
     <addaction name="actionFilter"/>
     <addaction name="separator"/>
@@ -162,13 +162,13 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string notr="true">Справка</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string notr="true">Правка</string>
     </property>
     <addaction name="actionNewCard"/>
     <addaction name="actionNewNote"/>
@@ -181,7 +181,7 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string notr="true">Инструменты</string>
     </property>
     <addaction name="actionImport"/>
     <addaction name="actionExport"/>
@@ -200,7 +200,7 @@
   </widget>
   <action name="actionOpen">
    <property name="text">
-    <string>Open...</string>
+    <string notr="true">Открыть...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -211,7 +211,7 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string notr="true">Выход</string>
    </property>
   </action>
   <action name="actionShow_Deleted">
@@ -219,12 +219,12 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Show Deleted</string>
+    <string notr="true">Показывать удаленные</string>
    </property>
   </action>
   <action name="actionFilter">
    <property name="text">
-    <string>Filter</string>
+    <string notr="true">Фильтр</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
@@ -235,7 +235,7 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About...</string>
+    <string notr="true">О программе...</string>
    </property>
   </action>
   <action name="actionEdit">
@@ -243,7 +243,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Edit</string>
+    <string notr="true">Редактировать...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
@@ -254,7 +254,7 @@
   </action>
   <action name="actionNewCard">
    <property name="text">
-    <string>New Card...</string>
+    <string notr="true">Новая карточка...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -265,7 +265,7 @@
   </action>
   <action name="actionNewNote">
    <property name="text">
-    <string>New Note...</string>
+    <string notr="true">Новая заметка...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -282,7 +282,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Favorite</string>
+    <string notr="true">Избранное</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -293,7 +293,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string notr="true">Удалить</string>
    </property>
    <property name="shortcut">
     <string>Shift+Del</string>
@@ -304,7 +304,7 @@
   </action>
   <action name="actionRestore">
    <property name="text">
-    <string>Restore</string>
+    <string notr="true">Восстановить</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -315,7 +315,7 @@
   </action>
   <action name="actionNew">
    <property name="text">
-    <string>New...</string>
+    <string notr="true">Новый...</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -323,27 +323,27 @@
   </action>
   <action name="actionChangePassword">
    <property name="text">
-    <string>Change Password...</string>
+    <string notr="true">Изменить пароль...</string>
    </property>
   </action>
   <action name="actionPurge">
    <property name="text">
-    <string>Purge...</string>
+    <string notr="true">Очистить...</string>
    </property>
   </action>
   <action name="actionExport">
    <property name="text">
-    <string>Export...</string>
+    <string notr="true">Экспорт...</string>
    </property>
   </action>
   <action name="actionImport">
    <property name="text">
-    <string>Import...</string>
+    <string notr="true">Импорт...</string>
    </property>
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>Settings...</string>
+    <string notr="true">Настройки...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+S</string>

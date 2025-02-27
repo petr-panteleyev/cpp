@@ -15,9 +15,9 @@ QVariant EditFieldListModel::headerData(int section, Qt::Orientation orientation
     }
 
     switch (section) {
-        case FIELD_TABLE_NAME_COLUMN: return tr("Name");
-        case FIELD_TABLE_TYPE_COLUMN: return tr("Type");
-        case FIELD_TABLE_VALUE_COLUMN: return tr("Value");
+        case FIELD_TABLE_NAME_COLUMN: return "Название";
+        case FIELD_TABLE_TYPE_COLUMN: return "Тип";
+        case FIELD_TABLE_VALUE_COLUMN: return "Значение";
         default: return QVariant();
     }
 }

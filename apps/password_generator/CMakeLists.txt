@@ -1,9 +1,9 @@
-# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
 project(password_generator VERSION 24.11.1 LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -26,13 +26,6 @@ qt_add_resources(password_generator "resources"
     PREFIX "/images"
     BASE "resources"
     FILES ${PASSWORD_GENERATOR_RESOURCE_FILES}
-)
-
-qt_add_translations(password_generator
-    INCLUDE_DIRECTORIES
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    TS_FILES
-        src/password_generator_ru.ts
 )
 
 target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets pwdgen)

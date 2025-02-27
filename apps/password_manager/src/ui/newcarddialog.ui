@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>New Card</string>
+   <string notr="true">Новая карточка</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -21,21 +21,21 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Title:</string>
+          <string notr="true">Название:</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="titleEdit">
          <property name="placeholderText">
-          <string>Card title</string>
+          <string notr="true"/>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="typeLabel">
          <property name="text">
-          <string>Type:</string>
+          <string notr="true">Тип:</string>
          </property>
         </widget>
        </item>
@@ -62,7 +62,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="pictureLabel">
          <property name="text">
-          <string>Picture:</string>
+          <string notr="true">Иконка:</string>
          </property>
         </widget>
        </item>

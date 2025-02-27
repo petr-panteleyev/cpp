@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
+    <width>619</width>
     <height>196</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
-       <string>Password</string>
+       <string notr="true">Пароль</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -30,7 +30,7 @@
           <bool>true</bool>
          </property>
          <property name="placeholderText">
-          <string>Password</string>
+          <string notr="true">Пароль</string>
          </property>
         </widget>
        </item>
@@ -40,41 +40,41 @@
     <item>
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>Options</string>
+       <string>Опции</string>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QCheckBox" name="upperCaseCheck">
          <property name="text">
-          <string>Upper Case</string>
+          <string notr="true">Большие буквы</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="lowerCaseCheck">
          <property name="text">
-          <string>Lower Case</string>
+          <string notr="true">Маленькие буквы</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="digitsCheck">
          <property name="text">
-          <string>Digits</string>
+          <string notr="true">Цифры</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="symbolsCheck">
          <property name="text">
-          <string>Symbols</string>
+          <string notr="true">Символы</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Length:</string>
+          <string notr="true">Длина:</string>
          </property>
         </widget>
        </item>
@@ -91,13 +91,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>525</width>
+     <width>619</width>
      <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string notr="true">Файл</string>
     </property>
     <addaction name="actionGenerate"/>
     <addaction name="separator"/>
@@ -105,7 +105,7 @@
    </widget>
    <widget class="QMenu" name="menuVariants">
     <property name="title">
-     <string>Variants</string>
+     <string notr="true">Варианты</string>
     </property>
     <addaction name="actionMedium_Password"/>
     <addaction name="actionLong_Password"/>
@@ -115,7 +115,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string notr="true">Правка</string>
     </property>
     <addaction name="actionCopy"/>
    </widget>
@@ -125,7 +125,7 @@
   </widget>
   <action name="actionGenerate">
    <property name="text">
-    <string>Generate</string>
+    <string notr="true">Генерировать</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
@@ -133,12 +133,12 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string notr="true">Выход</string>
    </property>
   </action>
   <action name="actionMedium_Password">
    <property name="text">
-    <string>Medium Password</string>
+    <string notr="true">Средний</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
@@ -146,7 +146,7 @@
   </action>
   <action name="actionLong_Password">
    <property name="text">
-    <string>Long Password</string>
+    <string notr="true">Длинный</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
@@ -170,7 +170,7 @@
   </action>
   <action name="actionCopy">
    <property name="text">
-    <string>Copy</string>
+    <string notr="true">Копировать</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>

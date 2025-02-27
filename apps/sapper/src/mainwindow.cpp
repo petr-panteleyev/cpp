@@ -25,9 +25,11 @@ static const QString STYLE_BLACK{"color: black"};
 static const QIcon EMPTY_ICON;
 
 static const QString ABOUT_TEXT = R"(
-<h1>Sapper</h1>
-<h2>Sapper %1</h2>
-Built on %2<br>
+<h1>Сапёр</h1>
+<table border='0'>
+<tr><td>Версия:<td>%1
+<tr><td>Дата сборки:<td>%2
+</table>
 Copyright &copy; 2024 Petr Panteleyev
 )";
 
@@ -275,5 +277,5 @@ void MainWindow::onHelpAbout() {
     auto text = QString(ABOUT_TEXT)
                     .arg(QString::fromStdString(Version::projectVersion))
                     .arg(QString::fromStdString(Version::buildDate));
-    QMessageBox::about(this, tr("About Sapper"), text);
+    QMessageBox::about(this, "О программе", text);
 }

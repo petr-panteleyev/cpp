@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string notr="true">Редактирование</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -26,7 +26,7 @@
        </property>
        <widget class="QWidget" name="fieldsTab">
         <attribute name="title">
-         <string>Fields</string>
+         <string notr="true">Поля</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
@@ -46,7 +46,7 @@
        </widget>
        <widget class="QWidget" name="notesTab">
         <attribute name="title">
-         <string>Notes</string>
+         <string notr="true">Заметки</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
@@ -56,7 +56,7 @@
        </widget>
        <widget class="QWidget" name="propertiesTab">
         <attribute name="title">
-         <string>Properties</string>
+         <string notr="true">Свойства</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
@@ -64,7 +64,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Title:</string>
+              <string notr="true">Название:</string>
              </property>
             </widget>
            </item>
@@ -74,7 +74,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="pictureLabel">
              <property name="text">
-              <string>Picture:</string>
+              <string notr="true">Иконка:</string>
              </property>
             </widget>
            </item>

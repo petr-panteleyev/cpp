@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "generator.h"
@@ -42,15 +42,6 @@ int main(int argc, char *argv[]) {
     if (arguments.size() == 1) {
         a.setWindowIcon(QIcon(":images/icon.png"));
 
-        QTranslator translator;
-        const auto uiLanguages = QLocale::system().uiLanguages();
-        for (const auto &locale : uiLanguages) {
-            const auto baseName = "password_generator_" + QLocale(locale).name();
-            if (translator.load(":/i18n/" + baseName)) {
-                a.installTranslator(&translator);
-                break;
-            }
-        }
         MainWindow w;
         w.show();
         return a.exec();
