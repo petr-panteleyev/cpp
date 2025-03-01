@@ -9,6 +9,11 @@
 
 class CardTableItemModel : public QAbstractItemModel {
   public:
+    static constexpr int ICON_COLUMN = 0;
+    static constexpr int NAME_COLUMN = 1;
+    static constexpr int AUX_COLUMN = 2;
+
+  public:
     explicit CardTableItemModel(QObject *parent) : QAbstractItemModel{parent} {};
 
     void setItems(std::vector<Card> &items) {

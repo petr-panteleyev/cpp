@@ -47,6 +47,7 @@ class Card final {
     const std::vector<Field> &fields() const { return fields_; }
     void setActive(bool active) noexcept { active_ = active; }
     void toggleActive(bool active) noexcept { active_ = !active_; }
+    void setFavorite(bool favorite) noexcept { favorite_ = favorite; }
     void toggleFavorite() noexcept { favorite_ = !favorite_; }
 
     bool isCard() const noexcept { return cardClass_ == CardClass::CARD; }

@@ -43,6 +43,9 @@
         </item>
         <item>
          <widget class="QTableView" name="cardListView">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::NoSelection</enum>
           </property>

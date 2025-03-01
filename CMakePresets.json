@@ -43,15 +43,6 @@
             "name": "install",
             "configurePreset": "release",
             "targets": ["install"]
-        },
-        {
-            "name": "lupdate",
-            "configurePreset": "debug",
-            "targets": [
-                "password_generator_lupdate",
-                "password_manager_lupdate",
-                "sapper_lupdate"
-            ]
         }
     ],
     "testPresets": [

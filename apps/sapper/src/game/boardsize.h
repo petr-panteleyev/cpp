@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef BOARDSIZE_H
@@ -28,7 +28,7 @@ class BoardSize final {
     bool operator==(const BoardSize &that) const noexcept = default;
     bool operator<(const BoardSize &that) const noexcept { return this->mines_ < that.mines_; }
 
-    static BoardSize boardSize(int width, int height, int mines) {
+    static constexpr BoardSize boardSize(int width, int height, int mines) {
         if (width < MIN_WIDTH || width > MAX_WIDTH || height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw std::out_of_range("Board dimensions are out of bounds");
         }
@@ -36,7 +36,7 @@ class BoardSize final {
     }
 
   private:
-    explicit BoardSize(int width, int height, int mines) noexcept : width_{width}, height_{height}, mines_{mines} {};
+    explicit constexpr BoardSize(int width, int height, int mines) noexcept : width_{width}, height_{height}, mines_{mines} {};
 
   private:
     int width_;
@@ -44,9 +44,9 @@ class BoardSize final {
     int mines_;
 };
 
-inline const BoardSize BoardSize::BIG{30, 16, 99};
-inline const BoardSize BoardSize::MEDIUM{16, 16, 40};
-inline const BoardSize BoardSize::SMALL{8, 8, 10};
+inline constexpr BoardSize BoardSize::BIG{30, 16, 99};
+inline constexpr BoardSize BoardSize::MEDIUM{16, 16, 40};
+inline constexpr BoardSize BoardSize::SMALL{8, 8, 10};
 
 inline const std::set<BoardSize> BoardSize::STANDARD_SIZES{
     BoardSize::BIG,

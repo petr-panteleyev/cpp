@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
+    <width>528</width>
     <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Settings</string>
+   <string notr="true">Настройки</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -22,11 +22,11 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="passwordstTab">
         <attribute name="title">
-         <string>Passwords</string>
+         <string notr="true">Пароли</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
@@ -56,28 +56,28 @@
              <item>
               <widget class="QCheckBox" name="upperCaseCheckBox">
                <property name="text">
-                <string>Upper Case</string>
+                <string notr="true">Верхний регистр</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="lowerCaseCheckBox">
                <property name="text">
-                <string>Lower Case</string>
+                <string notr="true">Нижний регистр</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="digitsCheckBox">
                <property name="text">
-                <string>Digits</string>
+                <string notr="true">Цифры</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="symbolsCheckBox">
                <property name="text">
-                <string>Symbols</string>
+                <string notr="true">Символы</string>
                </property>
               </widget>
              </item>
@@ -101,7 +101,7 @@
              <item>
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>Length:</string>
+                <string notr="true">Длина:</string>
                </property>
               </widget>
              </item>
@@ -142,7 +142,7 @@
        </widget>
        <widget class="QWidget" name="tab">
         <attribute name="title">
-         <string>Fonts</string>
+         <string notr="true">Шрифты</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_8">
          <item row="0" column="0">
@@ -152,7 +152,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>Text:</string>
+                <string notr="true">Текст:</string>
                </property>
               </widget>
              </item>
@@ -169,7 +169,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_9">
                <property name="text">
-                <string>Menu:</string>
+                <string notr="true">Меню:</string>
                </property>
               </widget>
              </item>
@@ -204,7 +204,7 @@
        </widget>
        <widget class="QWidget" name="colorTab">
         <attribute name="title">
-         <string>Colors</string>
+         <string notr="true">Цвета</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_5">
          <item row="0" column="0">
@@ -214,7 +214,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>Field Name:</string>
+                <string notr="true">Название поля:</string>
                </property>
               </widget>
              </item>
@@ -228,7 +228,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>Field Value:</string>
+                <string notr="true">Значение поля:</string>
                </property>
               </widget>
              </item>
@@ -259,7 +259,7 @@
          <item row="1" column="0">
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
-            <string>Import</string>
+            <string notr="true">Импорт</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
@@ -269,7 +269,7 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_3">
                   <property name="text">
-                   <string>Add:</string>
+                   <string notr="true">Добавить:</string>
                   </property>
                  </widget>
                 </item>
@@ -283,7 +283,7 @@
                 <item row="0" column="2">
                  <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string>Replace:</string>
+                   <string notr="true">Заменить:</string>
                   </property>
                   <property name="margin">
                    <number>0</number>
@@ -300,7 +300,7 @@
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
-                   <string>Delete:</string>
+                   <string notr="true">Удалить:</string>
                   </property>
                  </widget>
                 </item>
@@ -314,7 +314,7 @@
                 <item row="1" column="2">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
-                   <string>Restore:</string>
+                   <string notr="true">Восстановить:</string>
                   </property>
                   <property name="margin">
                    <number>0</number>

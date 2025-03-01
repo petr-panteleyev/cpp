@@ -44,10 +44,10 @@ namespace {
 constexpr int TAB_FIELDS = 0;
 constexpr int TAB_NOTE = 1;
 
-static const QString FILE_FILTERS{"Password Files (*.pwd);;All Files (*.*)"};
+const QString FILE_FILTERS{"Password Files (*.pwd);;All Files (*.*)"};
 
-static const QString ABOUT_TEXT = R"(
-<h1>Менеджер паролей</h1>
+const QString ABOUT_TEXT = R"(
+<h1>Password Manager</h1>
 <table border='0'>
 <tr><td>Версия:<td>%1
 <tr><td>Дата сборки:<td>%2
@@ -59,12 +59,12 @@ Copyright &copy; 2024-2025 Petr Panteleyev
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, cardModel_{new CardTableItemModel{this}},
-      sortFilterModel_{new CardTableSortFilterModel{this}}, fieldModel_{new FieldTableItemModel{this}},
-      fieldFilterModel_{new FieldTableSortFilterModel{this}}, copyFieldAction_{new QAction{this}},
-      openLinkAction_{new QAction{"Открыть ссылку", this}}, fieldContextMenu_{new QMenu{this}}, currentFileName_{""},
-      passwordDialog_{new PasswordDialog{this}}, changePasswordDialog_{new ChangePasswordDialog{this}},
-      cardEditDialog_{new CardEditDialog{this}}, importDialog_{new ImportDialog{this}},
-      settingsDialog_{new SettingsDialog{this}} {
+      sortFilterModel_{new CardTableSortFilterModel{this}}, cardContextMenu_{new QMenu{this}},
+      fieldModel_{new FieldTableItemModel{this}}, fieldFilterModel_{new FieldTableSortFilterModel{this}},
+      copyFieldAction_{new QAction{this}}, openLinkAction_{new QAction{"Открыть ссылку", this}},
+      fieldContextMenu_{new QMenu{this}}, currentFileName_{""}, passwordDialog_{new PasswordDialog{this}},
+      changePasswordDialog_{new ChangePasswordDialog{this}}, cardEditDialog_{new CardEditDialog{this}},
+      importDialog_{new ImportDialog{this}}, settingsDialog_{new SettingsDialog{this}} {
     ui->setupUi(this);
 
     sortFilterModel_->setSourceModel(cardModel_);
@@ -73,9 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
     sortFilterModel_->sort(0);
 
     auto header = ui->cardListView->horizontalHeader();
-    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(1, QHeaderView::Stretch);
-    header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(CardTableItemModel::ICON_COLUMN, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(CardTableItemModel::NAME_COLUMN, QHeaderView::Stretch);
+    header->setSectionResizeMode(CardTableItemModel::AUX_COLUMN, QHeaderView::ResizeToContents);
 
     ui->cardListView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->cardListView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -100,6 +100,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setTabIcon(TAB_FIELDS, Picture::GENERIC.icon());
     ui->tabWidget->setTabText(TAB_NOTE, Str::NOTES);
     ui->tabWidget->setTabIcon(TAB_NOTE, Picture::NOTE.icon());
+
+    setupCardContextMenu();
 
     // Field context menu
     QtHelpers::addActions(fieldContextMenu_, {copyFieldAction_, openLinkAction_});
@@ -140,7 +142,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(copyFieldAction_, &QAction::triggered, this, &MainWindow::onCopyField);
     connect(openLinkAction_, &QAction::triggered, this, &MainWindow::onOpenLink);
 
-    connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::onEditMenuAboutToShow);
+    connect(ui->menuEdit, &QMenu::aboutToShow, this, &MainWindow::updateActionsState);
 
     connect(passwordDialog_, &QDialog::accepted, this, &MainWindow::onPasswordDialogAccepted);
     connect(settingsDialog_, &QDialog::accepted, [this]() { updateFonts(); });
@@ -246,7 +248,7 @@ void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIn
         ui->tabWidget->setTabVisible(TAB_NOTE, false);
     }
 
-    onEditMenuAboutToShow();
+    updateActionsState();
 }
 
 void MainWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
@@ -407,21 +409,25 @@ void MainWindow::onActionNew() {
     writeFile();
 }
 
-void MainWindow::onEditMenuAboutToShow() {
+void MainWindow::updateActionsState() {
     bool hasCurrentCard = false;
     auto index = currentIndex();
     if (index.isValid()) {
         hasCurrentCard = true;
     }
 
-    QtHelpers::enableActions(hasCurrentCard, {ui->actionEdit, ui->actionFavorite, ui->actionDelete});
+    ui->actionDelete->setEnabled(hasCurrentCard);
 
     if (hasCurrentCard) {
         const auto &card = this->cardModel_->cardAtIndex(index.row());
+        QtHelpers::enableActions(card.active(), {ui->actionEdit, ui->actionFavorite});
         ui->actionRestore->setVisible(!card.active());
         ui->actionRestore->setEnabled(!card.active());
         ui->actionDelete->setText(card.active() ? Str::DELETE : Str::PURGE);
         ui->actionFavorite->setChecked(card.favorite());
+    } else {
+        ui->actionEdit->setEnabled(false);
+        ui->actionFavorite->setEnabled(false);
     }
 }
 
@@ -456,6 +462,7 @@ void MainWindow::onActionDelete() {
             return;
         }
         card.setActive(false);
+        card.setFavorite(false);
         cardModel_->cardUpdated(index.row());
     } else {
         auto result =
@@ -469,6 +476,7 @@ void MainWindow::onActionDelete() {
     sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
+    updateActionsState();
 }
 
 void MainWindow::scrollToCurrentCard() {
@@ -490,6 +498,7 @@ void MainWindow::onActionRestore() {
     sortFilterModel_->invalidate();
     scrollToCurrentCard();
     writeFile();
+    updateActionsState();
 }
 
 void MainWindow::onActionPurge() {
@@ -504,7 +513,7 @@ void MainWindow::onActionPurge() {
 }
 
 void MainWindow::onActionExport() {
-    auto fileName = QFileDialog::getSaveFileName(this, "Экспорт", QString(), FILE_FILTERS);
+    auto fileName = QFileDialog::getSaveFileName(this, Str::EXPORT, QString(), FILE_FILTERS);
     if (fileName.isEmpty()) {
         return;
     }
@@ -592,4 +601,22 @@ void MainWindow::updateFonts() {
             menu->setFont(menuFont);
         }
     }
+}
+
+void MainWindow::setupCardContextMenu() {
+    QtHelpers::addActions(cardContextMenu_, {
+                                                ui->actionEdit,
+                                                ui->actionFavorite,
+                                                nullptr,
+                                                ui->actionDelete,
+                                                ui->actionRestore,
+                                            });
+
+    connect(ui->cardListView, &QTableView::customContextMenuRequested, [this](auto pos) {
+        auto index = ui->cardListView->indexAt(pos);
+        if (!index.isValid()) {
+            return;
+        }
+        cardContextMenu_->popup(ui->cardListView->viewport()->mapToGlobal(pos));
+    });
 }

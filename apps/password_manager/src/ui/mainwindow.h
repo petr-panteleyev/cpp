@@ -46,10 +46,12 @@ class MainWindow : public QMainWindow {
     void updateWindowTitle();
     void scrollToCurrentCard();
 
+    void setupCardContextMenu();
+
     // Actions and other events
     void onCopyField();
     void onOpenLink();
-    void onEditMenuAboutToShow();
+    void updateActionsState();
     void onFieldTableDoubleClicked(const QModelIndex &index);
     void onFieldTableContextMenuRequested(QPoint pos);
     void onCurrentCardChanged(const QModelIndex &current, const QModelIndex &previous);
@@ -84,6 +86,7 @@ class MainWindow : public QMainWindow {
 
     CardTableItemModel *cardModel_;
     CardTableSortFilterModel *sortFilterModel_;
+    QMenu *cardContextMenu_;
 
     FieldTableItemModel *fieldModel_;
     FieldTableSortFilterModel *fieldFilterModel_;

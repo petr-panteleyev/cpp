@@ -14,6 +14,7 @@ const inline QString ADD{"Добавить"};
 const inline QString COPY{"Копировать"};
 const inline QString CRITICAL_ERROR{"Критическая ошибка"};
 const inline QString DELETE{"Удалить"};
+const inline QString EXPORT{"Экспорт"};
 const inline QString IMPORT{"Импорт"};
 const inline QString LOGIN{"Логин"};
 const inline QString LONG_PASSWORD{"Длинный пароль"};

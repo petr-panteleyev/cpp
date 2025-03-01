@@ -8,7 +8,12 @@
 #include "picture.h"
 #include "settings.h"
 
-static const QString MASK = "*****";
+namespace {
+
+const QString MASK = "*****";
+const QColor LINK_COLOR{0, 0, 255};
+
+} // namespace
 
 void FieldTableItemModel::setItems(const std::vector<Field> &items) {
     beginResetModel();
@@ -36,7 +41,13 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
             switch (role) {
                 case Qt::DisplayRole: return field->showContent() ? field->getValueAsString() : MASK;
                 case Qt::TextAlignmentRole: return Qt::AlignLeft;
-                case Qt::ForegroundRole: return Settings::getColor(Settings::Color::FieldValue);
+                case Qt::ForegroundRole: {
+                    if (field->type() == FieldType::LINK) {
+                        return LINK_COLOR;
+                    } else {
+                        return Settings::getColor(Settings::Color::FieldValue);
+                    }
+                }
                 case Qt::DecorationRole: {
                     if (field->type() == FieldType::CARD_TYPE) {
                         auto ordinal = field->value().toUInt();
