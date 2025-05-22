@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -13,6 +13,7 @@
 #include "version.h"
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <ranges>
 
 static constexpr int CELL_SIZE{40};
 static constexpr QSize IMAGE_SIZE{24, 24};
@@ -42,8 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, game_{*this}, eventFilter_{this},
       boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
       lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
-      scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}},
-      boardSizeDialog_{new BoardSizeDialog{this}} {
+      scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}}, boardSizeDialog_{new BoardSizeDialog{this}} {
     ui->setupUi(this);
 
     scoreBoard_.load();

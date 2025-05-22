@@ -21,7 +21,7 @@ class CardEditDialog final : public QDialog {
     ~CardEditDialog();
 
     void setCard(const Card &card);
-    const Card &card() const { return card_; };
+    const Card &card() const { return card_; }
 
     virtual void done(int code) override;
 

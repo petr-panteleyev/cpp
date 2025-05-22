@@ -28,7 +28,7 @@ template <typename T> class EnumClass {
   public:
     virtual ~EnumClass() = default;
 
-    static const std::vector<std::reference_wrapper<const T>> &values() noexcept { return values_; };
+    static const std::vector<std::reference_wrapper<const T>> &values() noexcept { return values_; }
 
     static const T &valueOf(const std::string &name) {
         for (const T &v : values()) {
@@ -45,8 +45,8 @@ template <typename T> class EnumClass {
     explicit EnumClass(const std::string &name) noexcept : ordinal_{nextOrdinal_++}, name_{name} {}
 
   private:
-    EnumClass<T>(const EnumClass<T> &) = delete;
-    EnumClass<T>(const EnumClass<T> &&) = delete;
+    EnumClass(const EnumClass &) = delete;
+    EnumClass(const EnumClass &&) = delete;
 
   private:
     const unsigned ordinal_;

@@ -36,6 +36,7 @@
 #include <QTimer>
 #include <iterator>
 #include <memory>
+#include <ranges>
 
 using namespace Crypto;
 
@@ -570,7 +571,7 @@ std::vector<Card> MainWindow::loadRecords(const QString &fileName, const QString
         QDomDocument doc;
 
         if (password.isEmpty()) {
-            bool success = doc.setContent(&file);
+            auto success = doc.setContent(&file);
             if (!success) {
                 throw PasswordManagerException("File cannot be parsed!");
             }

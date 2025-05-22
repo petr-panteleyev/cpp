@@ -4,6 +4,7 @@
 #include "decimal.h"
 #include "arithmeticexception.h"
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <cmath>
