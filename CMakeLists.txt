@@ -1,7 +1,7 @@
-# Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+# Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.31)
 
 project(cpp VERSION 1.0.0 LANGUAGES CXX)
 

@@ -1,6 +1,7 @@
 # C++
 
-[![License](docs/license.svg)](LICENSE)
+[![License](https://www.panteleyev.org/badges/license-bsd-2.svg)](LICENSE)
+[![C++](https://www.panteleyev.org/badges/cpp-20.svg)](https://jdk.java.net/archive/)
 
 Монорепозиторий для C++.
 
@@ -19,8 +20,8 @@
 ## Сборка
 
 Требования:
-* gcc 10+ (C++20 совместимый компилятор)
-* cmake 3.23+
+* gcc 13+ (C++20 совместимый компилятор)
+* cmake 3.31+
 * Qt6
 * OpenSSL
 * GTest
