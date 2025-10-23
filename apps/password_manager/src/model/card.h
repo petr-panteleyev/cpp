@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef CARD_H
@@ -33,6 +33,13 @@ class Card final {
     ~Card() = default;
 
     Card &operator=(const Card &) = default;
+
+    bool operator==(const Card &that) const noexcept {
+        return this->cardClass_.get() == that.cardClass_.get() && this->uuid_ == that.uuid_ &&
+               this->picture_.get() == that.picture_.get() && this->name_ == that.name_ &&
+               this->modified_ == that.modified_ && this->note_ == that.note_ && this->favorite_ == that.favorite_ &&
+               this->active_ == that.active_ && this->fields_ == that.fields_;
+    }
 
   public:
     const CardClass &cardClass() const { return cardClass_; }

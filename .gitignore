@@ -1,4 +1,5 @@
 build/
 .vscode/
+.cache/
 
 CMakeLists.txt.user

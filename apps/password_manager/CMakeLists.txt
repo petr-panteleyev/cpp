@@ -1,7 +1,7 @@
-# Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+# Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_manager VERSION 25.3.1 LANGUAGES CXX)
+project(password_manager VERSION 25.10.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -9,11 +9,13 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
+find_package(XercesC REQUIRED COMPONENTS XercesC)
 
 qt_add_executable(password_manager)
 add_subdirectory(src)
+add_subdirectory(test)
 
 target_compile_options(password_manager PRIVATE
     -Werror
@@ -34,11 +36,17 @@ qt_add_resources(password_manager "resources"
     FILES ${PASSWORD_MANAGER_RESOURCE_FILES}
 )
 
+qt_add_resources(password_manager "xsd"
+    PREFIX "/xsd"
+    BASE "resources/xsd"
+    FILES "resources/xsd/password-manager.xsd"
+)
+
 target_link_libraries(password_manager PRIVATE 
     Qt6::Core
     Qt6::Widgets
-    Qt6::Xml
     OpenSSL::Crypto
+    XercesC::XercesC
     pwdgen
     qthelpers
 )

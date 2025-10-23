@@ -17,3 +17,5 @@ AllowShortBlocksOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortLambdasOnASingleLine: Inline
+
+BreakTemplateDeclarations: Yes

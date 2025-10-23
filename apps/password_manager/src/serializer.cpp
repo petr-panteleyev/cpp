@@ -1,208 +1,316 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "serializer.h"
-#include "cardclass.h"
+#include "serializer.hpp"
 #include "creditcardtype.h"
 #include "exceptions.h"
 #include "field.h"
-#include "fieldtype.h"
-#include "picture.h"
-#include "quuid.h"
+#include "qiodevicebase.h"
 #include "version.h"
 #include <QDate>
-#include <QDomElement>
-#include <QDomNamedNodeMap>
-#include <QUuid>
-#include <QXmlStreamWriter>
+#include <QFile>
+#include <QString>
+#include <string>
+#include <vector>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
+#include <xercesc/framework/MemBufFormatTarget.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/sax2/DefaultHandler.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/Xerces_autoconf_config.hpp>
 
-namespace Serializer {
+using namespace xercesc;
 
-static const QString WALLET{"wallet"};
-static const QString RECORDS{"records"};
+namespace {
 
-static const QString RECORD{"record"};
-
-static const QString ELEMENT_FIELDS{"fields"};
-static const QString ELEMENT_FIELD{"field"};
-static const QString ELEMENT_NOTE{"note"};
-
-static const QString ATTR_VERSION{"version"};
-static const QString ATTR_RECORD_CLASS{"recordClass"};
-static const QString ATTR_UUID{"uuid"};
-static const QString ATTR_NAME{"name"};
-static const QString ATTR_MODIFIED{"modified"};
-static const QString ATTR_FAVORITE{"favorite"};
-static const QString ATTR_ACTIVE{"active"};
-static const QString ATTR_PICTURE{"picture"};
-static const QString ATTR_TYPE{"type"};
-static const QString ATTR_VALUE{"value"};
-
-static QString getStringAttribute(const QDomNamedNodeMap &attributes, const QString &name,
-                                  const QString &defaultValue) {
-    if (attributes.contains(name)) {
-        return attributes.namedItem(name).toAttr().value();
-    } else {
-        return defaultValue;
-    }
+template <typename T>
+auto autoReleased(T *p) {
+    return std::unique_ptr<T, void (*)(T *)>{p, [](auto *ptr) {
+                                                 ptr->release();
+                                             }};
 }
 
-static QUuid getUuidAttribute(const QDomNamedNodeMap &attributes, const QString &name) {
-    if (attributes.contains(name)) {
-        auto stringValue = attributes.namedItem(name).toAttr().value();
-        return QUuid{stringValue};
+QString XtoQ(const XMLCh *x) {
+    return QString::fromUtf16(x);
+}
+
+const XMLCh *QtoX(const QString &s) {
+    return reinterpret_cast<const XMLCh *>(s.utf16());
+}
+
+class PasswordManagerErrorHandler : public DefaultHandler {
+  public:
+    void fatalError(const SAXParseException &exc) override { handle(exc); }
+    void error(const SAXParseException &exc) override { handle(exc); }
+    void warning(const SAXParseException &exc) override { handle(exc); }
+
+  private:
+    void handle(const SAXParseException &exc) { throw PasswordManagerException(XtoQ(exc.getMessage())); }
+};
+
+static const XMLCh *WALLET{u"wallet"};
+static const XMLCh *RECORDS{u"records"};
+
+static const XMLCh *IMPL{u"LS"};
+
+static const XMLCh *RECORD{u"record"};
+
+static const XMLCh *ELEMENT_FIELDS{u"fields"};
+static const XMLCh *ELEMENT_FIELD{u"field"};
+static const XMLCh *ELEMENT_NOTE{u"note"};
+
+static const XMLCh *ATTR_VERSION{u"version"};
+static const XMLCh *ATTR_RECORD_CLASS{u"recordClass"};
+static const XMLCh *ATTR_UUID{u"uuid"};
+static const XMLCh *ATTR_NAME{u"name"};
+static const XMLCh *ATTR_MODIFIED{u"modified"};
+static const XMLCh *ATTR_FAVORITE{u"favorite"};
+static const XMLCh *ATTR_ACTIVE{u"active"};
+static const XMLCh *ATTR_PICTURE{u"picture"};
+static const XMLCh *ATTR_TYPE{u"type"};
+static const XMLCh *ATTR_VALUE{u"value"};
+
+// XSD schema buffer
+static QByteArray XSD_SCHEMA;
+
+static const XMLCh *fieldValueToString(const Field &field) {
+    auto value = field.value();
+    const auto &type = field.type();
+
+    QString str;
+    if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
+        auto date = value.toDate();
+        str = date.toString("yyyy-MM-dd");
+    } else if (type == FieldType::CARD_TYPE) {
+        auto ordinal = value.toUInt();
+        auto &creditCardType = CreditCardType::valueOf(ordinal);
+        str = QString::fromStdString(creditCardType.name());
     } else {
+        str = value.toString();
+    }
+    return QtoX(str);
+}
+
+QString getStringAttribute(const DOMNamedNodeMap *attributes, const XMLCh *name, const QString &defaultValue) {
+    auto node = attributes->getNamedItem(name);
+    if (node == nullptr) {
+        return defaultValue;
+    }
+
+    auto value = node->getNodeValue();
+    if (value == nullptr) {
+        return defaultValue;
+    }
+
+    return XtoQ(value);
+}
+
+QUuid getUuidAttribute(const DOMNamedNodeMap *attributes, const XMLCh *name) {
+    auto node = attributes->getNamedItem(name);
+    if (node == nullptr) {
         return QUuid::createUuid();
     }
-}
 
-static long getLongAttribute(const QDomNamedNodeMap &attributes, const QString &name, long defaultValue) {
-    if (attributes.contains(name)) {
-        bool ok;
-        auto long_value = attributes.namedItem(name).toAttr().value().toLong(&ok);
-        return ok ? long_value : defaultValue;
-    } else {
-        return defaultValue;
+    auto value = node->getNodeValue();
+    if (value == nullptr) {
+        return QUuid::createUuid();
     }
-    return defaultValue;
+
+    return QUuid{XtoQ(value)};
 }
 
-static bool getBoolAttribute(const QDomNamedNodeMap &attributes, const QString &name, bool defaultValue) {
-    if (attributes.contains(name)) {
-        auto bool_value = attributes.namedItem(name).toAttr().value();
-        return bool_value == "true";
-    } else {
-        return defaultValue;
-    }
+long getLongAttribute(const DOMNamedNodeMap *attributes, const XMLCh *name, long defaultValue) {
+    auto stringValue = ::getStringAttribute(attributes, name, QString::fromStdString(std::to_string(defaultValue)));
+    bool ok;
+    auto long_value = stringValue.toLong(&ok);
+    return ok ? long_value : defaultValue;
 }
 
-static void deserializeField(const QDomElement &fieldElement, std::vector<Field> &fields) {
-    auto attrs = fieldElement.attributes();
+bool getBoolAttribute(const DOMNamedNodeMap *attributes, const XMLCh *name, bool defaultValue) {
+    auto stringValue = ::getStringAttribute(attributes, name, QString::fromStdString(std::to_string(defaultValue)));
+    return stringValue == "true";
+}
 
-    auto fieldTypeStr = getStringAttribute(attrs, ATTR_TYPE, "STRING");
+void deserializeField(const DOMElement *fieldElement, std::vector<Field> &fields) {
+    auto attrs = fieldElement->getAttributes();
+
+    auto fieldTypeStr = ::getStringAttribute(attrs, ATTR_TYPE, "STRING");
     auto &fieldType = FieldType::valueOf(fieldTypeStr.toStdString());
 
-    auto name = getStringAttribute(attrs, ATTR_NAME, "");
+    auto name = ::getStringAttribute(attrs, ATTR_NAME, "");
 
-    auto stringValue = getStringAttribute(attrs, ATTR_VALUE, "");
+    auto stringValue = ::getStringAttribute(attrs, ATTR_VALUE, "");
     QVariant value = Field::deserialize(stringValue, fieldType);
 
     fields.emplace_back(fieldType, name, value);
 }
 
-static void deserializeCard(const QDomElement &cardElement, std::vector<Card> &cards) {
-    auto attrs = cardElement.attributes();
+static void deserializeCard(const DOMElement *cardElement, std::vector<Card> &cards) {
+    auto attrs = cardElement->getAttributes();
 
-    auto cardClassAttr = getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
+    auto cardClassAttr = ::getStringAttribute(attrs, ATTR_RECORD_CLASS, "CARD");
     auto &cardClass = CardClass::valueOf(cardClassAttr.toStdString());
 
-    auto uuid = getUuidAttribute(attrs, ATTR_UUID);
-    auto name = getStringAttribute(attrs, ATTR_NAME, "");
+    auto uuid = ::getUuidAttribute(attrs, ATTR_UUID);
+    auto name = ::getStringAttribute(attrs, ATTR_NAME, "");
     if (name.isEmpty()) {
         throw PasswordManagerException("Mandatory attribute name is missing");
     }
 
-    auto pictureStrValue = getStringAttribute(attrs, ATTR_PICTURE, "GENERIC");
+    auto pictureStrValue = ::getStringAttribute(attrs, ATTR_PICTURE, "GENERIC");
     auto &picture = Picture::valueOf(pictureStrValue.toStdString());
-    auto modified = getLongAttribute(attrs, ATTR_MODIFIED, 0L);
-    bool favorite = getBoolAttribute(attrs, ATTR_FAVORITE, false);
-    auto active = getBoolAttribute(attrs, ATTR_ACTIVE, true);
+    auto modified = ::getLongAttribute(attrs, ATTR_MODIFIED, 0L);
+    bool favorite = ::getBoolAttribute(attrs, ATTR_FAVORITE, false);
+    auto active = ::getBoolAttribute(attrs, ATTR_ACTIVE, true);
 
     // Deserialize fields
-    auto fieldNodes = cardElement.elementsByTagName(ELEMENT_FIELD);
+    auto fieldNodes = cardElement->getElementsByTagName(ELEMENT_FIELD);
     std::vector<Field> fields;
-    fields.reserve(fieldNodes.count());
-    for (auto index = 0; index < fieldNodes.count(); ++index) {
-        auto fieldElement = fieldNodes.at(index).toElement();
+    fields.reserve(fieldNodes->getLength());
+    for (XMLSize_t index = 0; index < fieldNodes->getLength(); ++index) {
+        auto fieldElement = reinterpret_cast<DOMElement *>(fieldNodes->item(index));
         deserializeField(fieldElement, fields);
     }
 
     // Deserialize note
     QString note;
-    auto noteNodes = cardElement.elementsByTagName(ELEMENT_NOTE);
-    if (!noteNodes.isEmpty()) {
-        note = noteNodes.at(0).toElement().text();
+    auto noteNodes = cardElement->getElementsByTagName(ELEMENT_NOTE);
+    if (noteNodes != nullptr && noteNodes->getLength() != 0) {
+        auto nodeElement = reinterpret_cast<DOMElement *>(noteNodes->item(0));
+        note = XtoQ(nodeElement->getTextContent());
     }
 
     cards.emplace_back(cardClass, uuid, picture, name, modified, note, favorite, active, fields);
 }
 
-void deserialize(const QDomDocument &doc, std::vector<Card> &cards) {
-    auto recordNodes = doc.elementsByTagName("record");
-    cards.reserve(recordNodes.size());
-    for (auto index = 0; index < recordNodes.size(); ++index) {
-        auto node = recordNodes.at(index);
-        deserializeCard(node.toElement(), cards);
+} // namespace
+
+namespace Serializer {
+
+void initialize() {
+    QString fileName(":/xsd/password-manager.xsd");
+    QFile file(fileName);
+    file.open(QIODeviceBase::ReadOnly);
+    XSD_SCHEMA = file.readAll();
+}
+
+void deserialize(const std::span<char> &content, std::vector<Card> &cards) {
+    MemBufInputSource inputSource(reinterpret_cast<XMLByte *>(content.data()), content.size(), "bufferid");
+    MemBufInputSource xsdInputSource(reinterpret_cast<XMLByte *>(XSD_SCHEMA.data()), XSD_SCHEMA.size(), "xsd");
+
+    XercesDOMParser parser;
+
+    if (parser.loadGrammar(xsdInputSource, Grammar::GrammarType::SchemaGrammarType, true) == nullptr) {
+        throw PasswordManagerException("Failed to load XSD schema");
+    }
+
+    ::PasswordManagerErrorHandler errorHandler;
+    parser.setErrorHandler(&errorHandler);
+
+    parser.setValidationScheme(XercesDOMParser::Val_Always);
+    parser.setDoSchema(true);
+    parser.setDoNamespaces(true);
+    parser.useCachedGrammarInParse(true);
+    parser.setValidationConstraintFatal(true);
+    parser.setValidationSchemaFullChecking(true);
+
+    parser.parse(inputSource);
+
+    if (parser.getErrorCount() != 0) {
+        throw PasswordManagerException("Error parsing document");
+    }
+
+    auto doc = parser.getDocument();
+    auto root = doc->getDocumentElement();
+
+    auto nodeList = root->getElementsByTagName(RECORD);
+    XMLSize_t length = nodeList->getLength();
+    cards.reserve(length);
+    for (XMLSize_t i = 0; i < length; i++) {
+        auto node = reinterpret_cast<DOMElement *>(nodeList->item(i));
+        deserializeCard(node, cards);
     }
 }
 
-static QString fieldValueToString(const Field &field) {
-    auto value = field.value();
-    const auto &type = field.type();
+static void serializeField(DOMDocument *doc, DOMElement *parent, const Field &field) {
+    auto fieldElement = doc->createElement(ELEMENT_FIELD);
 
-    if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
-        auto date = value.toDate();
-        return date.toString("yyyy-MM-dd");
-    } else if (type == FieldType::CARD_TYPE) {
-        auto ordinal = value.toUInt();
-        auto &creditCardType = CreditCardType::valueOf(ordinal);
-        return QString::fromStdString(creditCardType.name());
-    } else {
-        return value.toString();
-    }
+    fieldElement->setAttribute(ATTR_NAME, QtoX(field.name()));
+    fieldElement->setAttribute(ATTR_TYPE, QtoX(QString::fromStdString(field.type().name())));
+    fieldElement->setAttribute(ATTR_VALUE, fieldValueToString(field));
+
+    parent->appendChild(fieldElement);
 }
 
-static void serializeField(QXmlStreamWriter &stream, const Field &field) {
-    stream.writeStartElement(ELEMENT_FIELD);
-    stream.writeAttribute(ATTR_NAME, field.name());
-    stream.writeAttribute(ATTR_TYPE, QString::fromStdString(field.type().name()));
-    stream.writeAttribute(ATTR_VALUE, fieldValueToString(field));
-    stream.writeEndElement();
-}
+static void serializeCard(DOMDocument *doc, DOMElement *parent, const Card &card) {
+    XMLCh buffer[10];
 
-static void serializeCard(QXmlStreamWriter &stream, const Card &card) {
-    stream.writeStartElement(RECORD);
+    auto record = doc->createElement(RECORD);
+    parent->appendChild(record);
 
     // Attributes
-    stream.writeAttribute(ATTR_RECORD_CLASS, QString::fromStdString(card.cardClass().name()));
-    stream.writeAttribute(ATTR_NAME, card.name());
-    stream.writeAttribute(ATTR_UUID, card.uuid().toString(QUuid::WithoutBraces));
-    stream.writeAttribute(ATTR_MODIFIED, QString::number(card.modified()));
-    stream.writeAttribute(ATTR_PICTURE, QString::fromStdString(card.picture().name()));
-    stream.writeAttribute(ATTR_FAVORITE, card.favorite() ? "true" : "false");
-    stream.writeAttribute(ATTR_ACTIVE, card.active() ? "true" : "false");
+    record->setAttribute(ATTR_RECORD_CLASS, QtoX(QString::fromStdString(card.cardClass().name())));
+    record->setAttribute(ATTR_NAME, QtoX(card.name()));
+    record->setAttribute(ATTR_UUID, QtoX(card.uuid().toString(QUuid::WithoutBraces)));
+    record->setAttribute(ATTR_MODIFIED, QtoX(QString::number(card.modified())));
+    record->setAttribute(ATTR_PICTURE, QtoX(QString::fromStdString(card.picture().name())));
+    XMLString::transcode(card.favorite() ? "true" : "false", buffer, 9);
+    record->setAttribute(ATTR_FAVORITE, buffer);
+    XMLString::transcode(card.active() ? "true" : "false", buffer, 9);
+    record->setAttribute(ATTR_ACTIVE, buffer);
 
     // Fields
     if (!card.fields().empty()) {
-        stream.writeStartElement(ELEMENT_FIELDS);
+        auto fields = doc->createElement(ELEMENT_FIELDS);
+        record->appendChild(fields);
         for (const auto &field : card.fields()) {
-            serializeField(stream, field);
+            serializeField(doc, fields, field);
         }
-        stream.writeEndElement();
     }
 
     // Note
-    stream.writeTextElement(ELEMENT_NOTE, card.note());
-    stream.writeEndElement();
+    auto note = doc->createElement(ELEMENT_NOTE);
+    record->appendChild(note);
+    note->setTextContent(QtoX(card.note()));
 }
 
 void serialize(const std::vector<Card> &list, QByteArray &byteArray) {
-    QXmlStreamWriter stream{&byteArray};
+    try {
+        auto impl = DOMImplementationRegistry::getDOMImplementation(IMPL);
 
-    stream.writeStartDocument();
+        auto doc = ::autoReleased(impl->createDocument(nullptr, WALLET, nullptr));
 
-    stream.writeStartElement(WALLET);
-    stream.writeAttribute(ATTR_VERSION, QString::fromStdString(Version::projectVersion));
+        auto root = doc->getDocumentElement();
+        root->setAttribute(ATTR_VERSION, QtoX(QString::fromStdString(Version::projectVersion)));
 
-    stream.writeStartElement(RECORDS);
+        auto records = doc->createElement(RECORDS);
+        root->appendChild(records);
 
-    for (const auto &card : list) {
-        serializeCard(stream, card);
+        for (const auto &card : list) {
+            serializeCard(doc.get(), records, card);
+        }
+
+        auto serializer = ::autoReleased(impl->createLSSerializer());
+        auto output = ::autoReleased(impl->createLSOutput());
+
+        auto target = MemBufFormatTarget();
+        output->setByteStream(&target);
+
+        serializer->write(doc.get(), output.get());
+
+        auto bufferSize = target.getLen();
+        byteArray.resize(bufferSize);
+        std::memcpy(byteArray.data(), target.getRawBuffer(), bufferSize);
+    } catch (const XMLException &ex) {
+        throw PasswordManagerException(XtoQ(ex.getMessage()));
+    } catch (const DOMException &ex) {
+        throw PasswordManagerException(XtoQ(ex.getMessage()));
+    } catch (...) {
+        throw PasswordManagerException("Unknown exception while writing document");
     }
-
-    stream.writeEndElement();
-    stream.writeEndElement();
-    stream.writeEndDocument();
 }
 
 } // namespace Serializer

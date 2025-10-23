@@ -1,5 +1,5 @@
 {
-    "version": 4,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
         "minor": 31,
@@ -12,9 +12,10 @@
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            },
-            "environment": {}
+                "CMAKE_BUILD_TYPE": "Debug",
+                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON",
+                "QT_FORCE_CMP0156_TO_VALUE": "NEW"                
+            }
         },
         {
             "name": "release",
@@ -23,7 +24,9 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/build/install",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON",
+                "QT_FORCE_CMP0156_TO_VALUE": "NEW"
             }
         }
     ],
@@ -31,13 +34,15 @@
         {
             "name": "debug",
             "displayName": "All - Debug",
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "jobs": 10
         },
         {
             "name": "release",
             "displayName": "All - Release",
             "configurePreset": "release",
-            "cleanFirst": true
+            "cleanFirst": true,
+            "jobs": 10
         },
         {
             "name": "install",

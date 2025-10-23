@@ -1,12 +1,17 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
+#include "serializer.hpp"
 #include "str.h"
 #include "translations.h"
 #include "ui/mainwindow.h"
 #include <QApplication>
+#include <xercesc/util/PlatformUtils.hpp>
 
 int main(int argc, char *argv[]) {
+    xercesc::XMLPlatformUtils::Initialize();
+    Serializer::initialize();
+
     QApplication a(argc, argv);
     a.setWindowIcon(QIcon(":images/icon.png"));
 

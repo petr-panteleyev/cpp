@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #ifndef FIELD_H
@@ -16,6 +16,10 @@ class Field final {
     ~Field() = default;
 
     Field &operator=(const Field &) noexcept = default;
+
+    bool operator==(const Field &that) const noexcept {
+        return this->type_.get() == that.type_.get() && this->name_ == that.name_ && this->value_ == that.value_;
+    }
 
     const FieldType &type() const noexcept { return type_; }
     const QString &name() const noexcept { return name_; }

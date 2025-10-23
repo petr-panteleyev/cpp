@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -22,7 +22,7 @@
 #include "passworddialog.h"
 #include "qmainwindow.h"
 #include "qthelpers.h"
-#include "serializer.h"
+#include "serializer.hpp"
 #include "settings.h"
 #include "settingsdialog.h"
 #include "str.h"
@@ -30,13 +30,13 @@
 #include "version.h"
 #include <QClipboard>
 #include <QDesktopServices>
-#include <QDomDocument>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTimer>
 #include <iterator>
 #include <memory>
 #include <ranges>
+#include <vector>
 
 using namespace Crypto;
 
@@ -66,6 +66,9 @@ MainWindow::MainWindow(QWidget *parent)
       fieldContextMenu_{new QMenu{this}}, currentFileName_{""}, passwordDialog_{new PasswordDialog{this}},
       changePasswordDialog_{new ChangePasswordDialog{this}}, cardEditDialog_{new CardEditDialog{this}},
       importDialog_{new ImportDialog{this}}, settingsDialog_{new SettingsDialog{this}} {
+
+    //    xercesc::XMLPlatformUtils::Initialize();
+
     ui->setupUi(this);
 
     sortFilterModel_->setSourceModel(cardModel_);
@@ -568,22 +571,19 @@ std::vector<Card> MainWindow::loadRecords(const QString &fileName, const QString
     if (!file.open(QIODevice::ReadOnly)) {
         throw PasswordManagerException(Str::UNABLE_TO_OPEN_FILE);
     } else {
-        QDomDocument doc;
+        std::vector<Card> result;
 
-        if (password.isEmpty()) {
-            auto success = doc.setContent(&file);
-            if (!success) {
-                throw PasswordManagerException("File cannot be parsed!");
-            }
-        } else {
-            auto data = file.readAll();
-            auto decrypted = aes256::decrypt(data, password.toStdString());
-            doc.setContent(QByteArray::fromRawData(decrypted.data(), decrypted.size()));
-        }
+        auto data = file.readAll();
         file.close();
 
-        std::vector<Card> result;
-        Serializer::deserialize(doc, result);
+        if (password.isEmpty()) {
+            std::vector<char> plain(data.begin(), data.end());
+            Serializer::deserialize(plain, result);
+        } else {
+            auto decrypted = aes256::decrypt(data, password.toStdString());
+            Serializer::deserialize(decrypted, result);
+        }
+
         return result;
     }
 }
