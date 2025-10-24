@@ -1,4 +1,4 @@
-# Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+# Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
 project(password_generator VERSION 24.11.1 LANGUAGES CXX)
@@ -13,14 +13,11 @@ set(PASSWORD_GENERATOR_RESOURCE_FILES
     resources/icon.png
 )
 
-qt_add_executable(password_generator)
-add_subdirectory(src)
+FILE(GLOB_RECURSE headers "src/*.h" "src/*.hpp")
+FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
+qt_add_executable(password_generator ${headers} ${sources})
 
-target_compile_options(password_generator PRIVATE
-    -Werror
-    -Wall
-    -pedantic
-)
+target_compile_options(password_generator PRIVATE -Werror -Wall -pedantic)
 
 qt_add_resources(password_generator "resources"
     PREFIX "/images"
@@ -28,7 +25,10 @@ qt_add_resources(password_generator "resources"
     FILES ${PASSWORD_GENERATOR_RESOURCE_FILES}
 )
 
-target_link_libraries(password_generator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets pwdgen)
+target_link_libraries(password_generator PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    pwdgen
+)
 
 target_include_directories(password_generator PRIVATE
     ${CMAKE_SOURCE_DIR}/libs/pwdgen/src

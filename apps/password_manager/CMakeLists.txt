@@ -12,16 +12,17 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto)
 find_package(XercesC REQUIRED COMPONENTS XercesC)
+find_package(GTest REQUIRED)
 
-qt_add_executable(password_manager)
-add_subdirectory(src)
-add_subdirectory(test)
+#
+# Executable
+#
 
-target_compile_options(password_manager PRIVATE
-    -Werror
-    -Wall
-    -pedantic
-)
+FILE(GLOB_RECURSE headers "src/*.h" "src/*.hpp")
+FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
+qt_add_executable(password_manager ${headers} ${sources})
+
+target_compile_options(password_manager PRIVATE -Werror -Wall -pedantic)
 
 file(GLOB PASSWORD_MANAGER_RESOURCE_FILES "resources/*.png")
 
@@ -43,8 +44,8 @@ qt_add_resources(password_manager "xsd"
 )
 
 target_link_libraries(password_manager PRIVATE 
-    Qt6::Core
-    Qt6::Widgets
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
     OpenSSL::Crypto
     XercesC::XercesC
     pwdgen
@@ -56,6 +57,12 @@ target_include_directories(password_manager PRIVATE
     ${CMAKE_SOURCE_DIR}/libs/pwdgen/src
     ${CMAKE_SOURCE_DIR}/libs/common/src
     ${CMAKE_SOURCE_DIR}/libs/qthelpers/src
+    src
+    src/crypto
+    src/import
+    src/model
+    src/settings
+    src/ui
 )
 
 set_target_properties(password_manager PROPERTIES
@@ -75,3 +82,42 @@ install(FILES
     resources/icon.png
     DESTINATION password_manager
 )
+
+#
+# Test
+#
+
+add_executable(password_manager_tests)
+
+FILE(GLOB_RECURSE test_sources "test/*.cpp")
+target_sources(password_manager_tests PRIVATE
+    ${test_sources}
+    src/serializer.cpp
+    src/model/field.cpp
+    src/model/card.cpp
+    src/model/enums.cpp
+)
+
+target_include_directories(password_manager_tests PRIVATE
+    src
+    src/model
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/libs/common/src
+)
+
+qt_add_resources(password_manager_tests "xsd"
+    PREFIX "/xsd"
+    BASE "resources/xsd"
+    FILES "resources/xsd/password-manager.xsd"
+)
+
+target_link_libraries(password_manager_tests PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    XercesC::XercesC
+    ${GTEST_LIBRARIES}
+    gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(password_manager_tests)

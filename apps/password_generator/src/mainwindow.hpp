@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -30,4 +29,3 @@ class MainWindow : public QMainWindow {
   private:
     std::unique_ptr<Ui::MainWindow> ui;
 };
-#endif // MAINWINDOW_H

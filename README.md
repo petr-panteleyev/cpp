@@ -19,13 +19,13 @@
 
 ## Сборка
 
-Требования:
-* gcc 13+ (C++20 совместимый компилятор)
-* cmake 3.31+
-* Qt6.9
-* OpenSSL
-* Xerces-C++
-* GTest
+Проект собирается на следующем окружении:
+* gcc 13.2.1
+* cmake 3.31.7
+* Qt6.9.2
+* libcrypto 3.3.3
+* libxerces-c 3.2.5
+* GTest 1.13.0
 
 ```sh
 cmake . --preset <debug | release>
