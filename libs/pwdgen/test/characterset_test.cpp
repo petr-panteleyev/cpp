@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "characterset.h"
@@ -43,7 +43,6 @@ TEST(PwdGenCharsetTestSuite, containsAny_LOWER_CASE_CHARS) {
 TEST(PwdGenCharsetTestSuite, containsAny_DIGITS) {
     testContainsAny(CharacterSet::DIGITS, "a123");
 }
-
 
 TEST(PwdGenCharsetTestSuite, containsAny_SYMBOLS) {
     testContainsAny(CharacterSet::SYMBOLS, ",.123");

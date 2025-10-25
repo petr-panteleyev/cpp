@@ -1,8 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARD_H
-#define CARD_H
+#pragma once
 
 #include "cardclass.h"
 #include "field.h"
@@ -71,5 +70,3 @@ class Card final {
     bool active_;
     std::vector<Field> fields_;
 };
-
-#endif // CARD_H

@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDTABLEITEMMODEL_H
-#define CARDTABLEITEMMODEL_H
+#pragma once
 
 #include "card.h"
 #include <QAbstractItemModel>
@@ -54,5 +53,3 @@ class CardTableItemModel : public QAbstractItemModel {
 
     std::vector<Card> data_;
 };
-
-#endif // CARDTABLEITEMMODEL_H

@@ -39,9 +39,14 @@ cmake --build --preset <debug | release> [--target <target>]
 
 ## Тесты
 
-1. Собрать все (no --target) в отладочном режиме
-2. Запустить тесты
+```sh
+cmake --build --preset <debug | release>
+ctest --preset <debug | release>
+```
+
+или
+
 
 ```sh
-ctest --preset debug
+cmake --workflow --preset <debug | release>
 ```

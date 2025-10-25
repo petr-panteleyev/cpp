@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONNECTIONPROFILEDIALOG_H
-#define CONNECTIONPROFILEDIALOG_H
+#pragma once
 
 #include <QDialog>
 
@@ -31,5 +30,3 @@ class ConnectionProfileDialog : public QDialog {
 
     ConnectionProfileManager *profileManager_;
 };
-
-#endif // CONNECTIONPROFILEDIALOG_H

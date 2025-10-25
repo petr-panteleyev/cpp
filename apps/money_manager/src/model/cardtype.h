@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDTYPE_H
-#define CARDTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -35,5 +34,3 @@ const inline std::vector<CardTypeRef> Common::EnumClass<CardType>::values_{
     std::cref(CardType::NONE), std::cref(CardType::VISA), std::cref(CardType::MASTERCARD),
     std::cref(CardType::MIR),  std::cref(CardType::AMEX),
 };
-
-#endif // CARDTYPE_H

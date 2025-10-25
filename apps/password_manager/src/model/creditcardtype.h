@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CREDITCARDTYPE_H
-#define CREDITCARDTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <QString>
@@ -33,5 +32,3 @@ class CreditCardType final : public Common::EnumClass<CreditCardType> {
     QString cardTypeName_;
     const Picture &picture_;
 };
-
-#endif // CREDITCARDTYPE_H

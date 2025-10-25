@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONTACT_H
-#define CONTACT_H
+#pragma once
 
 #include "contacttype.h"
 #include "moneyrecord.h"
@@ -38,5 +37,3 @@ class Contact final : public MoneyRecord {
     QString zip_;
     std::optional<QUuid> iconUuid_;
 };
-
-#endif // CONTACT_H

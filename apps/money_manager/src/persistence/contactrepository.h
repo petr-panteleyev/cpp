@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONTACTREPOSITORY_H
-#define CONTACTREPOSITORY_H
+#pragma once
 
 #include "contact.h"
 #include "repository.h"
@@ -16,5 +15,3 @@ class ContactRepository final : public Repository<Contact> {
     virtual Contact fromResultSet(const ResultSet &rs) const override;
     virtual void fromResultSet(const ResultSet &rs, std::vector<Contact> &result) const override;
 };
-
-#endif // CONTACTREPOSITORY_H

@@ -43,7 +43,10 @@ qt_add_resources(sapper "fonts"
         resources/neat-lcd.ttf
 )
 
-target_link_libraries(sapper PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(sapper PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+)
 
 target_include_directories(sapper PRIVATE
   ${CMAKE_SOURCE_DIR}/include
@@ -80,7 +83,12 @@ target_include_directories(sapper_tests PRIVATE
     src/game
 )
 
-target_link_libraries(sapper_tests PRIVATE Qt6::Core Qt6::Widgets ${GTEST_LIBRARIES} gtest_main)
+target_link_libraries(sapper_tests PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${GTEST_LIBRARIES}
+    gtest_main
+)
 
 include(GoogleTest)
 gtest_discover_tests(sapper_tests)

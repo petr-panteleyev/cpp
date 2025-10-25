@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CURRENCY_H
-#define CURRENCY_H
+#pragma once
 
 #include "decimal.h"
 #include "moneyrecord.h"
@@ -30,5 +29,3 @@ class Currency final : public MoneyRecord {
     int direction_;
     bool useThousandSeparator_;
 };
-
-#endif // CURRENCY_H

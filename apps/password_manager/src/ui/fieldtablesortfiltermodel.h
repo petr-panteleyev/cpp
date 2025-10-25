@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef FIELDTABLESORTFILTERMODEL_H
-#define FIELDTABLESORTFILTERMODEL_H
+#pragma once
 
 #include <QSortFilterProxyModel>
 
@@ -12,5 +11,3 @@ class FieldTableSortFilterModel : public QSortFilterProxyModel {
 
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
-
-#endif // FIELDTABLESORTFILTERMODEL_H

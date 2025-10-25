@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef IMPORTACTION_H
-#define IMPORTACTION_H
+#pragma once
 
 enum class ImportAction {
     SKIP,
@@ -11,5 +10,3 @@ enum class ImportAction {
     DELETE,
     RESTORE,
 };
-
-#endif // IMPORTACTION_H

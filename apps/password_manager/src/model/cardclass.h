@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDCLASS_H
-#define CARDCLASS_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -26,5 +25,3 @@ const inline std::vector<CardClassRef> Common::EnumClass<CardClass>::values_{
     std::cref(CardClass::CARD),
     std::cref(CardClass::NOTE),
 };
-
-#endif // CARDCLASS_H

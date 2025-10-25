@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "cardwindow.h"
@@ -8,7 +8,6 @@
 #include "datacache.h"
 #include "imagecache.h"
 #include "mainwindow.h"
-#include "moneyrecorditemmodel.h"
 #include "qnamespace.h"
 #include "settings.h"
 #include "ui_cardwindow.h"
@@ -40,7 +39,7 @@ std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Номер", "Категория
 class CardWindow::CardFilterModel final : public QSortFilterProxyModel {
   public:
     explicit CardFilterModel() {}
-    ~CardFilterModel(){};
+    ~CardFilterModel() {};
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 

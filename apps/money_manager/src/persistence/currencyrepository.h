@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CURRENCYREPOSITORY_H
-#define CURRENCYREPOSITORY_H
+#pragma once
 
 #include "currency.h"
 #include "repository.h"
@@ -16,5 +15,3 @@ class CurrencyRepository final : public Repository<Currency> {
     virtual Currency fromResultSet(const ResultSet &rs) const override;
     virtual void fromResultSet(const ResultSet &rs, std::vector<Currency> &result) const override;
 };
-
-#endif // CURRENCYREPOSITORY_H

@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "aes256.h"
@@ -8,15 +8,11 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 
-namespace Crypto::aes256 {
+namespace {
 
-constexpr int AES_BLOCK_SIZE = 16;
-constexpr int AES_KEY_SIZE = 32;
+using Crypto::CryptoException;
 
-using ConstCharPtr = const unsigned char *;
-using CharPtr = unsigned char *;
-
-static EVP_CIPHER_CTX *createContext() {
+EVP_CIPHER_CTX *createContext() {
     auto ctx = EVP_CIPHER_CTX_new();
     if (ctx == nullptr) {
         throw CryptoException("EVP Error: failed to create cipher context");
@@ -24,10 +20,20 @@ static EVP_CIPHER_CTX *createContext() {
     return ctx;
 }
 
-static void cleanupAndThrow(EVP_CIPHER_CTX *ctx) {
+void cleanupAndThrow(EVP_CIPHER_CTX *ctx) {
     EVP_CIPHER_CTX_cleanup(ctx);
     throw CryptoException(ERR_error_string(ERR_get_error(), nullptr));
 }
+
+} // namespace
+
+namespace Crypto::aes256 {
+
+constexpr int AES_BLOCK_SIZE = 16;
+constexpr int AES_KEY_SIZE = 32;
+
+using ConstCharPtr = const unsigned char *;
+using CharPtr = unsigned char *;
 
 std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &passwd) {
     unsigned char key[AES_KEY_SIZE], iv[AES_BLOCK_SIZE], dummy[AES_BLOCK_SIZE];

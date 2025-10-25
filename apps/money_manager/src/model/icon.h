@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ICON_H
-#define ICON_H
+#pragma once
 
 #include "moneyrecord.h"
 #include <QByteArray>
@@ -20,5 +19,3 @@ class Icon final : public MoneyRecord {
     QString name_;
     QByteArray bytes_;
 };
-
-#endif // ICON_H

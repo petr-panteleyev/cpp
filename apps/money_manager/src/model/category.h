@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CATEGORY_H
-#define CATEGORY_H
+#pragma once
 
 #include "categorytype.h"
 #include "moneyrecord.h"
@@ -26,5 +25,3 @@ class Category final : public MoneyRecord {
     unsigned type_;
     std::optional<QUuid> iconUuid_;
 };
-
-#endif // CATEGORY_H

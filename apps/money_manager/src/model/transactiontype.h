@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TRANSACTIONTYPE_H
-#define TRANSACTIONTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -102,5 +101,3 @@ const inline std::vector<TransactionTypeRef> Common::EnumClass<TransactionType>:
     std::cref(TransactionType::REFUND),
     std::cref(TransactionType::UNDEFINED),
 };
-
-#endif // TRANSACTIONTYPE_H

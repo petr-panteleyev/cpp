@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef QTHELPERS_H
-#define QTHELPERS_H
+#pragma once
 
 #include <initializer_list>
 
@@ -26,5 +25,3 @@ void saveWindowDimensions(const QWidget &widget, QSettings &settings, const QStr
 void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &group);
 
 } // namespace QtHelpers
-
-#endif

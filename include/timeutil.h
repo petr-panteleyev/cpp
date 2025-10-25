@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TIMEUTIL_H
-#define TIMEUTIL_H
+#pragma once
 
 #include <chrono>
 
@@ -14,5 +13,3 @@ inline unsigned long currentTimeMillis() {
 }
 
 } // namespace TimeUtil
-
-#endif // TIMEUTIL_H

@@ -1,10 +1,9 @@
 /*
-  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2024-2025 Petr Panteleyev
   SPDX-License-Identifier: BSD-2-Clause
 */
 
-#ifndef PICTURES_H
-#define PICTURES_H
+#pragma once
 
 enum class Picture {
     ICON,
@@ -20,5 +19,3 @@ class QIcon;
 namespace Pictures {
 QIcon &icon(Picture picture);
 }
-
-#endif // PICTURE_H

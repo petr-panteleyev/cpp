@@ -1,14 +1,14 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "categorywindow.h"
 #include "category.h"
 #include "datacache.h"
 #include "mainwindow.h"
-#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "translation.h"
 #include "ui_categorywindow.h"
+#include <QHeaderView>
 #include <QSortFilterProxyModel>
 #include <algorithm>
 
@@ -35,7 +35,7 @@ const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Название", "Тип
 class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
   public:
     explicit CategoryFilterModel() : typeOrdinal_{-1}, nameFilter_{} {}
-    ~CategoryFilterModel(){};
+    ~CategoryFilterModel() {};
 
     void setTypeOrdinal(int ordinal) {
         typeOrdinal_ = ordinal;

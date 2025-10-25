@@ -16,7 +16,7 @@ static const int DEFAULT_PASSWORD_LENGTH = 16;
 static PasswordGeneratorOptions buildOptions(const QStringList &arguments);
 
 static const std::string USAGE_MESSAGE = R"(Password Generator v24.11.1
-(c) 2024, Petr Panteleyev
+© 2024, Petr Panteleyev
 Usage:
   -u        - use upper case letters
   -l        - use lower case letters

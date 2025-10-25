@@ -1,11 +1,10 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef DATABASECONNECTION_H
-#define DATABASECONNECTION_H
+#pragma once
 
-#include <memory>
 #include <QString>
+#include <memory>
 
 class PreparedStatement;
 
@@ -26,5 +25,3 @@ class DatabaseConnection final {
   private:
     QString name_;
 };
-
-#endif // DATABASECONNECTION_H

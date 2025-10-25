@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CURRENCYWINDOW_H
-#define CURRENCYWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -31,5 +30,3 @@ class CurrencyWindow : public QMainWindow {
     class CurrencyFilterModel;
     std::unique_ptr<CurrencyFilterModel> model_;
 };
-
-#endif // CURRENCYWINDOW_H

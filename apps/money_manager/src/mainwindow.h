@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include "observablevalue.h"
 #include <QMainWindow>
@@ -56,5 +55,3 @@ class MainWindow : public QMainWindow {
     class TransactionFilterModel;
     std::unique_ptr<TransactionFilterModel> model_;
 };
-
-#endif // MAINWINDOW_H

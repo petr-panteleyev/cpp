@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef NEWNOTEDIALOG_H
-#define NEWNOTEDIALOG_H
+#pragma once
 
 #include "card.h"
 #include <QDialog>
@@ -24,5 +23,3 @@ class NewNoteDialog : public QDialog {
   private:
     std::unique_ptr<Ui::NewNoteDialog> ui;
 };
-
-#endif // NEWNOTEDIALOG_H

@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef FIELDVALUEEDITDELEGATE_H
-#define FIELDVALUEEDITDELEGATE_H
+#pragma once
 
 #include <QStyledItemDelegate>
 
@@ -22,5 +21,3 @@ class FieldValueEditDelegate : public QStyledItemDelegate {
         return reinterpret_cast<const EditFieldListModel *>(index.model());
     }
 };
-
-#endif // FIELDVALUEEDITDELEGATE_H

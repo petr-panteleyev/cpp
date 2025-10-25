@@ -1,11 +1,10 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONNECTIONPROFILE_H
-#define CONNECTIONPROFILE_H
+#pragma once
 
-#include <QString>
 #include "datasource.h"
+#include <QString>
 
 class ConnectionProfile final {
   public:
@@ -33,5 +32,3 @@ class ConnectionProfile final {
     QString database_;
     QString schema_;
 };
-
-#endif // CONNECTIONPROFILE_H

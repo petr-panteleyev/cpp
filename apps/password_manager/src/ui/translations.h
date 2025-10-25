@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TRANSLATIONS_H
-#define TRANSLATIONS_H
+#pragma once
 
 #include "importaction.h"
 #include "passwordtype.h"
@@ -20,5 +19,3 @@ QString translate(ImportAction action);
 QString translate(Settings::PasswordType type);
 
 } // namespace Translations
-
-#endif // TRANSLATIONS_H

@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDEDITDIALOG_H
-#define CARDEDITDIALOG_H
+#pragma once
 
 #include "card.h"
 #include <QDialog>
@@ -53,5 +52,3 @@ class CardEditDialog final : public QDialog {
     QAction *fieldGenerateAction_;
     QMenu *fieldTableContextMenu_;
 };
-
-#endif // CARDEDITDIALOG_H

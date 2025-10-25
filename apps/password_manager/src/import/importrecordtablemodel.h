@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef IMPORTRECORDTABLEMODEL_H
-#define IMPORTRECORDTABLEMODEL_H
+#pragma once
 
 #include "importrecord.h"
 #include <QAbstractItemModel>
@@ -43,5 +42,3 @@ class ImportRecordTableModel final : public QAbstractItemModel {
   private:
     std::vector<ImportRecord> records_;
 };
-
-#endif // IMPORTRECORDTABLEMODEL_H

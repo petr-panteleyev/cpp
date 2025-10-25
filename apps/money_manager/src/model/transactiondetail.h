@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TRANSACTIONDETAIL_H
-#define TRANSACTIONDETAIL_H
+#pragma once
 
 #include "decimal.h"
 #include <QString>
@@ -25,5 +24,3 @@ class TransactionDetail final {
     QString comment_;
     long modified_;
 };
-
-#endif // TRANSACTIONDETAIL_H

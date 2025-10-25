@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef AES256_H
-#define AES256_H
+#pragma once
 
 #include <span>
 #include <string>
@@ -14,5 +13,3 @@ std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &p
 std::vector<char> encrypt(const std::span<char> &decrypted, const std::string &passwd);
 
 } // namespace Crypto::aes256
-
-#endif // AES256_H

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef DATACACHE_H
-#define DATACACHE_H
+#pragma once
 
 #include "account.h"
 #include "card.h"
@@ -107,5 +106,3 @@ class DataCache {
     std::unique_ptr<MoneyRecordItemModel<Icon>> iconItemModel_;
     std::unique_ptr<MoneyRecordItemModel<Transaction>> transactionItemModel_;
 };
-
-#endif // DATACACHE_H

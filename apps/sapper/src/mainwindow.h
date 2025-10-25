@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include "boardsize.h"
 #include "buttoneventfilter.h"
@@ -61,5 +60,3 @@ class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandl
     ScoreBoardDialog *scoreBoardDialog_;
     BoardSizeDialog *boardSizeDialog_;
 };
-
-#endif // MAINWINDOW_H

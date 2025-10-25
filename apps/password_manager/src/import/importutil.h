@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef IMPORTUTIL_H
-#define IMPORTUTIL_H
+#pragma once
 
 #include <vector>
 
@@ -14,5 +13,3 @@ namespace ImportUtil {
 std::vector<ImportRecord> calculateImport(const std::vector<Card> &existing, const std::vector<Card> &toImport);
 
 } // namespace ImportUtil
-
-#endif // IMPORTUTIL_H

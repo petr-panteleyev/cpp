@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef FIELDTABLEITEMMODEL_H
-#define FIELDTABLEITEMMODEL_H
+#pragma once
 
 #include "field.h"
 #include <QAbstractItemModel>
@@ -32,5 +31,3 @@ class FieldTableItemModel : public QAbstractItemModel {
 
     std::vector<Field> items_;
 };
-
-#endif // FIELDTABLEITEMMODEL_H

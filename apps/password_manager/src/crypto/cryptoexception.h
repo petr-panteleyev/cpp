@@ -1,8 +1,10 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CRYPTOEXCEPTION_H
-#define CRYPTOEXCEPTION_H
+#pragma once
+
+#include <exception>
+#include <string>
 
 namespace Crypto {
 
@@ -17,5 +19,3 @@ class CryptoException : public std::exception {
 };
 
 } // namespace Crypto
-
-#endif // CRYPTOEXCEPTION_H

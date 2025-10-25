@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MONEYRECORD_H
-#define MONEYRECORD_H
+#pragma once
 
 #include <QUuid>
 
@@ -20,5 +19,3 @@ class MoneyRecord {
     long created_;
     long modified_;
 };
-
-#endif // MONEYRECORD_H

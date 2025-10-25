@@ -28,9 +28,7 @@ namespace {
 
 template <typename T>
 auto autoReleased(T *p) {
-    return std::unique_ptr<T, void (*)(T *)>{p, [](auto *ptr) {
-                                                 ptr->release();
-                                             }};
+    return std::unique_ptr<T, void (*)(T *)>{p, [](auto *ptr) { ptr->release(); }};
 }
 
 QString XtoQ(const XMLCh *x) {
@@ -191,6 +189,7 @@ static void deserializeCard(const DOMElement *cardElement, std::vector<Card> &ca
 namespace Serializer {
 
 void initialize() {
+    xercesc::XMLPlatformUtils::Initialize();
     QString fileName(":/xsd/password-manager.xsd");
     QFile file(fileName);
     file.open(QIODeviceBase::ReadOnly);

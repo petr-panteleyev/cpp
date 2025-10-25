@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef PREPAREDSTATEMENT_H
-#define PREPAREDSTATEMENT_H
+#pragma once
 
 #include <memory>
 
@@ -21,5 +20,3 @@ class PreparedStatement {
   private:
     std::unique_ptr<QSqlQuery> query_;
 };
-
-#endif // PREPAREDSTATEMENT_H

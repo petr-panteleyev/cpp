@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef PASSWORDTYPE_H
-#define PASSWORDTYPE_H
+#pragma once
 
 namespace Settings {
 
@@ -14,5 +13,3 @@ enum class PasswordType {
 };
 
 }
-
-#endif // PASSWORDTYPE_H

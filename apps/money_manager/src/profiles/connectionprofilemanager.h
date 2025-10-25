@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONNECTIONPROFILEMANAGER_H
-#define CONNECTIONPROFILEMANAGER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -38,5 +37,3 @@ class ConnectionProfileManager {
 
     std::unique_ptr<ConnectionProfileItemModel> model_;
 };
-
-#endif // CONNECTIONPROFILEMANAGER_H

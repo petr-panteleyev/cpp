@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef STATEMENT_H
-#define STATEMENT_H
+#pragma once
 
 class DatabaseConnection;
 
@@ -13,5 +12,3 @@ class Statement {
   private:
     const DatabaseConnection &connection_;
 };
-
-#endif // STATEMENT_H

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ICONREPOSITORY_H
-#define ICONREPOSITORY_H
+#pragma once
 
 #include "icon.h"
 #include "repository.h"
@@ -16,5 +15,3 @@ class IconRepository final : public Repository<Icon> {
     virtual Icon fromResultSet(const ResultSet &rs) const override;
     virtual void fromResultSet(const ResultSet &rs, std::vector<Icon> &result) const override;
 };
-
-#endif // ICONREPOSITORY_H

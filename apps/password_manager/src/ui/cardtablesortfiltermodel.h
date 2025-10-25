@@ -1,15 +1,13 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDTABLESORTFILTERMODEL_H
-#define CARDTABLESORTFILTERMODEL_H
+#pragma once
 
 #include <QSortFilterProxyModel>
 
 class CardTableSortFilterModel : public QSortFilterProxyModel {
   public:
-    explicit CardTableSortFilterModel(QObject *parent)
-        : QSortFilterProxyModel{parent}, showDeleted_{false} {};
+    explicit CardTableSortFilterModel(QObject *parent) : QSortFilterProxyModel{parent}, showDeleted_{false} {};
 
     void setShowDeleted(bool show_deleted) {
         showDeleted_ = show_deleted;
@@ -28,5 +26,3 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     bool showDeleted_;
     QString filterText_;
 };
-
-#endif // CARDTABLESORTFILTERMODEL_H

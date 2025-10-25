@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "decimal.h"
@@ -38,7 +38,8 @@ static constexpr std::array<unsigned long, 19> POWERS_OF_TEN = {
 };
 static constexpr int POWERS_OF_TEN_SIZE = POWERS_OF_TEN.size();
 
-template <typename T> int signum(T x) {
+template <typename T>
+int signum(T x) {
     return x > 0 ? 1 : x < 0 ? -1 : 0;
 }
 

@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef BUTTONEVENTFILTER_H
-#define BUTTONEVENTFILTER_H
+#pragma once
 
 #include <QObject>
 
@@ -18,5 +17,3 @@ class ButtonEventFilter final : public QObject {
   private:
     bool disabled_;
 };
-
-#endif // BUTTONEVENTFILTER_H

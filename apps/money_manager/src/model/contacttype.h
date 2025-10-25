@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONTACTTYPE_H
-#define CONTACTTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -38,5 +37,3 @@ const inline std::vector<ContactTypeRef> Common::EnumClass<ContactType>::values_
     std::cref(ContactType::PERSONAL), std::cref(ContactType::CLIENT),   std::cref(ContactType::SUPPLIER),
     std::cref(ContactType::EMPLOYEE), std::cref(ContactType::EMPLOYER), std::cref(ContactType::SERVICE),
 };
-
-#endif // CONTACTTYPE_H

@@ -1,8 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef FIELD_H
-#define FIELD_H
+#pragma once
 
 #include "fieldtype.h"
 #include <QString>
@@ -47,5 +46,3 @@ class Field final {
 
     bool showContent_;
 };
-
-#endif // FIELD_H

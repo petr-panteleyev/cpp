@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef PASSWORDDIALOG_H
-#define PASSWORDDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <memory>
@@ -36,5 +35,3 @@ class PasswordDialog : public QDialog {
 
     Mode mode_;
 };
-
-#endif // PASSWORDDIALOG_H

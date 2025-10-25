@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef GAMETIMER_H
-#define GAMETIMER_H
+#pragma once
 
 #include <QTime>
 
@@ -38,5 +37,3 @@ class GameTimer final {
     QTime localTime_;
     GameTimerHandler *handler_;
 };
-
-#endif // GAMETIMER_H

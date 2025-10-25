@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 #include "fonttype.h"
 #include "generator.h"
@@ -48,5 +47,3 @@ void saveWindowDimensions(const QWidget *widget);
 void loadWindowDimensions(QWidget *widget);
 
 } // namespace Settings
-
-#endif // SETTINGS_H

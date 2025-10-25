@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CHARACTERSET_H
-#define CHARACTERSET_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -17,13 +16,9 @@ class CharacterSet final {
     static const CharacterSet SYMBOLS;
     static const CharacterSet BAD_LETTERS;
 
-    char at(std::size_t index) const {
-        return characters_.at(index);
-    }
+    char at(std::size_t index) const { return characters_.at(index); }
 
-    std::size_t size() const {
-        return characters_.size();
-    }
+    std::size_t size() const { return characters_.size(); }
 
     // Returns true if character set contains given character.
     bool contains(char ch) const;
@@ -34,10 +29,7 @@ class CharacterSet final {
   private:
     const std::vector<char> characters_;
 
-    explicit CharacterSet(const std::vector<char> &characters) : characters_(characters) {
-    }
+    explicit CharacterSet(const std::vector<char> &characters) : characters_(characters) {}
 };
 
-} // namespace password_generator
-
-#endif
+} // namespace pwdgen

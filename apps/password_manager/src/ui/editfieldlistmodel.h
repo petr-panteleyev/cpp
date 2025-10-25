@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef EDITFIELDLISTMODEL_H
-#define EDITFIELDLISTMODEL_H
+#pragma once
 
 #include "field.h"
 #include <QAbstractItemModel>
@@ -47,5 +46,3 @@ class EditFieldListModel : public QAbstractItemModel {
   private:
     std::vector<Field> fields_;
 };
-
-#endif // EDITFIELDLISTMODEL_H

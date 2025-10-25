@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef BOARDSIZE_H
-#define BOARDSIZE_H
+#pragma once
 
 #include <QString>
 #include <set>
@@ -36,7 +35,8 @@ class BoardSize final {
     }
 
   private:
-    explicit constexpr BoardSize(int width, int height, int mines) noexcept : width_{width}, height_{height}, mines_{mines} {};
+    explicit constexpr BoardSize(int width, int height, int mines) noexcept
+        : width_{width}, height_{height}, mines_{mines} {};
 
   private:
     int width_;
@@ -53,5 +53,3 @@ inline const std::set<BoardSize> BoardSize::STANDARD_SIZES{
     BoardSize::MEDIUM,
     BoardSize::SMALL,
 };
-
-#endif // BOARDSIZE_H

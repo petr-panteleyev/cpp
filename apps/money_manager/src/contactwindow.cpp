@@ -1,11 +1,10 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "contactwindow.h"
 #include "contact.h"
 #include "datacache.h"
 #include "mainwindow.h"
-#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "translation.h"
 #include "ui_contactwindow.h"
@@ -36,7 +35,7 @@ const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Имя", "Тип", "Тел
 class ContactWindow::ContactFilterModel : public QSortFilterProxyModel {
   public:
     explicit ContactFilterModel() : typeOrdinal_{-1}, nameFilter_{} {}
-    ~ContactFilterModel(){};
+    ~ContactFilterModel() {};
 
     void setTypeOrdinal(int ordinal) {
         typeOrdinal_ = ordinal;

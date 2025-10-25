@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONNECTDIALOG_H
-#define CONNECTDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <memory>
@@ -27,5 +26,3 @@ class ConnectDialog : public QDialog {
     std::unique_ptr<Ui::ConnectDialog> ui;
     ConnectionProfileManager *profileManager_;
 };
-
-#endif // CONNECTDIALOG_H

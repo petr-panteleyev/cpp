@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#pragma once
 
 #include "fonttype.h"
 #include "settings.h"
@@ -45,5 +44,3 @@ class SettingsDialog : public QDialog {
     Settings::PasswordTypePtrMap passwords_;
     Settings::FontPtrMap fonts_;
 };
-
-#endif // SETTINGSDIALOG_H

@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "decimal.h"
@@ -7,7 +7,8 @@
 
 using namespace Common;
 
-template <typename T> static void testDecimalCtor(T value, DecimalBits bits, int scale, int signum) {
+template <typename T>
+static void testDecimalCtor(T value, DecimalBits bits, int scale, int signum) {
     Decimal actual{value};
     EXPECT_EQ(actual.bits(), bits);
     EXPECT_EQ(actual.scale(), scale);

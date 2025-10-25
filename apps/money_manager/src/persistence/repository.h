@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef REPOSITORY_H
-#define REPOSITORY_H
+#pragma once
 
 #include "databaseconnection.h"
 #include "moneyrecord.h"
@@ -42,5 +41,3 @@ class Repository {
   private:
     QString tableName_;
 };
-
-#endif // REPOSITORY_H

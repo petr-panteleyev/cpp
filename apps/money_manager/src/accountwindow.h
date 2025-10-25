@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ACCOUNTWINDOW_H
-#define ACCOUNTWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -31,5 +30,3 @@ class AccountWindow : public QMainWindow {
     class AccountFilterModel;
     std::unique_ptr<AccountFilterModel> model_;
 };
-
-#endif // ACCOUNTWINDOW_H

@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SCOREBOARD_H
-#define SCOREBOARD_H
+#pragma once
 
 #include "gamescore.h"
 
@@ -21,5 +20,3 @@ class ScoreBoard {
   private:
     std::vector<GameScore> scores_;
 };
-
-#endif // SCOREBOARD_H

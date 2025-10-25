@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef VERSION_H
-#define VERSION_H
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ static const std::string buildDate{"NOT DEFINED"};
 #endif
 
 } // namespace Version
-
-#endif

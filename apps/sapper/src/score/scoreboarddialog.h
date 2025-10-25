@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SCOREBOARDDIALOG_H
-#define SCOREBOARDDIALOG_H
+#pragma once
 
 #include "boardsize.h"
 #include <QDialog>
@@ -33,5 +32,3 @@ class ScoreBoardDialog : public QDialog {
     std::unique_ptr<Ui::ScoreBoardDialog> ui;
     ScoreBoardItemModel *model_;
 };
-
-#endif // SCOREBOARDDIALOG_H

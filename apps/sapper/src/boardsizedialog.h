@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef BOARDSIZEDIALOG_H
-#define BOARDSIZEDIALOG_H
+#pragma once
 
 #include "boardsize.h"
 #include <QDialog>
@@ -24,5 +23,3 @@ class BoardSizeDialog final : public QDialog {
   private:
     std::unique_ptr<Ui::BoardSizeDialog> ui;
 };
-
-#endif // BOARDSIZEDIALOG_H

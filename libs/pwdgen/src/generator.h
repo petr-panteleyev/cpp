@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef GENERATOR_H
-#define GENERATOR_H
+#pragma once
 
 #include <exception>
 #include <memory>
@@ -32,7 +31,7 @@ struct PasswordGeneratorOptions {
     bool useLowerCase;
     bool useDigits;
     bool useSymbols;
-    int  length;
+    int length;
 
     std::unique_ptr<PasswordGeneratorOptions> copy() const {
         return std::make_unique<PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols, length);
@@ -49,5 +48,3 @@ constexpr PasswordGeneratorOptions LONG_OPTIONS = {true, true, true, true, 32};
 std::string generate(const PasswordGeneratorOptions &options);
 
 } // namespace pwdgen
-
-#endif

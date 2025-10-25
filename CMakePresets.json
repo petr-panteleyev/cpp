@@ -13,8 +13,9 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON",
-                "QT_FORCE_CMP0156_TO_VALUE": "NEW"                
+                "QT_FORCE_CMP0156_TO_VALUE": "NEW",
+                "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
+                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON"
             }
         },
         {
@@ -25,8 +26,9 @@
             "installDir": "${sourceDir}/build/install",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON",
-                "QT_FORCE_CMP0156_TO_VALUE": "NEW"
+                "QT_FORCE_CMP0156_TO_VALUE": "NEW",
+                "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
+                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON"
             }
         }
     ],
@@ -47,13 +49,57 @@
         {
             "name": "install",
             "configurePreset": "release",
-            "targets": ["install"]
+            "targets": [
+                "install"
+            ]
         }
     ],
     "testPresets": [
         {
             "name": "debug",
             "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "debug",
+            "displayName": "Debug Build and Test",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "debug"
+                },
+                {
+                    "type": "build",
+                    "name": "debug"
+                },
+                {
+                    "type": "test",
+                    "name": "debug"
+                }
+            ]
+        },
+        {
+            "name": "release",
+            "displayName": "Release Build and Test",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "release"
+                },
+                {
+                    "type": "build",
+                    "name": "release"
+                },
+                {
+                    "type": "test",
+                    "name": "release"
+                }
+            ]
         }
     ]
 }

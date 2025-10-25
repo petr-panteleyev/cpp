@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TRANSLATION_H
-#define TRANSLATION_H
+#pragma once
 
 #include <QString>
 
@@ -13,5 +12,3 @@ const QString &translateContactType(unsigned type);
 const QString &translateTransactionType(unsigned type);
 
 } // namespace Translation
-
-#endif // TRANSLATION_H

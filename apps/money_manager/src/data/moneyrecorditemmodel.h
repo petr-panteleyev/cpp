@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MONEYRECORDITEMMODEL_H
-#define MONEYRECORDITEMMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 #include <QUuid>
@@ -50,5 +49,3 @@ class MoneyRecordItemModel final : public QAbstractItemModel {
   private:
     std::vector<R> &data_;
 };
-
-#endif // MONEYRECORDITEMMODEL_H

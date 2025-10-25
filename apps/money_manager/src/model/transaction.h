@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef TRANSACTION_H
-#define TRANSACTION_H
+#pragma once
 
 #include "categorytype.h"
 #include "decimal.h"
@@ -54,5 +53,3 @@ class Transaction final : public MoneyRecord {
     QDate statementDate_;
     std::optional<QUuid> cardUuid_;
 };
-
-#endif // TRANSACTION_H

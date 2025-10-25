@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -18,13 +18,13 @@
 #include "decimal.h"
 #include "imagecache.h"
 #include "moneydao.h"
-#include "moneyrecorditemmodel.h"
 #include "qthelpers.h"
 #include "settings.h"
 #include "sqlexception.h"
 #include "transaction.h"
 #include "translation.h"
 #include "ui_mainwindow.h"
+#include <QHeaderView>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
 
@@ -83,7 +83,7 @@ void setDate(const std::unique_ptr<Ui::MainWindow> &ui, const QDate &date) {
 class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
   public:
     explicit TransactionFilterModel() : date_{QDate::currentDate()} {}
-    ~TransactionFilterModel(){};
+    ~TransactionFilterModel() {};
 
     QDate date() const noexcept { return date_; }
 

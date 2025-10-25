@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "board.h"
 
@@ -51,5 +50,3 @@ class GameCallbackHandler {
     virtual void onCellChanged(int x, int newValue) = 0;
     virtual void onGameStatusChanged(int x, const Game::Status &newStatus) = 0;
 };
-
-#endif // GAME_H

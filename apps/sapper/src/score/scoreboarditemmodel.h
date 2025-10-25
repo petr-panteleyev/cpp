@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SCOREBOARDITEMMODEL_H
-#define SCOREBOARDITEMMODEL_H
+#pragma once
 
 #include "gamescore.h"
 #include <QAbstractItemModel>
@@ -40,5 +39,3 @@ class ScoreBoardItemModel final : public QAbstractItemModel {
 
     static constexpr QModelIndex TOP_LEVEL = QModelIndex();
 };
-
-#endif // SCOREBOARDITEMMODEL_H

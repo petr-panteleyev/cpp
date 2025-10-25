@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef RESULTSET_H
-#define RESULTSET_H
+#pragma once
 
 #include "decimal.h"
 #include <QByteArray>
@@ -59,11 +58,13 @@ class ResultSet final {
     QByteArray getQByteArray(int columnNumber) const;
     QByteArray getQByteArray(const QString &name) const;
 
-    template <class E> const E &getEnum(int columnNumber) const {
+    template <class E>
+    const E &getEnum(int columnNumber) const {
         auto stringValue = getString(columnNumber);
         return E::valueOf(stringValue);
     }
-    template <class E> const E &getEnum(const QString &name) const {
+    template <class E>
+    const E &getEnum(const QString &name) const {
         auto stringValue = getString(name);
         return E::valueOf(stringValue);
     }
@@ -74,5 +75,3 @@ class ResultSet final {
     int rows_;
     int columns_;
 };
-
-#endif // RESULTSET_H

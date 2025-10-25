@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef DECIMAL_H
-#define DECIMAL_H
+#pragma once
 
 #include <compare>
 #include <string>
@@ -69,5 +68,3 @@ const inline Decimal Decimal::ONE{1};
 const inline Decimal Decimal::TEN{10};
 
 } // namespace Common
-
-#endif // DECIMAL_H

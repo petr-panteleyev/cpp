@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef OBSERVABLEVALUE_H
-#define OBSERVABLEVALUE_H
+#pragma once
 
 #include <functional>
 #include <mutex>
@@ -57,5 +56,3 @@ class ObservableValue final {
 };
 
 } // namespace Common
-
-#endif // OBSERVABLEVALUE_H

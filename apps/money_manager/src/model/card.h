@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARD_H
-#define CARD_H
+#pragma once
 
 #include "cardtype.h"
 #include "moneyrecord.h"
@@ -29,5 +28,3 @@ class Card final : public MoneyRecord {
     QString comment_;
     bool enabled_;
 };
-
-#endif // CARD_H

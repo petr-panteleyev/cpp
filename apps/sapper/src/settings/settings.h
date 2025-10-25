@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 #include "boardsize.h"
 #include "gamescore.h"
@@ -17,5 +16,3 @@ void setGameScores(const std::span<GameScore> &scores);
 std::vector<GameScore> getGameScores();
 
 } // namespace Settings
-
-#endif // SETTINGS_H

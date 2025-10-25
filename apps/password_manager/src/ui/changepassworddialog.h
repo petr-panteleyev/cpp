@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CHANGEPASSWORDDIALOG_H
-#define CHANGEPASSWORDDIALOG_H
+#pragma once
 
 #include <QDialog>
 
@@ -32,5 +31,3 @@ class ChangePasswordDialog : public QDialog {
     QPalette enabledColors_;
     QPalette disabledColors_;
 };
-
-#endif // CHANGEPASSWORDDIALOG_H

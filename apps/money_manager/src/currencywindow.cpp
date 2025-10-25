@@ -1,11 +1,10 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "currencywindow.h"
 #include "currency.h"
 #include "datacache.h"
 #include "mainwindow.h"
-#include "moneyrecorditemmodel.h"
 #include "settings.h"
 #include "ui_currencywindow.h"
 #include <QSortFilterProxyModel>
@@ -31,7 +30,7 @@ const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Название", "Опи
 class CurrencyWindow::CurrencyFilterModel final : public QSortFilterProxyModel {
   public:
     explicit CurrencyFilterModel() {}
-    ~CurrencyFilterModel(){};
+    ~CurrencyFilterModel() {};
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; }
 

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#pragma once
 
 #include "categorytype.h"
 #include "decimal.h"
@@ -51,5 +50,3 @@ class Account final : public MoneyRecord {
     Common::Decimal total_;
     Common::Decimal totalWaiting_;
 };
-
-#endif // ACCOUNT_H

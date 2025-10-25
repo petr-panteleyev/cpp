@@ -5,10 +5,8 @@
 #include "field.h"
 #include "serializer.hpp"
 #include <gtest/gtest.h>
-#include <xercesc/util/PlatformUtils.hpp>
 
 TEST(PasswordManager, Serializer_serializeAndDeserialize) {
-    xercesc::XMLPlatformUtils::Initialize();
     Serializer::initialize();
 
     std::vector<Card> cards{

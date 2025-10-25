@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#pragma once
 
 #include <QString>
 
@@ -15,5 +14,3 @@ class PasswordManagerException : std::exception {
   private:
     QString message_;
 };
-
-#endif // EXCEPTIONS_H

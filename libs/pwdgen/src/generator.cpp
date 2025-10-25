@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "generator.h"
@@ -12,7 +12,7 @@ namespace pwdgen {
 using Charsets = std::vector<const CharacterSet *>;
 
 static std::random_device rd;
-static std::mt19937       rand(rd());
+static std::mt19937 rand(rd());
 
 static int randomNumber(int max_value) {
     return rand() % max_value;

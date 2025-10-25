@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "accountwindow.h"
@@ -49,7 +49,7 @@ const std::array<QString, COLUMN_COUNT> COLUMN_NAMES{"Название", "Кат
 class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
   public:
     explicit AccountFilterModel() {}
-    ~AccountFilterModel(){};
+    ~AccountFilterModel() {};
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };
 

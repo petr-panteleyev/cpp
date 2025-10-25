@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CARDWINDOW_H
-#define CARDWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -31,5 +30,3 @@ class CardWindow : public QMainWindow {
     class CardFilterModel;
     std::unique_ptr<CardFilterModel> model_;
 };
-
-#endif // CARDWINDOW_H

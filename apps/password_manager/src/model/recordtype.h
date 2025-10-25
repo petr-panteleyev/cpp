@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef RECORDTYPE_H
-#define RECORDTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include "field.h"
@@ -33,5 +32,3 @@ class RecordType final : public Common::EnumClass<RecordType> {
     QString translation_;
     std::vector<Field> fields_;
 };
-
-#endif // RECORDTYPE_H

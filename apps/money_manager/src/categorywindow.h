@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CATEGORYWINDOW_H
-#define CATEGORYWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -31,5 +30,3 @@ class CategoryWindow : public QMainWindow {
     class CategoryFilterModel;
     std::unique_ptr<CategoryFilterModel> model_;
 };
-
-#endif // CATEGORYWINDOW_H

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 class QWidget;
 
@@ -12,5 +11,3 @@ void saveWindowDimensions(const QWidget *widget);
 void loadWindowDimensions(QWidget *widget);
 
 } // namespace Settings
-
-#endif // SETTINGS_H

@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include "observablevalue.h"
 #include <QMainWindow>
@@ -105,4 +104,3 @@ class MainWindow : public QMainWindow {
     ImportDialog *importDialog_;
     SettingsDialog *settingsDialog_;
 };
-#endif // MAINWINDOW_H

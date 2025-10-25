@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CATEGORYTYPE_H
-#define CATEGORYTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -40,5 +39,3 @@ const inline std::vector<CategoryTypeRef> Common::EnumClass<CategoryType>::value
     std::cref(CategoryType::DEBTS),          std::cref(CategoryType::PORTFOLIO), std::cref(CategoryType::ASSETS),
     std::cref(CategoryType::STARTUP),
 };
-
-#endif // CATEGORYTYPE_H

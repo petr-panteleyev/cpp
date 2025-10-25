@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef IMAGECACHE_H
-#define IMAGECACHE_H
+#pragma once
 
 class QImage;
 class QUuid;
@@ -12,5 +11,3 @@ namespace ImageCache {
 const QImage &getImage(const QUuid &uuid);
 
 }
-
-#endif // IMAGECACHE_H

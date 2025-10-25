@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef IMPORTDIALOG_H
-#define IMPORTDIALOG_H
+#pragma once
 
 #include "importrecord.h"
 #include <QDialog>
@@ -39,5 +38,3 @@ class ImportDialog : public QDialog {
     QMenu *contextMenu_;
     QAction *actionToggleApproval_;
 };
-
-#endif // IMPORTDIALOG_H

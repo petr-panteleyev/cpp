@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ENUMCLASS_H
-#define ENUMCLASS_H
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -10,7 +9,8 @@
 
 namespace Common {
 
-template <typename T> class EnumClass {
+template <typename T>
+class EnumClass {
   public:
     unsigned ordinal() const noexcept { return ordinal_; }
     const std::string &name() const noexcept { return name_; }
@@ -58,5 +58,3 @@ template <typename T> class EnumClass {
 };
 
 } // namespace Common
-
-#endif // ENUMCLASS_H

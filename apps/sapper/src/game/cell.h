@@ -1,8 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CELL_H
-#define CELL_H
+#pragma once
 
 namespace Cell {
 
@@ -48,5 +47,3 @@ inline bool isExplored(int value) {
 }
 
 } // namespace Cell
-
-#endif // CELL_H

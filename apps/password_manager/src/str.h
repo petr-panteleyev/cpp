@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef STR_H
-#define STR_H
+#pragma once
 
 #include <QString>
 
@@ -28,5 +27,3 @@ const inline QString SKIP{"Пропустить"};
 const inline QString UNABLE_TO_OPEN_FILE{"Невозможно открыть файл"};
 
 } // namespace Str
-
-#endif // STR_H

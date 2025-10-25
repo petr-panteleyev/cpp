@@ -1,8 +1,7 @@
-//  Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef FIELDTYPE_H
-#define FIELDTYPE_H
+#pragma once
 
 #include "enumclass.h"
 #include <functional>
@@ -34,5 +33,3 @@ class FieldType final : public Common::EnumClass<FieldType> {
 };
 
 using FieldTypeRef = std::reference_wrapper<const FieldType>;
-
-#endif // FIELDTYPE_H

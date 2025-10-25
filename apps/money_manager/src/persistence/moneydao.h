@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef MONEYDAO_H
-#define MONEYDAO_H
+#pragma once
 
 #include <memory>
 
@@ -41,5 +40,3 @@ class MoneyDao final {
     std::unique_ptr<IconRepository> iconRepository_;
     std::unique_ptr<TransactionRepository> transactionRepository_;
 };
-
-#endif // MONEYDAO_H

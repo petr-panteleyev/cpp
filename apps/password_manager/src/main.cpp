@@ -9,7 +9,6 @@
 #include <xercesc/util/PlatformUtils.hpp>
 
 int main(int argc, char *argv[]) {
-    xercesc::XMLPlatformUtils::Initialize();
     Serializer::initialize();
 
     QApplication a(argc, argv);

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONTACTWINDOW_H
-#define CONTACTWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
@@ -31,5 +30,3 @@ class ContactWindow : public QMainWindow {
     class ContactFilterModel;
     std::unique_ptr<ContactFilterModel> model_;
 };
-
-#endif // CONTACTWINDOW_H

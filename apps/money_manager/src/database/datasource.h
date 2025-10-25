@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef DATASOURCE_H
-#define DATASOURCE_H
+#pragma once
 
 #include <QString>
 #include <memory>
@@ -24,5 +23,3 @@ class DataSource final {
     QString database_;
     QString schema_;
 };
-
-#endif // DATASOURCE_H

@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef CONNECTIONPROFILEITEMMODEL_H
-#define CONNECTIONPROFILEITEMMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 
@@ -35,5 +34,3 @@ class ConnectionProfileItemModel : public QAbstractItemModel {
   private:
     std::vector<std::unique_ptr<ConnectionProfile>> profiles_;
 };
-
-#endif // CONNECTIONPROFILEITEMMODEL_H

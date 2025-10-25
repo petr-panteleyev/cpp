@@ -1,8 +1,7 @@
-//  Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#ifndef ARITHMETICEXCEPTION_H
-#define ARITHMETICEXCEPTION_H
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -12,5 +11,3 @@ class ArithmeticException final : public std::domain_error {
     explicit ArithmeticException(const std::string &message) : std::domain_error{message} {}
     ~ArithmeticException() = default;
 };
-
-#endif // ARITHMETICEXCEPTION_H
