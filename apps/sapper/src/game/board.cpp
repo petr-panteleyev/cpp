@@ -1,8 +1,9 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "board.h"
 #include "cell.h"
+#include <algorithm>
 #include <random>
 
 static std::random_device rd;

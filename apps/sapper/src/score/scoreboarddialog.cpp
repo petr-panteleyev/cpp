@@ -35,7 +35,7 @@ void ScoreBoardDialog::setup() {
 
     ui->boardSizeComboBox->clear();
     std::for_each(boardSizes.rbegin(), boardSizes.rend(), [this](const auto &size) {
-        ui->boardSizeComboBox->addItem(size.toString());
+        ui->boardSizeComboBox->addItem(QString::fromStdString(size.toString()));
         boardSizes_.push_back(size);
     });
 

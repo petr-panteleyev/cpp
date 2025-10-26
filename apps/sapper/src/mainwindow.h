@@ -10,6 +10,7 @@
 #include "scoreboard.h"
 #include <QMainWindow>
 #include <QMenu>
+#include <chrono>
 #include <memory>
 
 namespace Ui {
@@ -31,7 +32,7 @@ class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandl
 
     virtual void onCellChanged(int x, int newValue) override;
     virtual void onGameStatusChanged(int x, const Game::Status &newStatus) override;
-    virtual void onTimerUpdate(QTime time) override;
+    virtual void onTimerUpdate(std::chrono::seconds seconds) override;
 
   private:
     void newGame(const BoardSize &boardSize);

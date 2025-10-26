@@ -1,7 +1,15 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboarditemmodel.h"
+#include <format>
+
+namespace {
+
+constexpr auto TIME_FORMAT{"{0:%T}"};
+constexpr auto DATE_FORMAT{"{0:%d.%m.%Y}"};
+
+} // namespace
 
 ScoreBoardItemModel::ScoreBoardItemModel(QObject *parent, const ScoreBoard &scoreBoard) : QAbstractItemModel(parent) {
 }
@@ -28,8 +36,8 @@ QVariant ScoreBoardItemModel::data(const QModelIndex &index, int role) const {
 
     switch (index.column()) {
         case COLUMN_INDEX: return QString::number(index.row() + 1);
-        case COLUMN_TIME: return score.time.toString("HH:mm:ss.zzz");
-        case COLUMN_DATE: return score.date.toString("dd.MM.yyyy");
+        case COLUMN_TIME: return QString::fromStdString(std::format(TIME_FORMAT, score.seconds_));
+        case COLUMN_DATE: return QString::fromStdString(std::format(DATE_FORMAT, score.date_));
     }
 
     return QVariant();

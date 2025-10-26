@@ -1,29 +1,32 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "settings.h"
 #include <QSettings>
+#include <QTime>
 
-namespace Settings {
+namespace {
 
-static const QString LAST_BOARD_SIZE_GROUP{"lastBoardSize"};
-static const QString BOARD_WIDTH{"width"};
-static const QString BOARD_HEIGHT{"height"};
-static const QString BOARD_MINES{"mines"};
+constexpr auto TIME_FORMAT{"{0:%H:%M:%S}"};
 
-static const QString SCORES_ARRAY{"scores"};
-static const QString SCORE_DATE{"date"};
-static const QString SCORE_TIME{"time"};
+const QString LAST_BOARD_SIZE_GROUP{"lastBoardSize"};
+const QString BOARD_WIDTH{"width"};
+const QString BOARD_HEIGHT{"height"};
+const QString BOARD_MINES{"mines"};
 
-static const BoardSize DEFAULT_BOARD_SIZE = BoardSize::BIG;
+const QString SCORES_ARRAY{"scores"};
+const QString SCORE_DATE{"date"};
+const QString SCORE_TIME{"time"};
 
-static void saveBoardSize(const BoardSize &size, QSettings &settings) {
+constexpr BoardSize DEFAULT_BOARD_SIZE = BoardSize::BIG;
+
+void saveBoardSize(const BoardSize &size, QSettings &settings) {
     settings.setValue(BOARD_WIDTH, size.width());
     settings.setValue(BOARD_HEIGHT, size.height());
     settings.setValue(BOARD_MINES, size.mines());
 }
 
-static BoardSize loadBoardSize(QSettings &settings) {
+BoardSize loadBoardSize(QSettings &settings) {
     bool ok;
     auto width = settings.value(BOARD_WIDTH, BoardSize::BIG.width()).toInt(&ok);
     if (!ok) {
@@ -39,6 +42,10 @@ static BoardSize loadBoardSize(QSettings &settings) {
     }
     return BoardSize::boardSize(width, height, mines);
 }
+
+} // namespace
+
+namespace Settings {
 
 void setLastBoardSize(const BoardSize &boardSize) {
     QSettings settings;
@@ -65,9 +72,9 @@ void setGameScores(const std::span<GameScore> &scores) {
     auto index = 0;
     for (const auto &s : scores) {
         settings.setArrayIndex(index++);
-        saveBoardSize(s.boardSize, settings);
-        settings.setValue(SCORE_DATE, s.date.toString("yyyy-MM-dd"));
-        settings.setValue(SCORE_TIME, s.time.toString("HH:mm:ss.zzz"));
+        saveBoardSize(s.boardSize_, settings);
+        settings.setValue(SCORE_DATE, QString::fromStdString(LocalDate::toIsoString(s.date_)));
+        settings.setValue(SCORE_TIME, QString::fromStdString(std::format(TIME_FORMAT, s.seconds_)));
     }
 
     settings.endArray();
@@ -81,15 +88,17 @@ std::vector<GameScore> getGameScores() {
     for (auto i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
         auto boardSize = loadBoardSize(settings);
-        auto date = QDate::fromString(settings.value(SCORE_DATE).toString(), "yyyy-MM-dd");
-        if (!date.isValid()) {
+
+        auto date = LocalDate::fromIsoString(settings.value(SCORE_DATE).toString().toStdString());
+        if (!date.ok()) {
             continue;
         }
-        auto time = QTime::fromString(settings.value(SCORE_TIME).toString(), "HH:mm:ss.zzz");
+
+        auto time = QTime::fromString(settings.value(SCORE_TIME).toString(), "HH:mm:ss");
         if (!time.isValid()) {
             continue;
         }
-        result.push_back(GameScore{.boardSize = boardSize, .date = date, .time = time});
+        result.emplace_back(boardSize, date, QTime(0, 0).secsTo(time));
     }
 
     settings.endArray();

@@ -7,28 +7,36 @@
     },
     "configurePresets": [
         {
+            "name": "base",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/opt/gcc-15/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/opt/gcc-15/bin/g++",
+                "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
+                "QT_FORCE_CMP0156_TO_VALUE": "NEW"
+            },
+            "environment": {
+                "LD_LIBRARY_PATH": "/opt/gcc-15/lib64"
+            }
+        },
+        {
             "name": "debug",
+            "inherits": "base",
             "displayName": "Debug Configuration",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "QT_FORCE_CMP0156_TO_VALUE": "NEW",
-                "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
-                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
             "name": "release",
+            "inherits": "base",
             "displayName": "Release Configuration",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/build/install",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "QT_FORCE_CMP0156_TO_VALUE": "NEW",
-                "CMAKE_BUILD_WITH_INSTALL_RPATH": "ON",
-                "QT_CREATOR_SKIP_MAINTENANCE_TOOL_PROVIDER": "ON"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ],

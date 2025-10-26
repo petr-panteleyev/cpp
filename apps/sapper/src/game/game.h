@@ -28,10 +28,7 @@ class Game final {
     void processHit(int x);
     void toggleFlag(int x);
 
-    void newGame(const BoardSize &boardSize) {
-        board_.setup(boardSize);
-        gameStatus_ = Status::INITIAL;
-    }
+    void newGame(const BoardSize &boardSize);
 
   private:
     const Status checkForGameStatus() const {

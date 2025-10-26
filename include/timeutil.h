@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <ctime>
 
 namespace TimeUtil {
 

@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "game.h"
@@ -59,4 +59,9 @@ void Game::countMines(int x) {
             }
         }
     }
+}
+
+void Game::newGame(const BoardSize &boardSize) {
+    board_.setup(boardSize);
+    gameStatus_ = Status::INITIAL;
 }

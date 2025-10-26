@@ -17,8 +17,10 @@ target_sources(common
         src/decimal.h
         src/enumclass.h
         src/observablevalue.h
+        src/localdate.hpp
     PRIVATE
         src/decimal.cpp
+        src/localdate.cpp
 )
 
 #
@@ -29,9 +31,8 @@ add_executable(common_tests)
 
 find_package(GTest REQUIRED)
 
-target_sources(common_tests PRIVATE
-    test/decimaltest.cpp
-)
+FILE(GLOB_RECURSE test_sources "test/*.cpp")
+target_sources(common_tests PRIVATE ${test_sources})
 
 target_include_directories(common_tests PRIVATE src)
 

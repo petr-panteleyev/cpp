@@ -4,17 +4,18 @@
 #pragma once
 
 #include <QTime>
+#include <chrono>
 
 class QTimer;
 
 class GameTimerHandler {
   public:
-    virtual void onTimerUpdate(QTime time) = 0;
+    virtual void onTimerUpdate(std::chrono::seconds seconds) = 0;
 };
 
 class GameTimer final {
   private:
-    static inline const QTime ZERO_TIME{0, 0};
+    static inline const std::chrono::milliseconds ZERO_TIME{0};
 
   public:
     explicit GameTimer(GameTimerHandler &handler);
@@ -22,9 +23,9 @@ class GameTimer final {
 
     void start();
     void stop();
-    void reset() { handler_->onTimerUpdate(ZERO_TIME); }
+    void reset() { handler_->onTimerUpdate(std::chrono::seconds{0}); }
 
-    QTime localTime() const noexcept { return localTime_; }
+    std::chrono::seconds seconds() const { return std::chrono::floor<std::chrono::seconds>(millis_); }
 
   private:
     GameTimer(const GameTimer &) = delete;
@@ -34,6 +35,6 @@ class GameTimer final {
 
   private:
     std::unique_ptr<QTimer> timer_;
-    QTime localTime_;
+    std::chrono::milliseconds millis_;
     GameTimerHandler *handler_;
 };

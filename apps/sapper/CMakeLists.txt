@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 24.12.2.1 LANGUAGES CXX)
+project(sapper VERSION 25.10.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -46,10 +46,12 @@ qt_add_resources(sapper "fonts"
 target_link_libraries(sapper PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
+    common
 )
 
 target_include_directories(sapper PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/libs/common/src
   src/game
   src/score
   src/settings

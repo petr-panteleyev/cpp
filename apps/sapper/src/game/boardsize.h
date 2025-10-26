@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <QString>
+#include <format>
 #include <set>
 
 class BoardSize final {
@@ -22,7 +22,7 @@ class BoardSize final {
     int height() const noexcept { return height_; }
     int mines() const noexcept { return mines_; }
 
-    QString toString() const { return QString("%1 * %2 : %3").arg(width_).arg(height_).arg(mines_); }
+    std::string toString() const { return std::format("{} * {} : {}", width_, height_, mines_); }
 
     bool operator==(const BoardSize &that) const noexcept = default;
     bool operator<(const BoardSize &that) const noexcept { return this->mines_ < that.mines_; }

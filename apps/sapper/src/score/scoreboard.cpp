@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "scoreboard.h"
@@ -8,14 +8,14 @@
 constexpr int TOP_SIZE = 10;
 
 bool ScoreBoard::add(const GameScore &score) {
-    auto current = scores(score.boardSize);
+    auto current = scores(score.boardSize_);
 
     if (current.empty()) {
         scores_.push_back(score);
         return true;
     }
 
-    auto newTop = score.time < current.begin()->time;
+    auto newTop = score.seconds_ < current.begin()->seconds_;
 
     if (current.size() < TOP_SIZE) {
         scores_.push_back(score);
@@ -23,7 +23,7 @@ bool ScoreBoard::add(const GameScore &score) {
     }
 
     auto last = *current.rbegin();
-    if (score.time < last.time) {
+    if (score.seconds_ < last.seconds_) {
         std::erase(scores_, last);
         scores_.push_back(score);
         return newTop;
@@ -46,7 +46,7 @@ void ScoreBoard::load() {
 std::set<BoardSize> ScoreBoard::boardSizes() const {
     std::set<BoardSize> result;
     for (const auto &sc : scores_) {
-        result.insert(sc.boardSize);
+        result.insert(sc.boardSize_);
     }
     return result;
 }
@@ -54,7 +54,7 @@ std::set<BoardSize> ScoreBoard::boardSizes() const {
 std::set<GameScore> ScoreBoard::scores(const BoardSize &boardSize) const {
     std::set<GameScore> result;
     for (const auto &sc : scores_) {
-        if (sc.boardSize == boardSize) {
+        if (sc.boardSize_ == boardSize) {
             result.insert(sc);
         }
     }

@@ -85,11 +85,11 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupGameMenu() {
-    ui->actionBigGame->setText(BoardSize::BIG.toString());
+    ui->actionBigGame->setText(QString::fromStdString(BoardSize::BIG.toString()));
     connect(ui->actionBigGame, &QAction::triggered, [this]() { newGame(BoardSize::BIG); });
-    ui->actionMediumGame->setText(BoardSize::MEDIUM.toString());
+    ui->actionMediumGame->setText(QString::fromStdString(BoardSize::MEDIUM.toString()));
     connect(ui->actionMediumGame, &QAction::triggered, [this]() { newGame(BoardSize::MEDIUM); });
-    ui->actionSmallGame->setText(BoardSize::SMALL.toString());
+    ui->actionSmallGame->setText(QString::fromStdString(BoardSize::SMALL.toString()));
     connect(ui->actionSmallGame, &QAction::triggered, [this]() { newGame(BoardSize::SMALL); });
 
     buildCustomGameMenu();
@@ -202,8 +202,8 @@ void MainWindow::onGameStatusChanged(int x, const Game::Status &newStatus) {
     }
 }
 
-void MainWindow::onTimerUpdate(QTime time) {
-    ui->lcdTimer->setText(time.toString("mm:ss"));
+void MainWindow::onTimerUpdate(std::chrono::seconds seconds) {
+    ui->lcdTimer->setText(QString::fromStdString(std::format("{0:%M:%S}", seconds)));
 }
 
 void MainWindow::renderSuccess() {
@@ -212,7 +212,8 @@ void MainWindow::renderSuccess() {
     eventFilter_.setDisabled(true);
     ui->controlButton->setIcon(Pictures::icon(Picture::LAUGHING_FACE));
 
-    auto gameScore = GameScore{.boardSize = boardSize_, .date = QDate::currentDate(), .time = gameTimer_.localTime()};
+    auto gameScore = GameScore{boardSize_, gameTimer_.seconds()};
+
     auto top = scoreBoard_.add(gameScore);
     scoreBoard_.save();
 
@@ -266,7 +267,7 @@ void MainWindow::buildCustomGameMenu() {
     if (!filteredSizes.empty()) {
         menu->addSeparator();
         for (const auto &customSize : filteredSizes) {
-            auto action = new QAction(customSize.toString(), menu);
+            auto action = new QAction(QString::fromStdString(customSize.toString()), menu);
             menu->addAction(action);
             connect(action, &QAction::triggered, [this, customSize]() { newGame(customSize); });
         }
