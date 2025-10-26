@@ -5,6 +5,8 @@
 #include <QSettings>
 #include <QTime>
 
+import libs.common.localdate;
+
 namespace {
 
 constexpr auto TIME_FORMAT{"{0:%H:%M:%S}"};

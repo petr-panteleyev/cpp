@@ -1,9 +1,10 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "localdate.hpp"
 #include <chrono>
 #include <gtest/gtest.h>
+
+import libs.common.localdate;
 
 using namespace std::chrono;
 

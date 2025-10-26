@@ -1,12 +1,15 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "localdate.hpp"
+module;
+
 #include <chrono>
+
+export module libs.common.localdate;
 
 using namespace std::chrono;
 
-namespace LocalDate {
+export namespace LocalDate {
 
 std::chrono::year_month_day now() {
     auto now = system_clock::now();

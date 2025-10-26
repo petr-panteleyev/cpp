@@ -13,14 +13,17 @@ target_compile_options(common PRIVATE -Werror -Wall -pedantic)
 
 target_sources(common
     PUBLIC
+        FILE_SET CXX_MODULES
+            TYPE CXX_MODULES
+            FILES
+                src/localdate.cxx
+    PRIVATE
+        src/decimal.cpp
+
         src/arithmeticexception.h
         src/decimal.h
         src/enumclass.h
         src/observablevalue.h
-        src/localdate.hpp
-    PRIVATE
-        src/decimal.cpp
-        src/localdate.cpp
 )
 
 #
