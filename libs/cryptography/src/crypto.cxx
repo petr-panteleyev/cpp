@@ -1,16 +1,41 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "aes256.h"
-#include "cryptoexception.h"
+module;
+
 #include <cstring>
+#include <exception>
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <span>
+#include <string>
+#include <vector>
+
+export module libs.cryptography;
+
+export namespace Crypto {
+
+class CryptoException : public std::exception {
+  public:
+    explicit CryptoException(const std::string &message) noexcept : message_{message} {}
+
+    const std::string &message() const noexcept { return message_; }
+
+  private:
+    const std::string message_;
+};
+
+} // namespace Crypto
 
 namespace {
 
+constexpr int AES_BLOCK_SIZE = 16;
+constexpr int AES_KEY_SIZE = 32;
+
 using Crypto::CryptoException;
+using ConstCharPtr = const unsigned char *;
+using CharPtr = unsigned char *;
 
 EVP_CIPHER_CTX *createContext() {
     auto ctx = EVP_CIPHER_CTX_new();
@@ -27,13 +52,7 @@ void cleanupAndThrow(EVP_CIPHER_CTX *ctx) {
 
 } // namespace
 
-namespace Crypto::aes256 {
-
-constexpr int AES_BLOCK_SIZE = 16;
-constexpr int AES_KEY_SIZE = 32;
-
-using ConstCharPtr = const unsigned char *;
-using CharPtr = unsigned char *;
+export namespace Crypto::aes256 {
 
 std::vector<char> decrypt(const std::span<char> &encrypted, const std::string &passwd) {
     unsigned char key[AES_KEY_SIZE], iv[AES_BLOCK_SIZE], dummy[AES_BLOCK_SIZE];

@@ -2,16 +2,21 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "board.h"
-#include "cell.h"
 #include <algorithm>
 #include <random>
 
-static std::random_device rd;
-static std::mt19937 randomGenerator(rd());
+import apps.sapper.cell;
 
-static int randomNumber(int max_value) {
+namespace {
+
+std::random_device rd;
+std::mt19937 randomGenerator(rd());
+
+int randomNumber(int max_value) {
     return randomGenerator() % max_value;
 }
+
+} // namespace
 
 void Board::setup(const BoardSize &size) {
     width_ = size.width();

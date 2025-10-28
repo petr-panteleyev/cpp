@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_manager VERSION 25.10.1 LANGUAGES CXX)
+project(password_manager VERSION 25.10.2 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -50,6 +50,7 @@ target_link_libraries(password_manager PRIVATE
     XercesC::XercesC
     pwdgen
     qthelpers
+    cryptography
 )
 
 target_include_directories(password_manager PRIVATE
@@ -58,7 +59,6 @@ target_include_directories(password_manager PRIVATE
     ${CMAKE_SOURCE_DIR}/libs/common/src
     ${CMAKE_SOURCE_DIR}/libs/qthelpers/src
     src
-    src/crypto
     src/import
     src/model
     src/settings

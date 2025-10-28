@@ -2,7 +2,8 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "game.h"
-#include "cell.h"
+
+import apps.sapper.cell;
 
 void Game::processHit(int x) {
     auto value = board_.value(x);

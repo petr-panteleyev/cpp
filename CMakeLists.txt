@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 4.1.2)
 
 project(cpp VERSION 1.0.0 LANGUAGES CXX)
 
@@ -20,6 +20,7 @@ include(CTest)
 add_subdirectory(libs/pwdgen)
 add_subdirectory(libs/common)
 add_subdirectory(libs/qthelpers)
+add_subdirectory(libs/cryptography)
 
 # Applications
 add_subdirectory(apps/password_generator)

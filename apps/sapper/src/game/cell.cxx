@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#pragma once
+export module apps.sapper.cell;
 
-namespace Cell {
+export namespace Cell {
 
 constexpr int MAX_MINES = 8;
 

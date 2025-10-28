@@ -2,8 +2,9 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "board.h"
-#include "cell.h"
 #include <gtest/gtest.h>
+
+import apps.sapper.cell;
 
 static constexpr int MAX_VALUE = std::numeric_limits<int>::max();
 

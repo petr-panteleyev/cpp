@@ -2,13 +2,11 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
-#include "aes256.h"
 #include "card.h"
 #include "cardeditdialog.h"
 #include "cardtableitemmodel.h"
 #include "cardtablesortfiltermodel.h"
 #include "changepassworddialog.h"
-#include "cryptoexception.h"
 #include "exceptions.h"
 #include "field.h"
 #include "fieldtableitemmodel.h"
@@ -37,6 +35,8 @@
 #include <memory>
 #include <ranges>
 #include <vector>
+
+import libs.cryptography;
 
 using namespace Crypto;
 

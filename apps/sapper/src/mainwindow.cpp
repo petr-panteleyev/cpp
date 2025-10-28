@@ -5,7 +5,6 @@
 #include "boardsize.h"
 #include "boardsizedialog.h"
 #include "buttoneventfilter.h"
-#include "cell.h"
 #include "pictures.h"
 #include "scoreboarddialog.h"
 #include "settings.h"
@@ -14,6 +13,8 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <ranges>
+
+import apps.sapper.cell;
 
 static constexpr int CELL_SIZE{40};
 static constexpr QSize IMAGE_SIZE{24, 24};

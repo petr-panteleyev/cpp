@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.10.1 LANGUAGES CXX)
+project(sapper VERSION 25.10.2 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -19,6 +19,13 @@ find_package(GTest REQUIRED)
 FILE(GLOB_RECURSE headers "src/*.h" "src/*.hpp")
 FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
 qt_add_executable(sapper ${headers} ${sources})
+target_sources(sapper
+    PUBLIC
+        FILE_SET CXX_MODULES
+            TYPE CXX_MODULES
+            FILES
+                src/game/cell.cxx
+)
 
 target_compile_options(sapper PRIVATE -Werror -Wall -pedantic)
 
@@ -78,6 +85,13 @@ FILE(GLOB_RECURSE test_sources "test/*.cpp")
 target_sources(sapper_tests PRIVATE
     ${test_sources}
     src/game/board.cpp
+)
+target_sources(sapper_tests
+    PUBLIC
+        FILE_SET CXX_MODULES
+            TYPE CXX_MODULES
+            FILES
+                src/game/cell.cxx
 )
 
 target_include_directories(sapper_tests PRIVATE
