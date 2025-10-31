@@ -20,6 +20,8 @@ target_sources(cryptography
             TYPE CXX_MODULES
             FILES
                 src/crypto.cxx
+    PRIVATE
+        src/aes256.cpp
 )
 
 #

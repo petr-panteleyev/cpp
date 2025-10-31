@@ -1,12 +1,14 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#pragma once
+module;
 
 #include <format>
 #include <set>
 
-class BoardSize final {
+export module apps.sapper.boardsize;
+
+export class BoardSize final {
   public:
     static constexpr int MIN_WIDTH{8};
     static constexpr int MAX_WIDTH{30};

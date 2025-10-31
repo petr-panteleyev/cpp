@@ -14,35 +14,35 @@ constexpr int FLAG_MASK = 0b1000000;
 constexpr int EMPTY_WITH_FLAG = EMPTY | FLAG_MASK;
 constexpr int MINE_WITH_FLAG = MINE | FLAG_MASK;
 
-inline bool empty(int value) {
+bool empty(int value) {
     return (value & EMPTY) == EMPTY;
 }
 
-inline bool emptyWithFlag(int value) {
+bool emptyWithFlag(int value) {
     return value == EMPTY_WITH_FLAG;
 }
 
-inline bool mine(int value) {
+bool mine(int value) {
     return (value & MINE) == MINE;
 }
 
-inline bool flag(int value) {
+bool flag(int value) {
     return (value & FLAG_MASK) == FLAG_MASK;
 }
 
-inline bool mineNoFlag(int value) {
+bool mineNoFlag(int value) {
     return value == MINE;
 }
 
-inline int toggleFlag(int value) {
+int toggleFlag(int value) {
     return value ^ FLAG_MASK;
 }
 
-inline int putMine(int value) {
+int putMine(int value) {
     return (value ^ MINE) & (~EMPTY);
 }
 
-inline bool isExplored(int value) {
+bool isExplored(int value) {
     return value <= MAX_MINES;
 }
 

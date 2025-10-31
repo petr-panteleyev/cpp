@@ -1,0 +1,564 @@
+//  Copyright © 2024-2025 Petr Panteleyev
+//  SPDX-License-Identifier: BSD-2-Clause
+
+module;
+
+#include "gametimer.h"
+#include "pictures.h"
+#include "ui_boardsizedialog.h"
+#include "ui_mainwindow.h"
+#include "ui_scoreboarddialog.h"
+#include "version.h"
+#include <QAbstractItemModel>
+#include <QApplication>
+#include <QDialog>
+#include <QEvent>
+#include <QFontDatabase>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QSlider>
+#include <memory>
+#include <ranges>
+#include <span>
+
+module apps.sapper;
+
+import apps.sapper.cell;
+import apps.sapper.game;
+import apps.sapper.boardsize;
+import apps.sapper.gamescore;
+import apps.sapper.scoreboard;
+import apps.sapper.settings;
+
+//
+// ButtonEventFilter
+//
+
+class ButtonEventFilter final : public QObject {
+  public:
+    explicit ButtonEventFilter(QObject *parent) : QObject{parent}, disabled_{false} {};
+
+    void setDisabled(bool disabled) noexcept { disabled_ = disabled; }
+
+  protected:
+    virtual bool eventFilter(QObject *obj, QEvent *event) override;
+
+  private:
+    bool disabled_;
+};
+
+//
+// BoardSizeDialog
+//
+
+class BoardSizeDialog final : public QDialog {
+
+  public:
+    explicit BoardSizeDialog(QWidget *parent) : QDialog{parent}, ui{std::make_unique<Ui::BoardSizeDialog>()} {
+        ui->setupUi(this);
+
+        adjustMinesSlider();
+
+        connect(ui->widthSlider, &QSlider::valueChanged, [this](auto value) {
+            ui->widthValueLabel->setText(QString::number(value));
+            adjustMinesSlider();
+        });
+        connect(ui->heightSlider, &QSlider::valueChanged, [this](auto value) {
+            ui->heightValueLabel->setText(QString::number(value));
+            adjustMinesSlider();
+        });
+        connect(ui->minesSlider, &QSlider::valueChanged,
+                [this](auto value) { ui->minesValueLabel->setText(QString::number(value)); });
+    }
+
+    ~BoardSizeDialog() {}
+
+    BoardSize boardSize() const {
+        return BoardSize::boardSize(ui->widthSlider->value(), ui->heightSlider->value(), ui->minesSlider->value());
+    }
+
+  private:
+    void adjustMinesSlider() {
+        auto maxMines = (ui->widthSlider->value() - 1) * (ui->heightSlider->value() - 1);
+        ui->minesSlider->setMaximum(maxMines);
+        ui->minesMaxLabel->setText(QString::number(maxMines));
+    }
+
+  private:
+    std::unique_ptr<Ui::BoardSizeDialog> ui;
+};
+
+//
+// ScoreBoardItemModel
+//
+
+class ScoreBoardItemModel final : public QAbstractItemModel {
+  public:
+    static constexpr int COLUMN_INDEX = 0;
+    static constexpr int COLUMN_TIME = 1;
+    static constexpr int COLUMN_DATE = 2;
+
+  public:
+    explicit ScoreBoardItemModel(QObject *parent, const ScoreBoard &scoreBoard) : QAbstractItemModel(parent) {}
+
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+        if (role != Qt::DisplayRole || orientation != Qt::Horizontal) {
+            return QVariant();
+        }
+
+        switch (section) {
+            case 0: return "";
+            case 1: return "Время";
+            case 2: return "Дата";
+            default: return QVariant();
+        }
+    }
+
+    virtual QModelIndex index(int row, int column, const QModelIndex &parent = TOP_LEVEL) const override {
+        return createIndex(row, column);
+    }
+    virtual QModelIndex parent(const QModelIndex &index) const override { return TOP_LEVEL; };
+
+    virtual int rowCount(const QModelIndex &parent = TOP_LEVEL) const override { return scores_.size(); };
+    virtual int columnCount(const QModelIndex &parent = TOP_LEVEL) const override { return 3; };
+
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
+        if (!index.isValid() || role != Qt::DisplayRole) {
+            return QVariant();
+        }
+
+        auto score = scores_.at(index.row());
+
+        switch (index.column()) {
+            case COLUMN_INDEX: return QString::number(index.row() + 1);
+            case COLUMN_TIME: return QString::fromStdString(std::format(TIME_FORMAT, score.seconds_));
+            case COLUMN_DATE: return QString::fromStdString(std::format(DATE_FORMAT, score.date_));
+        }
+
+        return QVariant();
+    }
+
+    void setScores(const std::span<GameScore> &scores) {
+        beginResetModel();
+        scores_ = std::vector<GameScore>(scores.begin(), scores.end());
+        endResetModel();
+    }
+
+  private:
+    static constexpr auto TIME_FORMAT{"{0:%T}"};
+    static constexpr auto DATE_FORMAT{"{0:%d.%m.%Y}"};
+
+  private:
+    std::vector<GameScore> scores_;
+
+    static constexpr QModelIndex TOP_LEVEL = QModelIndex();
+};
+
+//
+// ScoreBoardDialog
+//
+
+class ScoreBoardDialog : public QDialog {
+  public:
+    explicit ScoreBoardDialog(QWidget *parent, const ScoreBoard &scoreBoard)
+        : QDialog{parent}, scoreBoard_{scoreBoard}, ui(std::make_unique<Ui::ScoreBoardDialog>()),
+          model_{new ScoreBoardItemModel{this, scoreBoard_}} {
+
+        ui->setupUi(this);
+
+        ui->scoreTableView->setModel(model_);
+        ui->scoreTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui->scoreTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+        auto header = ui->scoreTableView->horizontalHeader();
+        header->setSectionResizeMode(ScoreBoardItemModel::COLUMN_INDEX, QHeaderView::ResizeToContents);
+        header->setSectionResizeMode(ScoreBoardItemModel::COLUMN_TIME, QHeaderView::Stretch);
+        header->setSectionResizeMode(ScoreBoardItemModel::COLUMN_DATE, QHeaderView::ResizeToContents);
+
+        connect(ui->boardSizeComboBox, &QComboBox::currentIndexChanged, this,
+                &ScoreBoardDialog::onBoardSizeComboBoxIndexChanged);
+    }
+
+    ~ScoreBoardDialog() {}
+
+    void setup() {
+        auto boardSizes = scoreBoard_.boardSizes();
+        boardSizes_.clear();
+
+        ui->boardSizeComboBox->clear();
+        std::for_each(boardSizes.rbegin(), boardSizes.rend(), [this](const auto &size) {
+            ui->boardSizeComboBox->addItem(QString::fromStdString(size.toString()));
+            boardSizes_.push_back(size);
+        });
+
+        if (!boardSizes.empty()) {
+            onBoardSizeComboBoxIndexChanged(0);
+        }
+    }
+
+  private:
+    void onBoardSizeComboBoxIndexChanged(int index) {
+        if (boardSizes_.empty()) {
+            return;
+        }
+        auto boardSize = boardSizes_.at(index);
+        auto scores = scoreBoard_.scores(boardSize);
+        auto vec = std::vector<GameScore>(scores.begin(), scores.end());
+        model_->setScores(vec);
+    }
+
+  private:
+    const ScoreBoard &scoreBoard_;
+    std::vector<BoardSize> boardSizes_;
+
+    std::unique_ptr<Ui::ScoreBoardDialog> ui;
+    ScoreBoardItemModel *model_;
+};
+
+//
+// MainWindow
+//
+
+class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandler {
+  public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+    void onButtonClicked(QPushButton *button, QMouseEvent *event);
+
+    virtual void onCellChanged(int x, int newValue) override;
+    virtual void onGameStatusChanged(int x, const GameStatus &newStatus) override;
+    virtual void onTimerUpdate(std::chrono::seconds seconds) override;
+
+  private:
+    void newGame(const BoardSize &boardSize);
+    void setupGameMenu();
+    void renderSuccess();
+    void renderFailure(int hitPoint);
+    int hitPointToButtonIndex(int hitPoint);
+    void buildCustomGameMenu();
+    void onHelpAbout();
+
+  private:
+    std::unique_ptr<Ui::MainWindow> ui;
+
+    Game game_;
+    ScoreBoard scoreBoard_;
+
+    std::array<QPushButton *, BoardSize::BOARD_ARRAY_SIZE> buttons_;
+    std::array<int, BoardSize::BOARD_ARRAY_SIZE> points_;
+
+    ButtonEventFilter eventFilter_;
+    BoardSize boardSize_;
+    QFont buttonFont_;
+    QFont lcdFont_;
+    GameTimer gameTimer_;
+
+    ScoreBoardDialog *scoreBoardDialog_;
+    BoardSizeDialog *boardSizeDialog_;
+};
+
+static constexpr int CELL_SIZE{40};
+static constexpr QSize IMAGE_SIZE{24, 24};
+
+static constexpr QSize BUTTON_SIZE{CELL_SIZE, CELL_SIZE};
+
+static const QString STYLE_RED{"color: red"};
+static const QString STYLE_BLACK{"color: black"};
+
+static const QIcon EMPTY_ICON;
+
+static const QString ABOUT_TEXT = R"(
+<h1>Сапёр</h1>
+<table border='0'>
+<tr><td>Версия:<td>%1
+<tr><td>Дата сборки:<td>%2
+</table>
+Copyright &copy; 2024 Petr Panteleyev
+)";
+
+static std::array<QColor, 9> NUMBER_COLORS{
+    QColorConstants::White, // unused
+    QColorConstants::Blue,        QColorConstants::DarkGreen,        QColorConstants::Red,   QColorConstants::DarkBlue,
+    QColor::fromRgb(165, 42, 42), QColor::fromRgb(0x00, 0x80, 0x80), QColorConstants::Black, QColorConstants::Gray};
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, game_{*this}, eventFilter_{this},
+      boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
+      lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
+      scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}}, boardSizeDialog_{new BoardSizeDialog{this}} {
+    ui->setupUi(this);
+
+    scoreBoard_.setScores(Settings::getGameScores());
+
+    ui->lcdMineCount->setFont(lcdFont_);
+    ui->lcdMineCount->setStyleSheet(STYLE_RED);
+
+    ui->lcdTimer->setFont(lcdFont_);
+    ui->lcdTimer->setStyleSheet(STYLE_RED);
+
+    ui->controlButton->setIcon(Pictures::icon(Picture::SMILING_FACE));
+    connect(ui->controlButton, &QPushButton::clicked, [this]() { newGame(boardSize_); });
+
+    auto index = 0;
+    for (auto row = 0; row < BoardSize::MAX_HEIGHT; ++row) {
+        for (auto column = 0; column < BoardSize::MAX_WIDTH; ++column) {
+            auto button = new QPushButton();
+            button->setFixedSize(BUTTON_SIZE);
+            button->setCheckable(true);
+            button->setFont(buttonFont_);
+
+            button->installEventFilter(&eventFilter_);
+
+            buttons_[index++] = button;
+            ui->buttonGrid->addWidget(button, row, column);
+        }
+    }
+
+    connect(ui->actionExit, &QAction::triggered, [this]() { close(); });
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onHelpAbout);
+    connect(boardSizeDialog_, &QDialog::accepted, [this]() { newGame(boardSizeDialog_->boardSize()); });
+    connect(ui->actionNewCustomGame, &QAction::triggered, [this]() { boardSizeDialog_->show(); });
+
+    setupGameMenu();
+    newGame(Settings::getLastBoardSize());
+}
+
+MainWindow::~MainWindow() {
+}
+
+void MainWindow::setupGameMenu() {
+    ui->actionBigGame->setText(QString::fromStdString(BoardSize::BIG.toString()));
+    connect(ui->actionBigGame, &QAction::triggered, [this]() { newGame(BoardSize::BIG); });
+    ui->actionMediumGame->setText(QString::fromStdString(BoardSize::MEDIUM.toString()));
+    connect(ui->actionMediumGame, &QAction::triggered, [this]() { newGame(BoardSize::MEDIUM); });
+    ui->actionSmallGame->setText(QString::fromStdString(BoardSize::SMALL.toString()));
+    connect(ui->actionSmallGame, &QAction::triggered, [this]() { newGame(BoardSize::SMALL); });
+
+    buildCustomGameMenu();
+
+    connect(ui->actionResults, &QAction::triggered, [this]() {
+        scoreBoardDialog_->setup();
+        scoreBoardDialog_->show();
+    });
+}
+
+void MainWindow::newGame(const BoardSize &boardSize) {
+    gameTimer_.stop();
+    gameTimer_.reset();
+
+    eventFilter_.setDisabled(false);
+    ui->controlButton->setIcon(Pictures::icon(Picture::SMILING_FACE));
+
+    boardSize_ = boardSize;
+    game_.newGame(boardSize);
+
+    points_.fill(-1);
+
+    for (auto button : buttons_) {
+        button->setVisible(false);
+    }
+
+    for (auto row = 0; row < boardSize.height(); ++row) {
+        for (auto column = 0; column < boardSize.width(); ++column) {
+            auto index = row * BoardSize::MAX_WIDTH + column;
+            auto button = buttons_[index];
+            button->setVisible(true);
+            button->setEnabled(true);
+            button->setChecked(false);
+            button->setText(nullptr);
+            button->setIcon(EMPTY_ICON);
+            button->setStyleSheet(STYLE_BLACK);
+
+            points_[index] = row * boardSize.width() + column;
+        }
+    }
+
+    ui->lcdMineCount->setText(QString::number(boardSize.mines()));
+
+    this->adjustSize();
+    setFixedSize(this->width(), this->height());
+
+    Settings::setLastBoardSize(boardSize);
+}
+
+void MainWindow::onButtonClicked(QPushButton *button, QMouseEvent *event) {
+    if (game_.finished()) {
+        return;
+    }
+
+    auto found = std::find(buttons_.begin(), buttons_.end(), button);
+    if (found == buttons_.end()) {
+        return;
+    }
+    auto index = std::distance(buttons_.begin(), found);
+    auto hitPoint = points_.at(index);
+
+    if (event->button() == Qt::LeftButton) {
+        game_.processHit(hitPoint);
+    } else {
+        game_.toggleFlag(hitPoint);
+    }
+    ui->lcdMineCount->setText(QString::number(game_.remainingMines()));
+}
+
+int MainWindow::hitPointToButtonIndex(int hitPoint) {
+    auto hitPointPtr = std::find(points_.begin(), points_.end(), hitPoint);
+    if (hitPointPtr == points_.end()) {
+        throw std::runtime_error("Button not found");
+    }
+    return std::distance(points_.begin(), hitPointPtr);
+}
+
+void MainWindow::onCellChanged(int x, int newValue) {
+    int index = hitPointToButtonIndex(x);
+    auto button = buttons_[index];
+
+    if (Cell::flag(newValue)) {
+        button->setText(nullptr);
+        button->setIcon(Pictures::icon(Picture::RED_FLAG));
+        button->setIconSize(IMAGE_SIZE);
+    } else if (Cell::isExplored(newValue)) {
+        button->setIcon(EMPTY_ICON);
+        button->setChecked(true);
+        button->setDisabled(true);
+
+        if (newValue == 0) {
+            button->setText(nullptr);
+        } else {
+            button->setText(QString::number(newValue));
+            button->setStyleSheet("color: " + NUMBER_COLORS[newValue].name());
+        }
+    } else {
+        button->setText(nullptr);
+        button->setIcon(EMPTY_ICON);
+    }
+}
+
+void MainWindow::onGameStatusChanged(int x, const GameStatus &newStatus) {
+    if (newStatus == GameStatus::SUCCESS) {
+        renderSuccess();
+    } else if (newStatus == GameStatus::FAILURE) {
+        renderFailure(x);
+    } else if (newStatus == GameStatus::IN_PROGRESS) {
+        gameTimer_.start();
+    }
+}
+
+void MainWindow::onTimerUpdate(std::chrono::seconds seconds) {
+    ui->lcdTimer->setText(QString::fromStdString(std::format("{0:%M:%S}", seconds)));
+}
+
+void MainWindow::renderSuccess() {
+    gameTimer_.stop();
+
+    eventFilter_.setDisabled(true);
+    ui->controlButton->setIcon(Pictures::icon(Picture::LAUGHING_FACE));
+
+    auto gameScore = GameScore{boardSize_, gameTimer_.seconds()};
+
+    auto top = scoreBoard_.add(gameScore);
+    auto scores = scoreBoard_.scores();
+    Settings::setGameScores(scores);
+
+    buildCustomGameMenu();
+
+    if (top) {
+        scoreBoardDialog_->setup();
+        scoreBoardDialog_->show();
+    }
+}
+
+void MainWindow::renderFailure(int clickPoint) {
+    eventFilter_.setDisabled(true);
+
+    gameTimer_.stop();
+    ui->controlButton->setIcon(Pictures::icon(Picture::SAD_FACE));
+
+    for (int x = 0; x < game_.size(); x++) {
+        auto value = game_.value(x);
+        auto button = buttons_[hitPointToButtonIndex(x)];
+
+        if (x == clickPoint) {
+            button->setText("*");
+            button->setStyleSheet(STYLE_RED);
+        } else {
+            if (Cell::emptyWithFlag(value)) {
+                button->setText(nullptr);
+                button->setIcon(Pictures::icon(Picture::BLACK_FLAG));
+            }
+
+            if (Cell::mineNoFlag(value)) {
+                button->setText("*");
+                button->setIcon(EMPTY_ICON);
+            }
+        }
+    }
+}
+
+void MainWindow::buildCustomGameMenu() {
+    auto menu = ui->customGameMenu;
+
+    auto actions = menu->actions();
+    for (auto index = 1; index < actions.count(); ++index) {
+        menu->removeAction(actions.at(index));
+    }
+
+    auto sizes = scoreBoard_.boardSizes();
+    auto filteredSizes =
+        sizes | std::views::filter([](const auto &s) { return !BoardSize::STANDARD_SIZES.contains(s); });
+
+    if (!filteredSizes.empty()) {
+        menu->addSeparator();
+        for (const auto &customSize : filteredSizes) {
+            auto action = new QAction(QString::fromStdString(customSize.toString()), menu);
+            menu->addAction(action);
+            connect(action, &QAction::triggered, [this, customSize]() { newGame(customSize); });
+        }
+    }
+}
+
+void MainWindow::onHelpAbout() {
+    auto text = QString(ABOUT_TEXT)
+                    .arg(QString::fromStdString(Version::projectVersion))
+                    .arg(QString::fromStdString(Version::buildDate));
+    QMessageBox::about(this, "О программе", text);
+}
+
+//
+// ButtonEventFilter implementation
+//
+
+bool ButtonEventFilter::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick) {
+        return true;
+    } else if (event->type() == QEvent::MouseButtonRelease) {
+        if (!disabled_) {
+            auto mainWindow = reinterpret_cast<MainWindow *>(this->parent());
+            mainWindow->onButtonClicked(reinterpret_cast<QPushButton *>(obj), reinterpret_cast<QMouseEvent *>(event));
+        }
+        return true;
+    }
+
+    return QObject::eventFilter(obj, event);
+}
+
+//
+// SapperApplication
+//
+
+int SapperApplication::main(int argc, char *argv[]) {
+    QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":images/icon.png"));
+
+    QFontDatabase::addApplicationFont(":/fonts/mine-sweeper.ttf");
+    QFontDatabase::addApplicationFont(":/fonts/neat-lcd.ttf");
+
+    QApplication::setOrganizationDomain("panteleyev.org");
+    QApplication::setApplicationName("Sapper");
+
+    MainWindow w;
+    w.show();
+    return a.exec();
+}

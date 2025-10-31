@@ -1,17 +1,22 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#pragma once
+module;
 
-#include "boardsize.h"
 #include <chrono>
 
-struct GameScore final {
+export module apps.sapper.gamescore;
+
+import apps.sapper.boardsize;
+import libs.common.localdate;
+
+export struct GameScore final {
     BoardSize boardSize_;
     std::chrono::year_month_day date_;
     std::chrono::seconds seconds_;
 
-    explicit GameScore(const BoardSize &boardSize, const std::chrono::seconds &seconds);
+    explicit GameScore(const BoardSize &boardSize, const std::chrono::seconds &seconds)
+        : boardSize_{boardSize}, date_{LocalDate::now()}, seconds_{seconds} {}
 
     explicit GameScore(const BoardSize &boardSize, const std::chrono::year_month_day &date, int seconds)
         : boardSize_{boardSize}, date_{date}, seconds_{seconds} {}

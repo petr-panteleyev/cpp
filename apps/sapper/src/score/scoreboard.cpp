@@ -1,11 +1,18 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "scoreboard.h"
-#include "boardsize.h"
-#include "settings.h"
+module;
+
+#include <chrono>
+#include <set>
+
+module apps.sapper.scoreboard;
+
+namespace {
 
 constexpr int TOP_SIZE = 10;
+
+}
 
 bool ScoreBoard::add(const GameScore &score) {
     auto current = scores(score.boardSize_);
@@ -33,14 +40,6 @@ bool ScoreBoard::add(const GameScore &score) {
 }
 
 ScoreBoard::ScoreBoard() {
-}
-
-void ScoreBoard::save() {
-    Settings::setGameScores(scores_);
-}
-
-void ScoreBoard::load() {
-    scores_ = Settings::getGameScores();
 }
 
 std::set<BoardSize> ScoreBoard::boardSizes() const {

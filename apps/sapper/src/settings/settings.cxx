@@ -1,13 +1,17 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#pragma once
+module;
 
-#include "boardsize.h"
-#include "gamescore.h"
 #include <span>
+#include <vector>
 
-namespace Settings {
+export module apps.sapper.settings;
+
+import apps.sapper.boardsize;
+import apps.sapper.gamescore;
+
+export namespace Settings {
 
 void setLastBoardSize(const BoardSize &boardSize);
 BoardSize getLastBoardSize();

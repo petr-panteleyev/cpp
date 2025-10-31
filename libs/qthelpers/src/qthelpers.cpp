@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include <QMenu>
 #include <QSettings>
+#include <QUuid>
 #include <QWidget>
 
 namespace QtHelpers {
@@ -76,3 +77,11 @@ void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &g
 }
 
 } // namespace QtHelpers
+
+namespace UUID {
+
+std::string randomUuid() {
+    return QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
+}
+
+} // namespace UUID

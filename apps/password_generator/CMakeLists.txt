@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_generator VERSION 25.10.1 LANGUAGES CXX)
+project(password_generator VERSION 25.10.2 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
@@ -13,9 +13,19 @@ set(PASSWORD_GENERATOR_RESOURCE_FILES
     resources/icon.png
 )
 
-FILE(GLOB_RECURSE headers "src/*.hpp")
-FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
-qt_add_executable(password_generator ${headers} ${sources})
+qt_add_executable(password_generator)
+target_sources(password_generator
+    PUBLIC
+        FILE_SET CXX_MODULES
+            TYPE CXX_MODULES
+            FILES
+                src/password_generator.cxx
+                src/util.cxx
+    PRIVATE
+        src/main.cpp
+        src/password_generator.cpp
+        src/mainwindow.ui
+)
 
 target_compile_options(password_generator PRIVATE -Werror -Wall -pedantic)
 

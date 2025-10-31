@@ -1,12 +1,12 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.10.2 LANGUAGES CXX)
+project(sapper VERSION 25.10.3 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC OFF)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
@@ -24,7 +24,14 @@ target_sources(sapper
         FILE_SET CXX_MODULES
             TYPE CXX_MODULES
             FILES
+                src/sapper.cxx
                 src/game/cell.cxx
+                src/game/board.cxx
+                src/game/boardsize.cxx
+                src/game/game.cxx
+                src/score/gamescore.cxx
+                src/score/scoreboard.cxx
+                src/settings/settings.cxx
 )
 
 target_compile_options(sapper PRIVATE -Werror -Wall -pedantic)
@@ -84,14 +91,19 @@ FILE(GLOB_RECURSE test_sources "test/*.cpp")
 
 target_sources(sapper_tests PRIVATE
     ${test_sources}
-    src/game/board.cpp
+    src/game/board.cxx
 )
+
 target_sources(sapper_tests
     PUBLIC
         FILE_SET CXX_MODULES
             TYPE CXX_MODULES
             FILES
                 src/game/cell.cxx
+                src/game/board.cxx
+                src/game/boardsize.cxx
+    PRIVATE
+        src/game/board.cpp
 )
 
 target_include_directories(sapper_tests PRIVATE

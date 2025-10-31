@@ -4,6 +4,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <string>
 
 class QAction;
 class QComboBox;
@@ -25,3 +26,9 @@ void saveWindowDimensions(const QWidget &widget, QSettings &settings, const QStr
 void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &group);
 
 } // namespace QtHelpers
+
+namespace UUID {
+
+std::string randomUuid();
+
+}

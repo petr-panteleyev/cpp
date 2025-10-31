@@ -1,7 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "game.h"
+module apps.sapper.game;
 
 import apps.sapper.cell;
 
@@ -12,14 +12,14 @@ void Game::processHit(int x) {
         return;
     }
 
-    if (gameStatus_ == Status::INITIAL) {
+    if (gameStatus_ == GameStatus::INITIAL) {
         board_.initialize(x);
-        gameStatus_ = Status::IN_PROGRESS;
+        gameStatus_ = GameStatus::IN_PROGRESS;
         callbacks_.onGameStatusChanged(x, gameStatus_);
     }
 
     if (Cell::mineNoFlag(value)) {
-        gameStatus_ = Status::FAILURE;
+        gameStatus_ = GameStatus::FAILURE;
         callbacks_.onGameStatusChanged(x, gameStatus_);
         return;
     }
@@ -38,7 +38,7 @@ void Game::toggleFlag(int x) {
     auto newValue = board_.toggleFlag(x);
     callbacks_.onCellChanged(x, newValue);
 
-    if (gameStatus_ != Status::INITIAL) {
+    if (gameStatus_ != GameStatus::INITIAL) {
         const auto &newStatus = checkForGameStatus();
         if (newStatus != gameStatus_) {
             gameStatus_ = newStatus;
@@ -64,5 +64,5 @@ void Game::countMines(int x) {
 
 void Game::newGame(const BoardSize &boardSize) {
     board_.setup(boardSize);
-    gameStatus_ = Status::INITIAL;
+    gameStatus_ = GameStatus::INITIAL;
 }

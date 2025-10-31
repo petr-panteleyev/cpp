@@ -1,9 +1,12 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "settings.h"
+module;
+
 #include <QSettings>
 #include <QTime>
+
+module apps.sapper.settings;
 
 import libs.common.localdate;
 
