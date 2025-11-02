@@ -1,12 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module;
-
-#include <chrono>
-#include <set>
-
 module apps.sapper.scoreboard;
+
+import std;
 
 namespace {
 
@@ -22,7 +19,7 @@ bool ScoreBoard::add(const GameScore &score) {
         return true;
     }
 
-    auto newTop = score.seconds_ < current.begin()->seconds_;
+    auto newTop = score < *current.begin();
 
     if (current.size() < TOP_SIZE) {
         scores_.push_back(score);
@@ -30,7 +27,7 @@ bool ScoreBoard::add(const GameScore &score) {
     }
 
     auto last = *current.rbegin();
-    if (score.seconds_ < last.seconds_) {
+    if (score < last) {
         std::erase(scores_, last);
         scores_.push_back(score);
         return newTop;

@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.10.3 LANGUAGES CXX)
+project(sapper VERSION 25.11.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -25,6 +25,7 @@ target_sources(sapper
             TYPE CXX_MODULES
             FILES
                 src/sapper.cxx
+                src/gametimer.cxx
                 src/game/cell.cxx
                 src/game/board.cxx
                 src/game/boardsize.cxx

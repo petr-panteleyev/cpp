@@ -3,7 +3,6 @@
 
 module;
 
-#include "gametimer.h"
 #include "pictures.h"
 #include "ui_boardsizedialog.h"
 #include "ui_mainwindow.h"
@@ -30,6 +29,7 @@ import apps.sapper.boardsize;
 import apps.sapper.gamescore;
 import apps.sapper.scoreboard;
 import apps.sapper.settings;
+import apps.sapper.gametimer;
 
 //
 // ButtonEventFilter
@@ -220,18 +220,19 @@ class ScoreBoardDialog : public QDialog {
 // MainWindow
 //
 
-class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandler {
+class MainWindow final : public QMainWindow {
   public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     void onButtonClicked(QPushButton *button, QMouseEvent *event);
 
-    virtual void onCellChanged(int x, int newValue) override;
-    virtual void onGameStatusChanged(int x, const GameStatus &newStatus) override;
-    virtual void onTimerUpdate(std::chrono::seconds seconds) override;
+    void onTimerUpdate(std::chrono::seconds seconds);
 
   private:
+    void onCellChanged(int x, int newValue);
+    void onGameStatusChanged(int x, GameStatus newStatus);
+
     void newGame(const BoardSize &boardSize);
     void setupGameMenu();
     void renderSuccess();
@@ -259,34 +260,44 @@ class MainWindow final : public QMainWindow, GameCallbackHandler, GameTimerHandl
     BoardSizeDialog *boardSizeDialog_;
 };
 
-static constexpr int CELL_SIZE{40};
-static constexpr QSize IMAGE_SIZE{24, 24};
+namespace {
 
-static constexpr QSize BUTTON_SIZE{CELL_SIZE, CELL_SIZE};
+constexpr int CELL_SIZE{40};
+constexpr QSize IMAGE_SIZE{24, 24};
 
-static const QString STYLE_RED{"color: red"};
-static const QString STYLE_BLACK{"color: black"};
+constexpr QSize BUTTON_SIZE{CELL_SIZE, CELL_SIZE};
 
-static const QIcon EMPTY_ICON;
+const QString STYLE_RED{"color: red"};
+const QString STYLE_BLACK{"color: black"};
 
-static const QString ABOUT_TEXT = R"(
-<h1>Сапёр</h1>
+const QIcon EMPTY_ICON;
+
+const QString ABOUT_TEXT = R"(
+<h1>Sapper</h1>
 <table border='0'>
-<tr><td>Версия:<td>%1
-<tr><td>Дата сборки:<td>%2
+<tr><td>Version:<td>%1
+<tr><td>Build date:<td>%2
 </table>
-Copyright &copy; 2024 Petr Panteleyev
+Copyright &copy; 2024-2025 Petr Panteleyev
 )";
 
-static std::array<QColor, 9> NUMBER_COLORS{
+std::array<QColor, 9> NUMBER_COLORS{
     QColorConstants::White, // unused
     QColorConstants::Blue,        QColorConstants::DarkGreen,        QColorConstants::Red,   QColorConstants::DarkBlue,
     QColor::fromRgb(165, 42, 42), QColor::fromRgb(0x00, 0x80, 0x80), QColorConstants::Black, QColorConstants::Gray};
 
+} // namespace
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()}, game_{*this}, eventFilter_{this},
-      boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
-      lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{*this},
+    : QMainWindow{parent}, ui{std::make_unique<Ui::MainWindow>()},
+      game_{[this](int x, int value) { onCellChanged(x, value); },
+            [this](int x, GameStatus status) {
+                onGameStatusChanged(x, status);
+            }},
+      eventFilter_{this}, boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
+      lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{[this](auto seconds) {
+          onTimerUpdate(seconds);
+      }},
       scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}}, boardSizeDialog_{new BoardSizeDialog{this}} {
     ui->setupUi(this);
 
@@ -436,7 +447,7 @@ void MainWindow::onCellChanged(int x, int newValue) {
     }
 }
 
-void MainWindow::onGameStatusChanged(int x, const GameStatus &newStatus) {
+void MainWindow::onGameStatusChanged(int x, GameStatus newStatus) {
     if (newStatus == GameStatus::SUCCESS) {
         renderSuccess();
     } else if (newStatus == GameStatus::FAILURE) {

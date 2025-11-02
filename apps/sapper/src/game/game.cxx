@@ -1,6 +1,10 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
+module;
+
+#include <functional>
+
 export module apps.sapper.game;
 
 import apps.sapper.board;
@@ -13,15 +17,12 @@ export enum class GameStatus {
     FAILURE,
 };
 
-export class GameCallbackHandler {
-  public:
-    virtual void onCellChanged(int x, int newValue) = 0;
-    virtual void onGameStatusChanged(int x, const GameStatus &newStatus) = 0;
-};
-
 export class Game final {
   public:
-    explicit Game(GameCallbackHandler &callbacks) : gameStatus_{GameStatus::INITIAL}, callbacks_{callbacks} {};
+    explicit Game(const std::function<void(int, int)> &cellChangedCallback,
+                  const std::function<void(int, GameStatus)> &gameStatusChangedCallback)
+        : gameStatus_{GameStatus::INITIAL}, cellChangedCallback_{cellChangedCallback},
+          gameStatusChangedCallback_{gameStatusChangedCallback} {}
 
     bool finished() const noexcept { return gameStatus_ == GameStatus::SUCCESS || gameStatus_ == GameStatus::FAILURE; }
 
@@ -43,5 +44,7 @@ export class Game final {
   private:
     Board board_;
     GameStatus gameStatus_;
-    GameCallbackHandler &callbacks_;
+
+    std::function<void(int, int)> cellChangedCallback_;
+    std::function<void(int, GameStatus)> gameStatusChangedCallback_;
 };

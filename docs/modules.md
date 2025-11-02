@@ -21,7 +21,7 @@ export int length(const QString &str) {
 }
 ```
 
-There will be lots of diagnostings like
+There will be lots of compiler errors like
 
 ```
 /usr/include/qt6/QtCore/qlatin1stringview.h:156:25: error: ‘short int QLatin1String::toShort(bool*, int) const’ exposes TU-local entity ‘T QtPrivate::toIntegral(ByteArrayView, bool*, int) [with T = short int; ByteArrayView = QByteArrayView; <template-parameter-1-3> = void]’
@@ -39,9 +39,9 @@ Which means modules cannot export anything that refers to Qt definitions.
 The only solution I found so far is to gather all Qt related classes in a single implementation partition and
 import all other modules from there. This is ugly and does not scale well.
 
-### Moc
+### Qt MOC
 
-Mocs cannot be built because custom Qt toolchain knows nothing about modules, dependency graph, etc.
+Qt MOC cannot be built because custom Qt toolchain knows nothing about modules, dependency graph, etc.
 The only solution I found was to ```set(CMAKE_AUTOMOC OFF)``` for the project and remove all Q_OBJECT macros from project
 classes. This works if these classes don't use Qt syntax extensions like signals and slots. Translation
 macros will not work either.
@@ -52,4 +52,6 @@ Header imports are not supported by CMake currently at all.
 
 ## Import std
 
-Did not work for me at the first try, will check later.
+It works with significant limitations. There must be no STL headers included via ```#include``` either directly or
+indirectly. Which means ```import std``` is practically impossible in module interface units. It can be used in module
+implementation units for rather simple modules.

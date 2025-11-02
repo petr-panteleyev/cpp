@@ -1,14 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module;
-
-#include <algorithm>
-#include <random>
-#include <span>
-
 module apps.sapper.board;
 
+import std;
 import apps.sapper.cell;
 
 namespace {

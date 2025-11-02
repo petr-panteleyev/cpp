@@ -1,7 +1,7 @@
 # C++
 
 [![License](https://www.panteleyev.org/badges/license-bsd-2.svg)](LICENSE)
-![C++](https://www.panteleyev.org/badges/cpp-20.svg)
+![C++](https://www.panteleyev.org/badges/cpp-23.svg)
 
 Monorepo for C++ exercises.
 
@@ -21,8 +21,9 @@ Monorepo for C++ exercises.
 ## Build Environment
 
 This project is built using the following environment:
-* gcc 15.2.0
-* cmake 4.1.2
+* Linux
+* GCC 15.2.0
+* CMake 4.1.2
 * Qt6.9.2
 * libcrypto 3.3.3
 * libxerces-c 3.2.5
