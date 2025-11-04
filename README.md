@@ -3,24 +3,24 @@
 [![License](https://www.panteleyev.org/badges/license-bsd-2.svg)](LICENSE)
 ![C++](https://www.panteleyev.org/badges/cpp-23.svg)
 
-Monorepo for C++ exercises.
+Монорепозиторий для C++.
 
-## Applications
+## Приложения
 
 + [Password Generator](./apps/password_generator)
 + [Password Manager](./apps/password_manager)
 + [Sapper](./apps/sapper)
 
-## Libraries
+## Библиотеки
 
 + [common](./libs/common)
 + [cryptography](./libs/cryptography)
 + [pwdgen](./libs/pwdgen)
 + [qthelpers](./libs/qthelpers)
 
-## Build Environment
+## Сборка
 
-This project is built using the following environment:
+Проект собирается на следующем окружении:
 * Linux
 * GCC 15.2.0
 * CMake 4.1.2
@@ -34,25 +34,25 @@ cmake . --preset <debug | release>
 cmake --build --preset <debug | release> [--target <target>]
 ```
 
-Build targets:
+Цели для сборки приложений:
 * password_generator
 * password_manager
 * sapper
 
-## Tests
+## Тесты
 
 ```sh
 cmake --build --preset <debug | release>
 ctest --preset <debug | release>
 ```
 
-or
+или
 
 
 ```sh
 cmake --workflow --preset <debug | release>
 ```
 
-## More
+## Разное
 
-[Some notes on C++20 modules experience](docs/modules.md)
+[Заметки по опыту использования модулей C++20](docs/modules.md)

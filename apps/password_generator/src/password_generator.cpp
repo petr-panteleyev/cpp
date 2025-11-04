@@ -34,8 +34,6 @@ class MainWindow : public QMainWindow {
     explicit MainWindow(QWidget *parent = nullptr) : QMainWindow(parent), ui(std::make_unique<Ui::MainWindow>()) {
         ui->setupUi(this);
 
-        this->setWindowTitle("Генератор паролей");
-
         // Setup length combobox
         for (auto length : PASSWORD_LENGTH_OPTIONS) {
             ui->lengthComboBox->addItem(QString::number(length), QVariant(length));
@@ -103,6 +101,16 @@ class MainWindow : public QMainWindow {
 
 int PasswordGeneratorApplication::main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+
+    QTranslator translator;
+    const auto uiLanguages = QLocale::system().uiLanguages();
+    for (const auto &locale : uiLanguages) {
+        const auto baseName = "password_generator_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            a.installTranslator(&translator);
+            break;
+        }
+    }
 
     std::vector<std::string> arguments;
     for (auto str : QCoreApplication::arguments()) {
