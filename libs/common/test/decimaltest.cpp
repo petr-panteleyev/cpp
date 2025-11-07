@@ -1,8 +1,8 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "decimal.h"
-#include "arithmeticexception.h"
+#include "decimal.hpp"
+#include "arithmeticexception.hpp"
 #include <gtest/gtest.h>
 
 using namespace Common;

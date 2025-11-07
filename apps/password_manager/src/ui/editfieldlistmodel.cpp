@@ -1,10 +1,10 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "editfieldlistmodel.h"
-#include "field.h"
-#include "fieldtype.h"
-#include "translations.h"
+#include "editfieldlistmodel.hpp"
+#include "field.hpp"
+#include "fieldtype.hpp"
+#include "translations.hpp"
 
 EditFieldListModel::EditFieldListModel(QObject *parent) : QAbstractItemModel(parent) {
 }

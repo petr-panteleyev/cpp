@@ -2,7 +2,7 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "currency.h"
-#include "decimal.h"
+#include "decimal.hpp"
 
 using Common::Decimal;
 

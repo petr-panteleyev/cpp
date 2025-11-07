@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module apps.sapper.scoreboard;
-
-import std;
+#include "scoreboard.hpp"
+#include "gamescore.hpp"
+#include <set>
 
 namespace {
 
@@ -34,9 +34,6 @@ bool ScoreBoard::add(const GameScore &score) {
     }
 
     return false;
-}
-
-ScoreBoard::ScoreBoard() {
 }
 
 std::set<BoardSize> ScoreBoard::boardSizes() const {

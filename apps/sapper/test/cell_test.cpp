@@ -1,9 +1,8 @@
 //  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
+#include "cell.hpp"
 #include <gtest/gtest.h>
-
-import apps.sapper.cell;
 
 void testMine(int value, bool expected) {
     EXPECT_EQ(Cell::mine(value), expected);

@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module apps.sapper.gametimer;
-
-import std;
+#include "gametimer.hpp"
+#include <mutex>
+#include <thread>
 
 namespace {
 

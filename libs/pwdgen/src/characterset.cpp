@@ -1,7 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "characterset.h"
+#include "characterset.hpp"
 #include <algorithm>
 
 namespace pwdgen {

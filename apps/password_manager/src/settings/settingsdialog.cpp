@@ -1,15 +1,15 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "settingsdialog.h"
-#include "fonttype.h"
-#include "qcheckbox.h"
-#include "qcombobox.h"
-#include "qthelpers.h"
-#include "settings.h"
-#include "translations.h"
+#include "settingsdialog.hpp"
+#include "fonttype.hpp"
+#include "qthelpers.hpp"
+#include "settings.hpp"
+#include "translations.hpp"
 #include "ui_settingsdialog.h"
+#include <QCheckBox>
 #include <QColorDialog>
+#include <QComboBox>
 #include <QFontDialog>
 
 static const std::array<int, 6> LENGTH{4, 6, 8, 16, 24, 32};

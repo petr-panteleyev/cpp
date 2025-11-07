@@ -1,15 +1,14 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "cardtablesortfiltermodel.h"
-#include "card.h"
-#include "cardtableitemmodel.h"
+#include "cardtablesortfiltermodel.hpp"
+#include "card.hpp"
+#include "cardtableitemmodel.hpp"
 
 namespace {
 
 int compareByActive(const Card &left, const Card &right) {
-    if (left.active() == right.active())
-        return 0;
+    if (left.active() == right.active()) return 0;
     if (!left.active() && right.active())
         return -1;
     else
@@ -17,8 +16,7 @@ int compareByActive(const Card &left, const Card &right) {
 }
 
 int compareByFavorite(const Card &left, const Card &right) {
-    if (left.favorite() == right.favorite())
-        return 0;
+    if (left.favorite() == right.favorite()) return 0;
     if (left.favorite() && !right.favorite())
         return -1;
     else
@@ -26,8 +24,7 @@ int compareByFavorite(const Card &left, const Card &right) {
 }
 
 int compareByName(const Card &left, const Card &right) {
-    if (left.name() == right.name())
-        return 0;
+    if (left.name() == right.name()) return 0;
     if (left.name() < right.name())
         return -1;
     else

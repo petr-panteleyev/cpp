@@ -2,9 +2,9 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "serializer.hpp"
-#include "str.h"
-#include "translations.h"
-#include "ui/mainwindow.h"
+#include "str.hpp"
+#include "translations.hpp"
+#include "ui/mainwindow.hpp"
 #include <QApplication>
 #include <xercesc/util/PlatformUtils.hpp>
 

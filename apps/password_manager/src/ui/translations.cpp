@@ -1,10 +1,10 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "translations.h"
-#include "fieldtype.h"
-#include "recordtype.h"
-#include "str.h"
+#include "translations.hpp"
+#include "fieldtype.hpp"
+#include "recordtype.hpp"
+#include "str.hpp"
 
 namespace Translations {
 

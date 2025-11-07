@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "enumclass.h"
+#include "enumclass.hpp"
 #include <functional>
 
 class CategoryType final : public Common::EnumClass<CategoryType> {

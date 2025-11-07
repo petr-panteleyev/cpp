@@ -1,11 +1,11 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "newcarddialog.h"
-#include "picture.h"
-#include "qthelpers.h"
-#include "recordtype.h"
-#include "timeutil.h"
+#include "newcarddialog.hpp"
+#include "picture.hpp"
+#include "qthelpers.hpp"
+#include "recordtype.hpp"
+#include "timeutil.hpp"
 #include "ui_newcarddialog.h"
 
 namespace {

@@ -13,9 +13,9 @@ target_compile_options(pwdgen PRIVATE -Werror -Wall -pedantic)
 
 target_sources(pwdgen
     PUBLIC
-        src/generator.h
+    src/generator.hpp
     PRIVATE
-        src/characterset.h
+    src/characterset.hpp
         src/characterset.cpp
         src/generator.cpp
 )

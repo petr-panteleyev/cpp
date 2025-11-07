@@ -1,7 +1,7 @@
 //  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "generator.h"
+#include "generator.hpp"
 #include <gtest/gtest.h>
 
 TEST(PwdGenTestSuite, OptionsLong) {

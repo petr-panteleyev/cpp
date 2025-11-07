@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "field.h"
-#include "creditcardtype.h"
-#include "fieldtype.h"
+#include "field.hpp"
+#include "creditcardtype.hpp"
+#include "fieldtype.hpp"
 #include <QDate>
 
 static QDate parseLocalDate(const QString &stringValue);

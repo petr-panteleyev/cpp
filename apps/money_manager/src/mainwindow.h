@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "observablevalue.h"
+#include "observablevalue.hpp"
 #include <QMainWindow>
 
 namespace Ui {

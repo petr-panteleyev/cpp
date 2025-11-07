@@ -1,12 +1,12 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "creditcardtype.h"
-#include "field.h"
-#include "fieldtype.h"
-#include "picture.h"
-#include "recordtype.h"
-#include "str.h"
+#include "creditcardtype.hpp"
+#include "field.hpp"
+#include "fieldtype.hpp"
+#include "picture.hpp"
+#include "recordtype.hpp"
+#include "str.hpp"
 #include <QDate>
 
 using std::cref;

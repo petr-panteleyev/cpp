@@ -1,11 +1,10 @@
 //  Copyright © 2024 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
+#include "board.hpp"
+#include "cell.hpp"
 #include <gtest/gtest.h>
 #include <span>
-
-import apps.sapper.cell;
-import apps.sapper.board;
 
 static constexpr int MAX_VALUE = std::numeric_limits<int>::max();
 

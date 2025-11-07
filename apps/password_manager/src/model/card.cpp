@@ -1,7 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "card.h"
+#include "card.hpp"
 
 Card::Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name,
            unsigned long modified, const QString &note, bool favorite, bool active, const std::vector<Field> &fields)

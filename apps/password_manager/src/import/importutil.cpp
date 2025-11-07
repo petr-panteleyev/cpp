@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "importutil.h"
-#include "card.h"
-#include "importrecord.h"
+#include "importutil.hpp"
+#include "card.hpp"
+#include "importrecord.hpp"
 
 using ImportRecordVec = std::vector<std::unique_ptr<ImportRecord>>;
 

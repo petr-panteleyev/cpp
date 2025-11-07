@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "decimal.h"
+#include "decimal.hpp"
 #include "moneyrecord.h"
 #include <QString>
 #include <QUuid>

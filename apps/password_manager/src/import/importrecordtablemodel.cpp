@@ -1,10 +1,10 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "importrecordtablemodel.h"
-#include "card.h"
-#include "settings.h"
-#include "translations.h"
+#include "importrecordtablemodel.hpp"
+#include "card.hpp"
+#include "settings.hpp"
+#include "translations.hpp"
 #include <QDate>
 
 static std::unordered_map<ImportAction, Settings::Color> ACTION_COLORS{

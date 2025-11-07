@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "settings.h"
-#include "generator.h"
-#include "qthelpers.h"
+#include "settings.hpp"
+#include "generator.hpp"
+#include "qthelpers.hpp"
 #include <QFont>
 #include <QSettings>
 #include <QWidget>

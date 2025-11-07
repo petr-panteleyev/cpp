@@ -1,14 +1,13 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module;
-
+#include "settings.hpp"
+#include "boardsize.hpp"
+#include "gamescore.hpp"
+#include "localdate.hpp"
 #include <QSettings>
 #include <QTime>
-
-module apps.sapper.settings;
-
-import libs.common.localdate;
+#include <span>
 
 namespace {
 

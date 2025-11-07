@@ -8,7 +8,6 @@
 #include "datacache.h"
 #include "imagecache.h"
 #include "mainwindow.h"
-#include "qnamespace.h"
 #include "settings.h"
 #include "ui_cardwindow.h"
 #include <QSortFilterProxyModel>

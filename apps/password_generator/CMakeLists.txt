@@ -1,12 +1,12 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_generator VERSION 25.11.1 LANGUAGES CXX)
+project(password_generator VERSION 25.11.2 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
 
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(PASSWORD_GENERATOR_RESOURCE_FILES
@@ -15,15 +15,10 @@ set(PASSWORD_GENERATOR_RESOURCE_FILES
 
 qt_add_executable(password_generator)
 target_sources(password_generator
-    PUBLIC
-        FILE_SET CXX_MODULES
-            TYPE CXX_MODULES
-            FILES
-                src/password_generator.cxx
-                src/util.cxx
     PRIVATE
         src/main.cpp
-        src/password_generator.cpp
+        src/mainwindow.hpp
+        src/mainwindow.cpp
         src/mainwindow.ui
 )
 

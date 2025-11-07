@@ -16,10 +16,7 @@ target_compile_options(cryptography PRIVATE -Werror -Wall -pedantic)
 
 target_sources(cryptography
     PUBLIC
-        FILE_SET CXX_MODULES
-            TYPE CXX_MODULES
-            FILES
-                src/crypto.cxx
+        src/crypto.hpp
     PRIVATE
         src/aes256.cpp
 )

@@ -1,42 +1,41 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "mainwindow.h"
-#include "card.h"
-#include "cardeditdialog.h"
-#include "cardtableitemmodel.h"
-#include "cardtablesortfiltermodel.h"
-#include "changepassworddialog.h"
-#include "exceptions.h"
-#include "field.h"
-#include "fieldtableitemmodel.h"
-#include "fieldtablesortfiltermodel.h"
-#include "fieldtype.h"
-#include "fonttype.h"
-#include "importdialog.h"
-#include "importutil.h"
-#include "newcarddialog.h"
-#include "newnotedialog.h"
-#include "passworddialog.h"
-#include "qmainwindow.h"
-#include "qthelpers.h"
+#include "mainwindow.hpp"
+#include "card.hpp"
+#include "cardeditdialog.hpp"
+#include "cardtableitemmodel.hpp"
+#include "cardtablesortfiltermodel.hpp"
+#include "changepassworddialog.hpp"
+#include "crypto.hpp"
+#include "exceptions.hpp"
+#include "field.hpp"
+#include "fieldtableitemmodel.hpp"
+#include "fieldtablesortfiltermodel.hpp"
+#include "fieldtype.hpp"
+#include "fonttype.hpp"
+#include "importdialog.hpp"
+#include "importutil.hpp"
+#include "newcarddialog.hpp"
+#include "newnotedialog.hpp"
+#include "passworddialog.hpp"
+#include "qthelpers.hpp"
 #include "serializer.hpp"
-#include "settings.h"
-#include "settingsdialog.h"
-#include "str.h"
+#include "settings.hpp"
+#include "settingsdialog.hpp"
+#include "str.hpp"
 #include "ui_mainwindow.h"
-#include "version.h"
+#include "version.hpp"
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QMainWindow>
 #include <QMessageBox>
 #include <QTimer>
 #include <iterator>
 #include <memory>
 #include <ranges>
 #include <vector>
-
-import libs.cryptography;
 
 using namespace Crypto;
 

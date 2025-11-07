@@ -1,8 +1,8 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "generator.h"
-#include "characterset.h"
+#include "generator.hpp"
+#include "characterset.hpp"
 #include <algorithm>
 #include <random>
 #include <vector>

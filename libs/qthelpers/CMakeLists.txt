@@ -11,7 +11,7 @@ target_compile_options(qthelpers PRIVATE -Werror -Wall -pedantic)
 
 target_sources(qthelpers
     PUBLIC
-        src/qthelpers.h
+    src/qthelpers.hpp
     PRIVATE
         src/qthelpers.cpp
 )

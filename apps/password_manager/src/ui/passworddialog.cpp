@@ -1,7 +1,7 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "passworddialog.h"
+#include "passworddialog.hpp"
 #include "ui_passworddialog.h"
 
 PasswordDialog::PasswordDialog(QWidget *parent) : QDialog{parent}, ui{std::make_unique<Ui::PasswordDialog>()} {

@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "importdialog.h"
-#include "importrecordtablemodel.h"
-#include "str.h"
+#include "importdialog.hpp"
+#include "importrecordtablemodel.hpp"
+#include "str.hpp"
 #include "ui_importdialog.h"
 #include <QMenu>
 

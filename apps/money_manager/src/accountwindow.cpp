@@ -5,7 +5,7 @@
 #include "account.h"
 #include "currency.h"
 #include "datacache.h"
-#include "decimal.h"
+#include "decimal.hpp"
 #include "mainwindow.h"
 #include "moneyrecorditemmodel.h"
 #include "translation.h"

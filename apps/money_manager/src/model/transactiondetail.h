@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "decimal.h"
+#include "decimal.hpp"
 #include <QString>
 #include <QUuid>
 

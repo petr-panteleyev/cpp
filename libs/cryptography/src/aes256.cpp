@@ -1,8 +1,7 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module;
-
+#include "crypto.hpp"
 #include <cstring>
 #include <openssl/conf.h>
 #include <openssl/err.h>
@@ -10,8 +9,6 @@ module;
 #include <span>
 #include <string>
 #include <vector>
-
-module libs.cryptography;
 
 namespace {
 

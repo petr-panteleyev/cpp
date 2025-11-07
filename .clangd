@@ -1,2 +1,2 @@
 CompileFlags:
-    Add: [-std=c++23, -xc++-module, -fprebuilt-module-path=build/ ] 
+    Add: [-std=c++23] 

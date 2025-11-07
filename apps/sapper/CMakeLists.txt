@@ -1,12 +1,12 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.11.1 LANGUAGES CXX)
+project(sapper VERSION 25.11.2 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC OFF)
+set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
@@ -16,24 +16,9 @@ find_package(GTest REQUIRED)
 # Executable
 #
 
-FILE(GLOB_RECURSE headers "src/*.h" "src/*.hpp")
+FILE(GLOB_RECURSE headers "src/*.hpp")
 FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
 qt_add_executable(sapper ${headers} ${sources})
-target_sources(sapper
-    PUBLIC
-        FILE_SET CXX_MODULES
-            TYPE CXX_MODULES
-            FILES
-                src/sapper.cxx
-                src/gametimer.cxx
-                src/game/cell.cxx
-                src/game/board.cxx
-                src/game/boardsize.cxx
-                src/game/game.cxx
-                src/score/gamescore.cxx
-                src/score/scoreboard.cxx
-                src/settings/settings.cxx
-)
 
 target_compile_options(sapper PRIVATE -Werror -Wall -pedantic)
 
@@ -67,9 +52,11 @@ target_link_libraries(sapper PRIVATE
 target_include_directories(sapper PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/libs/common/src
+  src
   src/game
   src/score
   src/settings
+  src/ui
 )
 
 install(TARGETS sapper
@@ -92,17 +79,10 @@ FILE(GLOB_RECURSE test_sources "test/*.cpp")
 
 target_sources(sapper_tests PRIVATE
     ${test_sources}
-    src/game/board.cxx
+    src/game/board.hpp
 )
 
 target_sources(sapper_tests
-    PUBLIC
-        FILE_SET CXX_MODULES
-            TYPE CXX_MODULES
-            FILES
-                src/game/cell.cxx
-                src/game/board.cxx
-                src/game/boardsize.cxx
     PRIVATE
         src/game/board.cpp
 )

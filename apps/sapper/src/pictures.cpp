@@ -1,7 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "pictures.h"
+#include "pictures.hpp"
 #include <QIcon>
 
 static std::unordered_map<Picture, QString> FILE_NAMES{

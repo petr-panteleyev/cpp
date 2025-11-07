@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "decimal.h"
+#include "decimal.hpp"
 #include <QByteArray>
 #include <QDate>
 #include <QString>

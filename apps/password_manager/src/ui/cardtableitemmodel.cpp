@@ -1,8 +1,8 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "cardtableitemmodel.h"
-#include "card.h"
+#include "cardtableitemmodel.hpp"
+#include "card.hpp"
 
 namespace {
 

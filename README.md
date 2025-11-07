@@ -24,7 +24,7 @@
 * Linux
 * GCC 15.2.0
 * CMake 4.1.2
-* Qt6.9.2
+* Qt 6.9.2
 * libcrypto 3.3.3
 * libxerces-c 3.2.5
 * GTest 1.13.0

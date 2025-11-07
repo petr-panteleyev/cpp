@@ -4,7 +4,7 @@
 #pragma once
 
 #include "categorytype.h"
-#include "decimal.h"
+#include "decimal.hpp"
 #include "moneyrecord.h"
 #include "transactiontype.h"
 #include <QDate>

@@ -1,7 +1,7 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "qthelpers.h"
+#include "qthelpers.hpp"
 #include <QAction>
 #include <QComboBox>
 #include <QMenu>

@@ -1,12 +1,12 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "fieldvalueeditdelegate.h"
-#include "creditcardtype.h"
-#include "editfieldlistmodel.h"
-#include "field.h"
-#include "fieldtype.h"
-#include "translations.h"
+#include "fieldvalueeditdelegate.hpp"
+#include "creditcardtype.hpp"
+#include "editfieldlistmodel.hpp"
+#include "field.hpp"
+#include "fieldtype.hpp"
+#include "translations.hpp"
 #include <QComboBox>
 #include <QDateEdit>
 

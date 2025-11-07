@@ -1,8 +1,8 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "card.h"
-#include "field.h"
+#include "card.hpp"
+#include "field.hpp"
 #include "serializer.hpp"
 #include <gtest/gtest.h>
 

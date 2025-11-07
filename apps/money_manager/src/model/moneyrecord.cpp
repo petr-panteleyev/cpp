@@ -2,7 +2,7 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "moneyrecord.h"
-#include "timeutil.h"
+#include "timeutil.hpp"
 
 MoneyRecord::MoneyRecord(QUuid uuid, long created, long modified) noexcept
     : uuid_{uuid}, created_{created}, modified_{modified} {

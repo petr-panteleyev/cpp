@@ -1,19 +1,18 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "cardeditdialog.h"
-#include "card.h"
-#include "editfieldlistmodel.h"
-#include "field.h"
-#include "fieldtype.h"
-#include "fieldvalueeditdelegate.h"
-#include "generator.h"
-#include "picture.h"
-#include "qnamespace.h"
-#include "qthelpers.h"
-#include "settings.h"
-#include "str.h"
-#include "timeutil.h"
+#include "cardeditdialog.hpp"
+#include "card.hpp"
+#include "editfieldlistmodel.hpp"
+#include "field.hpp"
+#include "fieldtype.hpp"
+#include "fieldvalueeditdelegate.hpp"
+#include "generator.hpp"
+#include "picture.hpp"
+#include "qthelpers.hpp"
+#include "settings.hpp"
+#include "str.hpp"
+#include "timeutil.hpp"
 #include "ui_cardeditdialog.h"
 #include <QMenu>
 #include <QMessageBox>

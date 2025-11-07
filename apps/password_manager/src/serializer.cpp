@@ -2,14 +2,14 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "serializer.hpp"
-#include "creditcardtype.h"
-#include "exceptions.h"
-#include "field.h"
-#include "qiodevicebase.h"
-#include "version.h"
+#include "creditcardtype.hpp"
+#include "exceptions.hpp"
+#include "field.hpp"
+#include "version.hpp"
 #include <QDate>
 #include <QFile>
 #include <QString>
+#include <memory>
 #include <string>
 #include <vector>
 #include <xercesc/dom/DOM.hpp>
@@ -28,7 +28,9 @@ namespace {
 
 template <typename T>
 auto autoReleased(T *p) {
-    return std::unique_ptr<T, void (*)(T *)>{p, [](auto *ptr) { ptr->release(); }};
+    return std::unique_ptr<T, void (*)(T *)>{p, [](auto *ptr) {
+                                                 ptr->release();
+                                             }};
 }
 
 QString XtoQ(const XMLCh *x) {

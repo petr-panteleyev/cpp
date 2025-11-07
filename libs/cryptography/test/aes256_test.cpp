@@ -1,10 +1,9 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
+#include "crypto.hpp"
 #include <gtest/gtest.h>
 #include <string>
-
-import libs.cryptography;
 
 namespace {
 

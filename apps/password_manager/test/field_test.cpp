@@ -1,8 +1,8 @@
 //  Copyright © 2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-#include "creditcardtype.h"
-#include "field.h"
+#include "creditcardtype.hpp"
+#include "field.hpp"
 #include <QDate>
 #include <gtest/gtest.h>
 

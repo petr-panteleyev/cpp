@@ -1,9 +1,9 @@
 //  Copyright © 2024-2025 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
-module apps.sapper.game;
-
-import apps.sapper.cell;
+#include "game.hpp"
+#include "boardsize.hpp"
+#include "cell.hpp"
 
 void Game::processHit(int x) {
     auto value = board_.value(x);
