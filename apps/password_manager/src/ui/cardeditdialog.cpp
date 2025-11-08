@@ -184,9 +184,9 @@ void CardEditDialog::onGenerate() {
     const auto field = model_->at(index.row());
 
     if (GENERATOR_OPTIONS.contains(field->type().ordinal())) {
-        const auto &options = Settings::getPasswordOptions(GENERATOR_OPTIONS[field->type().ordinal()]);
-        auto password = pwdgen::generate(*options.get());
-        model_->setFieldValue(index.row(), QString::fromStdString(password));
+        const auto options = Settings::getPasswordOptions(GENERATOR_OPTIONS[field->type().ordinal()]);
+        auto password = pwdgen::generate(options);
+        model_->setFieldValue(index.row(), QString::fromStdString(password.value()));
     }
 }
 

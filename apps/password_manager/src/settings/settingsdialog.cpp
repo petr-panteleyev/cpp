@@ -21,7 +21,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(std::make_
     setupFontButtons();
 
     for (const auto &entry : Settings::getAllPasswordOptions()) {
-        passwords_[entry.first] = entry.second->copy();
+        passwords_[entry.first] = entry.second;
         ui->passwordTypeComboBox->addItem(Translations::translate(entry.first), QVariant::fromValue(entry.first));
     }
     connect(ui->passwordTypeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::onPasswordTypeSelected);
@@ -34,19 +34,19 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(std::make_
 
     connect(ui->upperCaseCheckBox, &QCheckBox::clicked, [this](bool checked) {
         auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-        passwords_.at(type)->useUpperCase = checked;
+        passwords_.at(type).useUpperCase = checked;
     });
     connect(ui->lowerCaseCheckBox, &QCheckBox::clicked, [this](bool checked) {
         auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-        passwords_.at(type)->useLowerCase = checked;
+        passwords_.at(type).useLowerCase = checked;
     });
     connect(ui->digitsCheckBox, &QCheckBox::clicked, [this](bool checked) {
         auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-        passwords_.at(type)->useDigits = checked;
+        passwords_.at(type).useDigits = checked;
     });
     connect(ui->symbolsCheckBox, &QCheckBox::clicked, [this](bool checked) {
         auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
-        passwords_.at(type)->useSymbols = checked;
+        passwords_.at(type).useSymbols = checked;
     });
 }
 
@@ -102,7 +102,7 @@ void SettingsDialog::done(int code) {
         // Reset controls to current settings
         setupColorButtons(false);
         for (const auto &entry : Settings::getAllPasswordOptions()) {
-            passwords_[entry.first] = entry.second->copy();
+            passwords_[entry.first] = entry.second;
         }
     }
     QDialog::done(code);
@@ -120,12 +120,12 @@ void SettingsDialog::onFieldNameColorButton(Settings::Color color, QPushButton *
 void SettingsDialog::onPasswordTypeSelected(int index) {
     auto type = ui->passwordTypeComboBox->itemData(index).value<Settings::PasswordType>();
     const auto &options = passwords_.at(type);
-    ui->upperCaseCheckBox->setChecked(options->useUpperCase);
-    ui->lowerCaseCheckBox->setChecked(options->useLowerCase);
-    ui->digitsCheckBox->setChecked(options->useDigits);
-    ui->symbolsCheckBox->setChecked(options->useSymbols);
+    ui->upperCaseCheckBox->setChecked(options.useUpperCase);
+    ui->lowerCaseCheckBox->setChecked(options.useLowerCase);
+    ui->digitsCheckBox->setChecked(options.useDigits);
+    ui->symbolsCheckBox->setChecked(options.useSymbols);
 
-    auto lengthIndex = QtHelpers::indexOfData(*ui->passwordLengthComboBox, options->length, Qt::UserRole);
+    auto lengthIndex = QtHelpers::indexOfData(*ui->passwordLengthComboBox, options.length, Qt::UserRole);
     if (lengthIndex != -1) {
         ui->passwordLengthComboBox->setCurrentIndex(lengthIndex);
     }
@@ -134,7 +134,7 @@ void SettingsDialog::onPasswordTypeSelected(int index) {
 void SettingsDialog::onPasswordLengthSelected(int index) {
     auto type = ui->passwordTypeComboBox->currentData().value<Settings::PasswordType>();
     auto length = ui->passwordLengthComboBox->itemData(index).toInt();
-    passwords_.at(type)->length = length;
+    passwords_.at(type).length = length;
 }
 
 void SettingsDialog::onFontButtonClicked(Settings::FontType fontType, QLineEdit *fontEdit) {

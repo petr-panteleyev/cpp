@@ -48,7 +48,7 @@ static const std::unordered_map<PasswordType, QString> PASSWORD_NAMES{
     {PasswordType::Long, "long"},
 };
 
-static const std::unordered_map<PasswordType, pwdgen::PasswordGeneratorOptions> PASSWORD_DEFAULTS{
+static const std::unordered_map<PasswordType, pwdgen::Options> PASSWORD_DEFAULTS{
     {PasswordType::Pin, pwdgen::PIN_OPTIONS},
     {PasswordType::Unix, pwdgen::UNIX_OPTIONS},
     {PasswordType::Short, pwdgen::MEDIUM_OPTIONS},
@@ -96,11 +96,11 @@ void setPasswordOptions(const PasswordTypePtrMap &passwords) {
 
     for (const auto &entry : passwords) {
         settings.beginGroup(PASSWORD_NAMES.at(entry.first));
-        settings.setValue(PASSWORD_LENGTH, entry.second->length);
-        settings.setValue(PASSWORD_USE_UPPER_CASE, entry.second->useUpperCase);
-        settings.setValue(PASSWORD_USE_LOWER_CASE, entry.second->useLowerCase);
-        settings.setValue(PASSWORD_USE_DIGITS, entry.second->useDigits);
-        settings.setValue(PASSWORD_USE_SYMBOLS, entry.second->useSymbols);
+        settings.setValue(PASSWORD_LENGTH, entry.second.length);
+        settings.setValue(PASSWORD_USE_UPPER_CASE, entry.second.useUpperCase);
+        settings.setValue(PASSWORD_USE_LOWER_CASE, entry.second.useLowerCase);
+        settings.setValue(PASSWORD_USE_DIGITS, entry.second.useDigits);
+        settings.setValue(PASSWORD_USE_SYMBOLS, entry.second.useSymbols);
         settings.endGroup();
     }
 
@@ -108,7 +108,7 @@ void setPasswordOptions(const PasswordTypePtrMap &passwords) {
     settings.sync();
 }
 
-std::unique_ptr<pwdgen::PasswordGeneratorOptions> getPasswordOptions(PasswordType type) {
+pwdgen::Options getPasswordOptions(PasswordType type) {
     QSettings settings;
 
     auto defaults = PASSWORD_DEFAULTS.at(type);
@@ -119,15 +119,20 @@ std::unique_ptr<pwdgen::PasswordGeneratorOptions> getPasswordOptions(PasswordTyp
 
     auto length = settings.value(group + PASSWORD_LENGTH, defaults.length).toInt(&isOk);
     if (!isOk) {
-        return defaults.copy();
+        return defaults;
     }
 
     auto useUpperCase = settings.value(group + PASSWORD_USE_UPPER_CASE, defaults.useUpperCase).toBool();
     auto useLowerCase = settings.value(group + PASSWORD_USE_LOWER_CASE, defaults.useLowerCase).toBool();
     auto useDigits = settings.value(group + PASSWORD_USE_DIGITS, defaults.useDigits).toBool();
     auto useSymbols = settings.value(group + PASSWORD_USE_SYMBOLS, defaults.useSymbols).toBool();
-    return std::make_unique<pwdgen::PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols,
-                                                              length);
+    return pwdgen::Options{
+        .useUpperCase = useUpperCase,
+        .useLowerCase = useLowerCase,
+        .useDigits = useDigits,
+        .useSymbols = useSymbols,
+        .length = length,
+    };
 }
 
 PasswordTypePtrMap getAllPasswordOptions() {

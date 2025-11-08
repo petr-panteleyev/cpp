@@ -3,48 +3,31 @@
 
 #pragma once
 
-#include <exception>
-#include <memory>
+#include <expected>
 #include <string>
 
 namespace pwdgen {
 
 constexpr int MIN_PASSWORD_LENGTH = 4;
 
-enum class PasswordGeneratorError {
+enum class Error {
     NO_CHARACTER_SET,
     LENGTH_TOO_SMALL,
 };
 
-class PasswordGeneratorException final : std::exception {
-  private:
-    PasswordGeneratorError errorCode_;
-
-  public:
-    explicit PasswordGeneratorException(PasswordGeneratorError errorCode) : errorCode_{errorCode} {}
-
-    PasswordGeneratorError errorCode() const { return errorCode_; }
-};
-
-struct PasswordGeneratorOptions {
+struct Options final {
     bool useUpperCase;
     bool useLowerCase;
     bool useDigits;
     bool useSymbols;
     int length;
-
-    std::unique_ptr<PasswordGeneratorOptions> copy() const {
-        return std::make_unique<PasswordGeneratorOptions>(useUpperCase, useLowerCase, useDigits, useSymbols, length);
-    }
 };
 
-using PasswordGeneratorOptionsPtr = std::unique_ptr<PasswordGeneratorOptions>;
+constexpr Options PIN_OPTIONS = {false, false, true, false, 4};
+constexpr Options UNIX_OPTIONS = {true, true, true, true, 8};
+constexpr Options MEDIUM_OPTIONS = {true, true, true, true, 16};
+constexpr Options LONG_OPTIONS = {true, true, true, true, 32};
 
-constexpr PasswordGeneratorOptions PIN_OPTIONS = {false, false, true, false, 4};
-constexpr PasswordGeneratorOptions UNIX_OPTIONS = {true, true, true, true, 8};
-constexpr PasswordGeneratorOptions MEDIUM_OPTIONS = {true, true, true, true, 16};
-constexpr PasswordGeneratorOptions LONG_OPTIONS = {true, true, true, true, 32};
-
-std::string generate(const PasswordGeneratorOptions &options);
+auto generate(const Options &options) noexcept -> std::expected<std::string, Error>;
 
 } // namespace pwdgen

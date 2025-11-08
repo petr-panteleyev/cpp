@@ -7,25 +7,29 @@
 #include <random>
 #include <vector>
 
-namespace pwdgen {
+namespace {
 
-using Charsets = std::vector<const CharacterSet *>;
+using Charsets = std::vector<const pwdgen::CharacterSet *>;
 
-static std::random_device rd;
-static std::mt19937 rand(rd());
+std::random_device rd;
+std::mt19937 rand(rd());
 
-static int randomNumber(int max_value) {
+auto randomNumber(int max_value) -> int {
     return rand() % max_value;
 }
 
-static bool passwordIsOk(const Charsets &charsets, const std::string &password) {
+auto passwordIsOk(const Charsets &charsets, const std::string &password) -> bool {
     return std::find_if(charsets.begin(), charsets.end(),
                         [password](auto charset) { return !charset->containsAny(password); }) == charsets.end();
 }
 
-std::string generate(const PasswordGeneratorOptions &options) {
+} // namespace
+
+namespace pwdgen {
+
+auto generate(const Options &options) noexcept -> std::expected<std::string, Error> {
     if (options.length < MIN_PASSWORD_LENGTH) {
-        throw PasswordGeneratorException(PasswordGeneratorError::LENGTH_TOO_SMALL);
+        return std::unexpected(Error::LENGTH_TOO_SMALL);
     }
 
     Charsets usedCharsets;
@@ -43,7 +47,7 @@ std::string generate(const PasswordGeneratorOptions &options) {
         usedCharsets.push_back(&CharacterSet::SYMBOLS);
     }
     if (usedCharsets.empty()) {
-        throw PasswordGeneratorException(PasswordGeneratorError::NO_CHARACTER_SET);
+        return std::unexpected(Error::NO_CHARACTER_SET);
     }
 
     std::string password;

@@ -6,13 +6,14 @@
 #include <QApplication>
 #include <QIcon>
 #include <QTranslator>
+#include <expected>
 #include <iostream>
 
 namespace {
 
 constexpr int DEFAULT_PASSWORD_LENGTH{16};
 
-const std::string USAGE_MESSAGE = R"(Password Generator v25.10.2
+const std::string USAGE_MESSAGE = R"(Password Generator v25.11.3
 © 2024-2025, Petr Panteleyev
 Usage:
   -u        - use upper case letters
@@ -27,13 +28,21 @@ Usage:
   --help    - print this help message and exit
 )";
 
-std::unordered_map<pwdgen::PasswordGeneratorError, std::string> ERROR_MESSAGES{
-    {pwdgen::PasswordGeneratorError::LENGTH_TOO_SMALL, "Password length is invalid"},
-    {pwdgen::PasswordGeneratorError::NO_CHARACTER_SET, "At least one character set must be selected"},
+std::unordered_map<pwdgen::Error, std::string> ERROR_MESSAGES{
+    {pwdgen::Error::LENGTH_TOO_SMALL, "Password length is invalid"},
+    {pwdgen::Error::NO_CHARACTER_SET, "At least one character set must be selected"},
 };
 
-pwdgen::PasswordGeneratorOptions buildOptions(const std::span<std::string> &arguments) {
-    pwdgen::PasswordGeneratorOptions options = {false, false, false, false, DEFAULT_PASSWORD_LENGTH};
+auto parseInt(const std::string &str) -> int {
+    try {
+        return std::stoi(str);
+    } catch (...) {
+        throw std::string{"Invalid length argument"};
+    }
+}
+
+auto buildOptions(const std::span<std::string> &arguments) -> std::expected<pwdgen::Options, std::string> {
+    pwdgen::Options options = {false, false, false, false, DEFAULT_PASSWORD_LENGTH};
 
     for (auto it = std::next(arguments.begin()); it < arguments.end(); ++it) {
         if (*it == "--help") {
@@ -53,18 +62,18 @@ pwdgen::PasswordGeneratorOptions buildOptions(const std::span<std::string> &argu
         }
         if (*it == "-n") {
             if (++it == arguments.end()) {
-                throw std::string("Length argument expects number.");
+                return std::unexpected("Length argument expects number.");
             } else {
-                int length = std::stoi(*it);
+                int length = parseInt(*it);
                 if (length < pwdgen::MIN_PASSWORD_LENGTH) {
-                    throw pwdgen::PasswordGeneratorException(pwdgen::PasswordGeneratorError::LENGTH_TOO_SMALL);
+                    return std::unexpected(ERROR_MESSAGES[pwdgen::Error::LENGTH_TOO_SMALL]);
                 } else {
                     options.length = length;
                 }
             }
         } else {
             if (!it->starts_with('-')) {
-                throw "Unrecognized argument: " + *it;
+                return std::unexpected("Unrecognized argument: " + *it);
             }
             for (auto char_it = std::next(it->begin()); char_it < it->end(); ++char_it) {
                 switch (*char_it) {
@@ -72,7 +81,7 @@ pwdgen::PasswordGeneratorOptions buildOptions(const std::span<std::string> &argu
                     case 'l': options.useLowerCase = true; break;
                     case 'd': options.useDigits = true; break;
                     case 's': options.useSymbols = true; break;
-                    default: throw std::string("Invalid option -") + *char_it;
+                    default: return std::unexpected(std::string{"Invalid option -"} + *char_it);
                 }
             }
         }
@@ -108,19 +117,17 @@ int main(int argc, char *argv[]) {
         w.show();
         return a.exec();
     } else {
-        try {
-            auto options = buildOptions(arguments);
-            std::cout << generate(options) << std::endl;
-        } catch (const pwdgen::PasswordGeneratorException &ex) {
-            std::cerr << ERROR_MESSAGES[ex.errorCode()] << std::endl;
-            return -1;
-        } catch (const std::string &message) {
-            std::cerr << message << std::endl;
-            return -1;
-        } catch (const QString &message) {
-            std::cerr << message.toStdString() << std::endl;
+        auto result = buildOptions(arguments).and_then([](const auto &options) {
+            auto pwd = pwdgen::generate(options);
+            return pwd ? std::expected<std::string, std::string>(pwd.value())
+                       : std::unexpected(ERROR_MESSAGES[pwd.error()]);
+        });
+        if (result) {
+            std::cout << result.value() << std::endl;
+            return 0;
+        } else {
+            std::cerr << result.error() << std::endl;
             return -1;
         }
     }
-    return -1;
 }
