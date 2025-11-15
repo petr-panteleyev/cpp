@@ -46,7 +46,7 @@ qt_add_resources(sapper "fonts"
 target_link_libraries(sapper PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
-    common
+#    common
 )
 
 target_include_directories(sapper PRIVATE

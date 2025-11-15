@@ -4,7 +4,7 @@
 #include "transactiondetail.h"
 #include "transaction.h"
 
-using Common::Decimal;
+using Numeric::Decimal;
 
 TransactionDetail::TransactionDetail(QUuid uuid, Decimal amount, QUuid accountCreditedUuid, const QString &comment,
                                      long modified)

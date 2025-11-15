@@ -4,7 +4,7 @@
 #include "resultset.h"
 #include <QSqlQuery>
 
-using Common::Decimal;
+using Numeric::Decimal;
 
 ResultSet::ResultSet(QSqlQuery &query) noexcept : query_{query}, currentRow_{-1} {
     rows_ = query.isSelect() ? query.size() : query.numRowsAffected();

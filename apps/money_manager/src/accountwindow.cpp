@@ -5,9 +5,9 @@
 #include "account.h"
 #include "currency.h"
 #include "datacache.h"
-#include "decimal.hpp"
 #include "mainwindow.h"
 #include "moneyrecorditemmodel.h"
+#include "numeric.hpp"
 #include "translation.h"
 #include "ui_accountwindow.h"
 #include <QSortFilterProxyModel>
@@ -15,8 +15,7 @@
 #include <settings.h>
 #include <unordered_map>
 
-using Common::Decimal;
-using Common::RoundingMode;
+using Numeric::Decimal;
 using std::make_unique;
 
 namespace {
@@ -91,10 +90,10 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
                 break;
             case COLUMN_INTEREST:
                 if (role == Qt::DisplayRole) {
-                    if (account.interest() <=> Decimal::ZERO == std::strong_ordering::equal) {
+                    if (account.interest() == Numeric::DECIMAL_ZERO) {
                         return "";
                     } else {
-                        return QString::fromStdString(account.interest().setScale(2, RoundingMode::HALF_UP).toString());
+                        return QString::fromStdString(Numeric::toFinancialString2(account.interest()));
                     }
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
@@ -113,20 +112,20 @@ class AccountWindow::AccountFilterModel : public QSortFilterProxyModel {
                 break;
             case COLUMN_BALANCE:
                 if (role == Qt::DisplayRole) {
-                    return QString::fromStdString(account.total().setScale(2, RoundingMode::HALF_UP).toString());
+                    return QString::fromStdString(Numeric::toFinancialString2(account.total()));
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::ForegroundRole) {
-                    return account.total().signum() < 0 ? NEGATIVE_COLOR : POSITIVE_COLOR;
+                    return account.total() < 0 ? NEGATIVE_COLOR : POSITIVE_COLOR;
                 }
                 break;
             case COLUMN_WAITING:
                 if (role == Qt::DisplayRole) {
-                    return QString::fromStdString(account.totalWaiting().setScale(2, RoundingMode::HALF_UP).toString());
+                    return QString::fromStdString(Numeric::toFinancialString2(account.totalWaiting()));
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::ForegroundRole) {
-                    return account.totalWaiting().signum() < 0 ? NEGATIVE_COLOR : POSITIVE_COLOR;
+                    return account.totalWaiting() < 0 ? NEGATIVE_COLOR : POSITIVE_COLOR;
                 }
                 break;
         }

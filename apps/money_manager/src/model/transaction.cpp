@@ -3,7 +3,7 @@
 
 #include "transaction.h"
 
-using Common::Decimal;
+using Numeric::Decimal;
 
 Transaction::Transaction(QUuid uuid, Decimal amount, Decimal creditAmount, QDate transactionDate,
                          const TransactionType &type, const QString &comment, bool checked, QUuid accountDebitedUuid,

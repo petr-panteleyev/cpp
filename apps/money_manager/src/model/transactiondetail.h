@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "decimal.hpp"
+#include "numeric.hpp"
 #include <QString>
 #include <QUuid>
 
@@ -11,7 +11,7 @@ class Transaction;
 
 class TransactionDetail final {
   public:
-    explicit TransactionDetail(QUuid uuid, Common::Decimal amount, QUuid accountCreditedUuid, const QString &comment,
+    explicit TransactionDetail(QUuid uuid, Numeric::Decimal amount, QUuid accountCreditedUuid, const QString &comment,
                                long modified);
 
     explicit TransactionDetail(const Transaction &transaction);
@@ -19,7 +19,7 @@ class TransactionDetail final {
 
   private:
     QUuid uuid_;
-    Common::Decimal amount_;
+    Numeric::Decimal amount_;
     QUuid accountCreditedUuid_;
     QString comment_;
     long modified_;

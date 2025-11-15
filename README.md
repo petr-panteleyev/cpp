@@ -10,6 +10,7 @@
 + [Password Generator](./apps/password_generator)
 + [Password Manager](./apps/password_manager)
 + [Sapper](./apps/sapper)
++ [Money Manager](./apps/money_manager)
 
 ## Библиотеки
 
@@ -21,7 +22,7 @@
 ## Сборка
 
 Проект собирается на следующем окружении:
-* Linux
+* Alt Linux p11
 * GCC 15.2.0
 * CMake 4.1.2
 * Qt 6.9.2
@@ -38,6 +39,7 @@ cmake --build --preset <debug | release> [--target <target>]
 * password_generator
 * password_manager
 * sapper
+* money_manager
 
 ## Тесты
 
@@ -52,6 +54,13 @@ ctest --preset <debug | release>
 ```sh
 cmake --workflow --preset <debug | release>
 ```
+
+
+## Сторонние исходные тексты
+
+Временно включены в репозиторий до появления в репозиториях Alt Linux:
++ [Boost.Decimal](https://develop.decimal.cpp.al/decimal/overview.html)
+
 
 ## Разное
 

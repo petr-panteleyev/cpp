@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include "decimal.hpp"
 #include "moneyrecord.h"
+#include "numeric.hpp"
 #include <QString>
 #include <QUuid>
 
 class Currency final : public MoneyRecord {
   public:
     explicit Currency(QUuid uuid, const QString &symbol, const QString &description, const QString &formatSymbol,
-                      int formatSymbolPosition, bool showFormatSymbol, bool def, Common::Decimal rate, int direction,
+                      int formatSymbolPosition, bool showFormatSymbol, bool def, Numeric::Decimal rate, int direction,
                       bool useThousandSeparator, long created, long modified);
     ~Currency() = default;
 
@@ -25,7 +25,7 @@ class Currency final : public MoneyRecord {
     int formatSymbolPosition_;
     bool showFormatSymbol_;
     bool def_;
-    Common::Decimal rate_;
+    Numeric::Decimal rate_;
     int direction_;
     bool useThousandSeparator_;
 };

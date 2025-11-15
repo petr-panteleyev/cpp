@@ -15,9 +15,9 @@
 #include "contactwindow.h"
 #include "currencywindow.h"
 #include "datacache.h"
-#include "decimal.hpp"
 #include "imagecache.h"
 #include "moneydao.h"
+#include "numeric.hpp"
 #include "qthelpers.hpp"
 #include "settings.h"
 #include "sqlexception.h"
@@ -155,7 +155,7 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
                 break;
             case COLUMN_AMOUNT:
                 if (role == Qt::DisplayRole) {
-                    return QString::fromStdString(tr.amount().setScale(2, Common::RoundingMode::HALF_UP).toString());
+                    return QString::fromStdString(Numeric::toFinancialString2(tr.amount()));
                 } else if (role == Qt::TextAlignmentRole) {
                     return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::ForegroundRole) {

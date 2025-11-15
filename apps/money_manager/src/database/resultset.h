@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "decimal.hpp"
+#include "numeric.hpp"
 #include <QByteArray>
 #include <QDate>
 #include <QString>
@@ -46,8 +46,8 @@ class ResultSet final {
     bool getBoolean(int columnNumber) const;
     bool getBoolean(const QString &name) const;
 
-    Common::Decimal getDecimal(int columnNumber) const;
-    Common::Decimal getDecimal(const QString &name) const;
+    Numeric::Decimal getDecimal(int columnNumber) const;
+    Numeric::Decimal getDecimal(const QString &name) const;
 
     QDate getQDate(int columnNumber) const;
     QDate getQDate(const QString &name) const;

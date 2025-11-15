@@ -4,7 +4,7 @@
 #include "account.h"
 #include <stdexcept>
 
-using Common::Decimal;
+using Numeric::Decimal;
 
 Account::Account(QUuid uuid, const QString &name, const QString &comment, const QString &accountNumber,
                  Decimal openingBalance, Decimal accountLimit, Decimal currencyRate, const CategoryType &type,

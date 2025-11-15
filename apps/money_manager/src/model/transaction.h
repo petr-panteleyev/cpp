@@ -4,8 +4,8 @@
 #pragma once
 
 #include "categorytype.h"
-#include "decimal.hpp"
 #include "moneyrecord.h"
+#include "numeric.hpp"
 #include "transactiontype.h"
 #include <QDate>
 #include <QUuid>
@@ -13,7 +13,7 @@
 
 class Transaction final : public MoneyRecord {
   public:
-    Transaction(QUuid uuid, Common::Decimal amount, Common::Decimal creditAmount, QDate transactionDate,
+    Transaction(QUuid uuid, Numeric::Decimal amount, Numeric::Decimal creditAmount, QDate transactionDate,
                 const TransactionType &type, const QString &comment, bool checked_, QUuid accountDebitedUuid,
                 QUuid accountCreditedUuid, const CategoryType &accountDebitedType,
                 const CategoryType &accountCreditedType, QUuid accountDebitedCategoryUuid,
@@ -22,7 +22,7 @@ class Transaction final : public MoneyRecord {
                 long created, long modified);
     ~Transaction() = default;
 
-    Common::Decimal amount() const noexcept { return amount_; }
+    Numeric::Decimal amount() const noexcept { return amount_; }
     QDate transactionDate() const noexcept { return transactionDate_; }
     unsigned type() const noexcept { return type_; }
     const QString &comment() const noexcept { return comment_; }
@@ -34,8 +34,8 @@ class Transaction final : public MoneyRecord {
     std::optional<QUuid> contactUuid() const noexcept { return contactUuid_; }
 
   private:
-    Common::Decimal amount_;
-    Common::Decimal creditAmount_;
+    Numeric::Decimal amount_;
+    Numeric::Decimal creditAmount_;
     QDate transactionDate_;
     unsigned type_;
     QString comment_;

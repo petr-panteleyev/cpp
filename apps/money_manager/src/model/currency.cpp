@@ -2,9 +2,8 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "currency.h"
-#include "decimal.hpp"
 
-using Common::Decimal;
+using Numeric::Decimal;
 
 Currency::Currency(QUuid uuid, const QString &symbol, const QString &description, const QString &formatSymbol,
                    int formatSymbolPosition, bool showFormatSymbol, bool def, Decimal rate, int direction,

@@ -1,7 +1,7 @@
 # Copyright © 2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(money_manager VERSION 25.1.1 LANGUAGES CXX)
+project(money_manager VERSION 25.11.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -35,7 +35,6 @@ target_link_libraries(money_manager PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Xml
     Qt${QT_VERSION_MAJOR}::Sql
-    common
     qthelpers
 )
 
