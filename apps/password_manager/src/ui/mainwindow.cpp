@@ -25,6 +25,7 @@
 #include "settingsdialog.hpp"
 #include "str.hpp"
 #include "ui_mainwindow.h"
+#include "ui_tools.hpp"
 #include "version.hpp"
 #include <QClipboard>
 #include <QDesktopServices>
@@ -207,7 +208,7 @@ void MainWindow::continueOpen(const QString &fileName, const QString &password) 
 
         Settings::setCurrentFile(currentFileName_.get());
     } catch (const PasswordManagerException &ex) {
-        QMessageBox::critical(this, Str::CRITICAL_ERROR, ex.message());
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, QString(ex.message()));
     } catch (const CryptoException &ex) {
         QMessageBox::critical(this, Str::CRITICAL_ERROR, QString::fromStdString(ex.message()));
     }
@@ -231,17 +232,17 @@ void MainWindow::onCurrentCardChanged(const QModelIndex &current, const QModelIn
         fieldModel_->setItems(currentCard.fields());
 
         if (currentCard.isNote()) {
-            ui->tabWidget->setTabText(TAB_NOTE, currentCard.name());
+            ui->tabWidget->setTabText(TAB_NOTE, QString(currentCard.name()));
         } else {
-            ui->tabWidget->setTabText(TAB_FIELDS, currentCard.name());
+            ui->tabWidget->setTabText(TAB_FIELDS, QString(currentCard.name()));
             ui->tabWidget->setTabIcon(TAB_FIELDS, currentCard.picture().icon());
             ui->tabWidget->setTabText(TAB_NOTE, Str::NOTES);
         }
 
         ui->tabWidget->setTabVisible(TAB_FIELDS, !currentCard.fields().empty());
-        ui->tabWidget->setTabVisible(TAB_NOTE, currentCard.isNote() || !currentCard.note().isEmpty());
+        ui->tabWidget->setTabVisible(TAB_NOTE, currentCard.isNote() || !currentCard.note().empty());
 
-        ui->noteViewer->setText(currentCard.note());
+        ui->noteViewer->setText(QString(currentCard.note()));
     } else {
         fieldModel_->clearItems();
         ui->noteViewer->setText("");
@@ -270,7 +271,7 @@ void MainWindow::onFieldTableDoubleClicked(const QModelIndex &index) {
     auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
 
     if (field->type() == FieldType::LINK && Settings::getOpenLinkWithDoubleClick()) {
-        QDesktopServices::openUrl(QUrl(field->getValueAsString()));
+        QDesktopServices::openUrl(QUrl(UiTools::toString(*field)));
     } else {
         fieldModel_->toggleMasking(sourceIndex, *field);
     }
@@ -285,8 +286,9 @@ void MainWindow::onFieldTableContextMenuRequested(QPoint pos) {
     const auto field = fieldModel_->fieldAtIndex(sourceIndex.row());
 
     copyFieldAction_->setText(Str::COPY + " \"" + field->name() + "\"");
-    copyFieldAction_->setData(field->getValueAsString());
-    openLinkAction_->setData(field->getValueAsString());
+    auto fieldValueString = UiTools::toString(*field);
+    copyFieldAction_->setData(fieldValueString);
+    openLinkAction_->setData(fieldValueString);
     fieldContextMenu_->popup(ui->fieldTable->viewport()->mapToGlobal(pos));
 
     openLinkAction_->setVisible(field->type() == FieldType::LINK);
@@ -374,19 +376,19 @@ void MainWindow::writeFile(const QString &fileName, const QString &password) con
         return;
     }
 
-    QByteArray buffer;
+    std::vector<char> buffer;
     Serializer::serialize(cardModel_->data(), buffer);
 
     QFile file{fileName};
     if (!file.open(QIODevice::WriteOnly)) {
-        throw PasswordManagerException("Файл не может быть сохранен.");
+        throw PasswordManagerException(u"Файл не может быть сохранен.");
     }
 
     if (!password.isEmpty()) {
         auto encrypted = aes256::encrypt(buffer, password.toStdString());
         file.write(encrypted.data(), encrypted.size());
     } else {
-        file.write(buffer);
+        file.write(buffer.data(), buffer.size());
     }
 
     file.close();
@@ -559,7 +561,7 @@ void MainWindow::continueImport(const QString &fileName, const QString &password
             }
         }
     } catch (const PasswordManagerException &ex) {
-        QMessageBox::critical(this, Str::CRITICAL_ERROR, ex.message());
+        QMessageBox::critical(this, Str::CRITICAL_ERROR, QString(ex.message()));
     } catch (const CryptoException &ex) {
         QMessageBox::critical(this, Str::CRITICAL_ERROR, QString::fromStdString(ex.message()));
     }

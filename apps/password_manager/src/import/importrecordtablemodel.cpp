@@ -37,7 +37,7 @@ QVariant ImportRecordTableModel::data(const QModelIndex &index, int role) const 
                    : Settings::getColor(ACTION_COLORS[record.action()]);
     } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
-            case COLUMN_TITLE: return record.cardToImport()->name();
+            case COLUMN_TITLE: return QString(record.cardToImport()->name());
             case COLUMN_UPDATED: {
                 auto dateTime = QDateTime::fromMSecsSinceEpoch(record.cardToImport()->modified());
                 return dateTime.toString("dd.MM.yyyy HH:mm:ss");

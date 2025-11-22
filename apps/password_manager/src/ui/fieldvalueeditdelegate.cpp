@@ -6,7 +6,9 @@
 #include "editfieldlistmodel.hpp"
 #include "field.hpp"
 #include "fieldtype.hpp"
+#include "qthelpers.hpp"
 #include "translations.hpp"
+#include "ui_tools.hpp"
 #include <QComboBox>
 #include <QDateEdit>
 
@@ -29,9 +31,11 @@ QWidget *FieldValueEditDelegate::createEditor(QWidget *parent, const QStyleOptio
             if (field->type() == FieldType::CARD_TYPE) {
                 auto comboBox = new QComboBox(parent);
                 for (const CreditCardType &type : CreditCardType::values()) {
-                    comboBox->addItem(type.cardTypeName(), type.ordinal());
+                    comboBox->addItem(QString(type.cardTypeName()), type.ordinal());
                 }
                 return comboBox;
+            } else if (field->type() == FieldType::DATE || field->type() == FieldType::EXPIRATION_MONTH) {
+                return new QDateEdit(parent);
             } else {
                 return QStyledItemDelegate::createEditor(parent, option, index);
             }
@@ -54,8 +58,11 @@ void FieldValueEditDelegate::setEditorData(QWidget *editor, const QModelIndex &i
         case EditFieldListModel::FIELD_TABLE_VALUE_COLUMN: {
             if (field->type() == FieldType::CARD_TYPE) {
                 auto comboBox = reinterpret_cast<QComboBox *>(editor);
-                auto index = field->value().toUInt();
+                auto index = std::get<unsigned int>(field->value());
                 comboBox->setCurrentIndex(index);
+            } else if (field->type() == FieldType::DATE || field->type() == FieldType::EXPIRATION_MONTH) {
+                auto dateEdit = reinterpret_cast<QDateEdit *>(editor);
+                dateEdit->setDate(field->valueAsDate());
             } else {
                 QStyledItemDelegate::setEditorData(editor, index);
             }
@@ -75,10 +82,11 @@ void FieldValueEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
             auto ordinal = comboBox->currentData().toUInt();
             const auto &newType = FieldType::valueOf(ordinal);
             if (newType != field->type()) {
-                auto newValue = field->convertValue(newType);
+                auto newValue = UiTools::convertValue(*field, newType);
                 field->setType(newType);
                 field->setValue(newValue);
             }
+            break;
         }
 
         case EditFieldListModel::FIELD_TABLE_VALUE_COLUMN: {
@@ -88,10 +96,11 @@ void FieldValueEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
                 field->setValue(ordinal);
             } else if (field->type() == FieldType::DATE || field->type() == FieldType::EXPIRATION_MONTH) {
                 auto dateEdit = reinterpret_cast<QDateEdit *>(editor);
-                field->setValue(dateEdit->date());
+                field->setValue(QtHelpers::toChrono(dateEdit->date()));
             } else {
                 QStyledItemDelegate::setModelData(editor, model, index);
             }
+            break;
         }
 
         default: QStyledItemDelegate::setModelData(editor, model, index);

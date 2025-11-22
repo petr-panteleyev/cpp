@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <QString>
+#include <string>
 
 class PasswordManagerException : std::exception {
   public:
-    PasswordManagerException(const QString &message) : message_{message} {}
+    PasswordManagerException(const std::u16string &message) : message_{message} {}
 
-    const QString &message() const noexcept { return message_; }
+    const std::u16string &message() const noexcept { return message_; }
 
   private:
-    QString message_;
+    std::u16string message_;
 };

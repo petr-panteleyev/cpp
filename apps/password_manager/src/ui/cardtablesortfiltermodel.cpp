@@ -60,5 +60,5 @@ bool CardTableSortFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex
         return true;
     }
 
-    return card.name().toLower().contains(filterText_.toLower());
+    return QString(card.name()).toLower().contains(filterText_.toLower());
 }

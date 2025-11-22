@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include <chrono>
 #include <initializer_list>
-#include <string>
 
 class QAction;
 class QComboBox;
@@ -13,6 +13,7 @@ class QMenu;
 class QSettings;
 class QString;
 class QWidget;
+class QDate;
 
 namespace QtHelpers {
 
@@ -25,10 +26,6 @@ int indexOfData(const QComboBox &comboBox, const QVariant &data, int role);
 void saveWindowDimensions(const QWidget &widget, QSettings &settings, const QString &group);
 void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &group);
 
+std::chrono::year_month_day toChrono(const QDate &date);
+
 } // namespace QtHelpers
-
-namespace UUID {
-
-std::string randomUuid();
-
-}

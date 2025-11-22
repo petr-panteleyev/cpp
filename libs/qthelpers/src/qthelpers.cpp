@@ -4,9 +4,9 @@
 #include "qthelpers.hpp"
 #include <QAction>
 #include <QComboBox>
+#include <QDate>
 #include <QMenu>
 #include <QSettings>
-#include <QUuid>
 #include <QWidget>
 
 namespace QtHelpers {
@@ -76,12 +76,11 @@ void loadWindowDimensions(QWidget &widget, QSettings &settings, const QString &g
     settings.endGroup();
 }
 
-} // namespace QtHelpers
-
-namespace UUID {
-
-std::string randomUuid() {
-    return QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
+std::chrono::year_month_day toChrono(const QDate &date) {
+    if (!date.isValid()) return std::chrono::year_month_day{};
+    return std::chrono::year_month_day{std::chrono::year{date.year()},
+                                       std::chrono::month{static_cast<unsigned int>(date.month())},
+                                       std::chrono::day{static_cast<unsigned int>(date.day())}};
 }
 
-} // namespace UUID
+} // namespace QtHelpers

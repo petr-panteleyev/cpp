@@ -4,12 +4,15 @@
 #include "creditcardtype.hpp"
 #include "field.hpp"
 #include "fieldtype.hpp"
+#include "localdate.hpp"
 #include "picture.hpp"
 #include "recordtype.hpp"
-#include "str.hpp"
-#include <QDate>
 
 using std::cref;
+
+namespace {
+const std::u16string EMPTY_STRING{u""};
+}
 
 // Picture
 const Picture Picture::AIRPLANE{"AIRPLANE", "airplane.png"};
@@ -127,15 +130,15 @@ const std::vector<std::reference_wrapper<const FieldType>> Common::EnumClass<Fie
 };
 
 // CreditCardType
-const CreditCardType CreditCardType::AMEX("AMEX", "American Express", Picture::AMEX);
-const CreditCardType CreditCardType::DINERS("DINERS", "Diners Club", Picture::DINERS);
-const CreditCardType CreditCardType::JCB("JCB", "JCB", Picture::JCB);
-const CreditCardType CreditCardType::MASTERCARD("MASTERCARD", "MasterCard", Picture::MASTERCARD);
-const CreditCardType CreditCardType::MIR("MIR", "Мир", Picture::MIR);
-const CreditCardType CreditCardType::PAYPAL("PAYPAL", "PayPal", Picture::PAYPAL);
-const CreditCardType CreditCardType::UNION_PAY("UNION_PAY", "Union Pay", Picture::UNIONPAY);
-const CreditCardType CreditCardType::VISA("VISA", "VISA", Picture::VISA);
-const CreditCardType CreditCardType::OTHER("OTHER", "Other", Picture::CREDIT_CARD);
+const CreditCardType CreditCardType::AMEX("AMEX", u"American Express", Picture::AMEX);
+const CreditCardType CreditCardType::DINERS("DINERS", u"Diners Club", Picture::DINERS);
+const CreditCardType CreditCardType::JCB("JCB", u"JCB", Picture::JCB);
+const CreditCardType CreditCardType::MASTERCARD("MASTERCARD", u"MasterCard", Picture::MASTERCARD);
+const CreditCardType CreditCardType::MIR("MIR", u"Мир", Picture::MIR);
+const CreditCardType CreditCardType::PAYPAL("PAYPAL", u"PayPal", Picture::PAYPAL);
+const CreditCardType CreditCardType::UNION_PAY("UNION_PAY", u"Union Pay", Picture::UNIONPAY);
+const CreditCardType CreditCardType::VISA("VISA", u"VISA", Picture::VISA);
+const CreditCardType CreditCardType::OTHER("OTHER", u"Other", Picture::CREDIT_CARD);
 
 template <>
 const std::vector<std::reference_wrapper<const CreditCardType>> Common::EnumClass<CreditCardType>::values_{
@@ -145,27 +148,26 @@ const std::vector<std::reference_wrapper<const CreditCardType>> Common::EnumClas
 };
 
 // RecordType
-const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, "Пустая", {});
-const RecordType
-    RecordType::CREDIT_CARD("CREDIT_CARD", Picture::CREDIT_CARD, "Кредитная карта",
-                            {
-                                Field(FieldType::STRING, "Кто выпустил", ""),
-                                Field(FieldType::CARD_TYPE, "Тип карты", CreditCardType::MIR.ordinal()),
-                                Field(FieldType::CREDIT_CARD_NUMBER, "Номер карты", ""),
-                                Field(FieldType::EXPIRATION_MONTH, "Месяц окончания", QDate::currentDate()),
-                                Field(FieldType::PIN, "PIN", ""),
-                                Field(FieldType::STRING, "Имя на карте", ""),
-                                Field(FieldType::STRING, "Телефон банка", ""),
-                                Field(FieldType::HIDDEN, "CVC#", ""),
-                                Field(FieldType::STRING, Str::LOGIN, ""),
-                                Field(FieldType::LONG_PASSWORD, Str::PASSWORD, ""),
-                            });
-const RecordType RecordType::PASSWORD("PASSWORD", Picture::GENERIC, Str::PASSWORD,
+const RecordType RecordType::EMPTY("EMPTY", Picture::GENERIC, u"Пустая", {});
+const RecordType RecordType::CREDIT_CARD("CREDIT_CARD", Picture::CREDIT_CARD, u"Кредитная карта",
+                                         {
+                                             Field(FieldType::STRING, u"Кто выпустил", EMPTY_STRING),
+                                             Field(FieldType::CARD_TYPE, u"Тип карты", CreditCardType::MIR.ordinal()),
+                                             Field(FieldType::CREDIT_CARD_NUMBER, u"Номер карты", EMPTY_STRING),
+                                             Field(FieldType::EXPIRATION_MONTH, u"Месяц окончания", LocalDate::now()),
+                                             Field(FieldType::PIN, u"PIN", EMPTY_STRING),
+                                             Field(FieldType::STRING, u"Имя на карте", EMPTY_STRING),
+                                             Field(FieldType::STRING, u"Телефон банка", EMPTY_STRING),
+                                             Field(FieldType::HIDDEN, u"CVC#", EMPTY_STRING),
+                                             Field(FieldType::STRING, u"Логин", EMPTY_STRING),
+                                             Field(FieldType::LONG_PASSWORD, u"Пароль", EMPTY_STRING),
+                                         });
+const RecordType RecordType::PASSWORD("PASSWORD", Picture::GENERIC, u"Пароль",
                                       {
-                                          Field(FieldType::STRING, "Система", ""),
-                                          Field(FieldType::STRING, Str::LOGIN, ""),
-                                          Field(FieldType::LONG_PASSWORD, Str::PASSWORD, ""),
-                                          Field(FieldType::LINK, "URL", ""),
+                                          Field(FieldType::STRING, u"Система", EMPTY_STRING),
+                                          Field(FieldType::STRING, u"Логин", EMPTY_STRING),
+                                          Field(FieldType::LONG_PASSWORD, u"Пароль", EMPTY_STRING),
+                                          Field(FieldType::LINK, u"URL", EMPTY_STRING),
                                       });
 
 template <>

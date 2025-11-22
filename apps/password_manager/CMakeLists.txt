@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(password_manager VERSION 25.11.2 LANGUAGES CXX)
+project(password_manager VERSION 25.11.3 LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -19,7 +19,7 @@ find_package(GTest REQUIRED)
 #
 
 FILE(GLOB_RECURSE headers "src/*.h" "src/*.hpp")
-FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
+FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui" "src/*.c")
 qt_add_executable(password_manager ${headers} ${sources})
 
 target_compile_options(password_manager PRIVATE -Werror -Wall -pedantic)
@@ -35,12 +35,6 @@ qt_add_resources(password_manager "resources"
     PREFIX "/images"
     BASE "resources"
     FILES ${PASSWORD_MANAGER_RESOURCE_FILES}
-)
-
-qt_add_resources(password_manager "xsd"
-    PREFIX "/xsd"
-    BASE "resources/xsd"
-    FILES "resources/xsd/password-manager.xsd"
 )
 
 target_link_libraries(password_manager PRIVATE 
@@ -62,6 +56,7 @@ target_include_directories(password_manager PRIVATE
     src
     src/import
     src/model
+    src/serializer
     src/settings
     src/ui
 )
@@ -93,15 +88,19 @@ add_executable(password_manager_tests)
 FILE(GLOB_RECURSE test_sources "test/*.cpp")
 target_sources(password_manager_tests PRIVATE
     ${test_sources}
-    src/serializer.cpp
+    src/serializer/serializer.cpp
+    src/serializer/xsd_schema.c
     src/model/field.cpp
     src/model/card.cpp
     src/model/enums.cpp
+    src/ui/ui_tools.cpp
 )
 
 target_include_directories(password_manager_tests PRIVATE
     src
     src/model
+    src/serializer
+    src/ui
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/libs/common/src
 )

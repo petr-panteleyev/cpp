@@ -58,7 +58,12 @@ cmake --workflow --preset <debug | release>
 
 ## Сторонние исходные тексты
 
-Временно включены в репозиторий до появления в репозиториях Alt Linux:
++ Boost 1.89.0
+    + [Boost.Assert](https://www.boost.org/library/1.89.0/assert/)
+    + [Boost.Config](https://www.boost.org/library/1.89.0/config/)
+    + [Boost.ThrowException](https://www.boost.org/library/1.89.0/throw_exception/)
+    + [Boost.TypeTraits](https://www.boost.org/library/1.89.0/type_traits/)
+    + [Boost.Uuid](https://www.boost.org/library/1.89.0/uuid/)
 + [Boost.Decimal](https://develop.decimal.cpp.al/decimal/overview.html)
 
 

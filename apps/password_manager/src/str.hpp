@@ -24,6 +24,6 @@ const inline QString REPLACE{"Заменить"};
 const inline QString RESTORE{"Восстановить"};
 const inline QString SHORT_PASSWORD{"Короткий пароль"};
 const inline QString SKIP{"Пропустить"};
-const inline QString UNABLE_TO_OPEN_FILE{"Невозможно открыть файл"};
+const inline std::u16string UNABLE_TO_OPEN_FILE{u"Невозможно открыть файл"};
 
 } // namespace Str

@@ -4,7 +4,10 @@
 #include "editfieldlistmodel.hpp"
 #include "field.hpp"
 #include "fieldtype.hpp"
+#include "qthelpers.hpp"
 #include "translations.hpp"
+#include "ui_tools.hpp"
+#include <QDate>
 
 EditFieldListModel::EditFieldListModel(QObject *parent) : QAbstractItemModel(parent) {
 }
@@ -31,16 +34,22 @@ QVariant EditFieldListModel::data(const QModelIndex &index, int role) const {
 
     switch (index.column()) {
         case FIELD_TABLE_NAME_COLUMN: {
-            return role == Qt::DisplayRole || role == Qt::EditRole ? field->name() : QVariant();
+            return role == Qt::DisplayRole || role == Qt::EditRole ? QString(field->name()) : QVariant();
         };
         case FIELD_TABLE_TYPE_COLUMN: {
             return role == Qt::DisplayRole ? Translations::translate(field->type()) : QVariant();
         }
         case FIELD_TABLE_VALUE_COLUMN: {
             if (role == Qt::DisplayRole)
-                return field->getValueAsString();
+                return UiTools::toString(*field);
             else if (role == Qt::EditRole) {
-                return field->value();
+                if (field->isDate()) {
+                    return QDate(field->valueAsDate());
+                } else if (field->isString()) {
+                    return QString(field->valueAsString());
+                } else {
+                    return QVariant::fromStdVariant(field->value());
+                }
             } else {
                 return QVariant();
             }
@@ -58,8 +67,8 @@ bool EditFieldListModel::setData(const QModelIndex &index, const QVariant &value
         auto field = at(index.row());
 
         switch (index.column()) {
-            case FIELD_TABLE_NAME_COLUMN: field->setName(value.toString()); break;
-            case FIELD_TABLE_VALUE_COLUMN: field->setValue(value.toString()); break;
+            case FIELD_TABLE_NAME_COLUMN: field->setName(value.toString().toStdU16String()); break;
+            case FIELD_TABLE_VALUE_COLUMN: field->setValue(value.toString().toStdU16String()); break;
             default: return false;
         }
 
@@ -84,7 +93,7 @@ void EditFieldListModel::setFields(const std::vector<Field> &fields) {
 
 void EditFieldListModel::addField() {
     beginInsertRows(QModelIndex(), fields_.size(), fields_.size());
-    fields_.emplace_back(FieldType::STRING, "Field", "");
+    fields_.emplace_back(FieldType::STRING, u"Field", u"");
     endInsertRows();
 }
 
@@ -107,7 +116,13 @@ void EditFieldListModel::moveDown(int row) {
 }
 
 void EditFieldListModel::setFieldValue(int row, const QVariant &value) {
-    std::next(fields_.begin(), row)->setValue(value);
+    if (value.typeId() == QMetaType::UInt) {
+        std::next(fields_.begin(), row)->setValue(value.toUInt());
+    } else if (value.typeId() == QMetaType::QString) {
+        std::next(fields_.begin(), row)->setValue(value.toString().toStdU16String());
+    } else if (value.typeId() == QMetaType::QDate) {
+        std::next(fields_.begin(), row)->setValue(QtHelpers::toChrono(value.toDate()));
+    }
     auto updateIndex = index(row, FIELD_TABLE_VALUE_COLUMN);
     emit dataChanged(updateIndex, updateIndex, {Qt::EditRole});
 }

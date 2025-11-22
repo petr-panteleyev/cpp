@@ -13,5 +13,5 @@ NewNoteDialog::~NewNoteDialog() {
 }
 
 Card NewNoteDialog::note() const {
-    return Card(ui->titleEdit->text(), TimeUtil::currentTimeMillis());
+    return Card(ui->titleEdit->text().toStdU16String(), TimeUtil::currentTimeMillis());
 }

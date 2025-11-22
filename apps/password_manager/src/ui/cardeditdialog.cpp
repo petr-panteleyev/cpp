@@ -63,8 +63,9 @@ void CardEditDialog::setCard(const Card &card) {
 
     model_->setFields(card.fields());
 
-    ui->notesEditor->appendPlainText(card.note());
-    ui->nameEditor->setText(card.name());
+    ui->notesEditor->clear();
+    ui->notesEditor->appendPlainText(QString(card.note()));
+    ui->nameEditor->setText(QString(card.name()));
 
     // Fields and picture are editable for CARD only
     bool isCard = card.isCard();
@@ -134,9 +135,9 @@ void CardEditDialog::done(int code) {
         }
 
         auto pictureOrdinal = ui->pictureComboBox->currentData().toUInt();
-        card_ = Card(card_.cardClass(), card_.uuid(), Picture::valueOf(pictureOrdinal), newName,
-                     TimeUtil::currentTimeMillis(), ui->notesEditor->toPlainText(), card_.favorite(), card_.active(),
-                     model_->fields());
+        card_ = Card(card_.cardClass(), card_.uuid(), Picture::valueOf(pictureOrdinal), newName.toStdU16String(),
+                     TimeUtil::currentTimeMillis(), ui->notesEditor->toPlainText().toStdU16String(), card_.favorite(),
+                     card_.active(), model_->fields());
     }
     QDialog::done(code);
 }

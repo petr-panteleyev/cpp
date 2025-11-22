@@ -4,7 +4,6 @@
 #pragma once
 
 #include "enumclass.hpp"
-#include <QString>
 
 class Picture;
 
@@ -21,14 +20,15 @@ class CreditCardType final : public Common::EnumClass<CreditCardType> {
     static const CreditCardType OTHER;
 
   public:
-    const QString &cardTypeName() const noexcept { return cardTypeName_; }
+    const std::u16string &cardTypeName() const noexcept { return cardTypeName_; }
     const Picture &picture() const noexcept { return picture_; }
 
   private:
-    explicit CreditCardType(const std::string &name, const QString &cardTypeName, const Picture &picture) noexcept
+    explicit CreditCardType(const std::string &name, const std::u16string &cardTypeName,
+                            const Picture &picture) noexcept
         : EnumClass{name}, cardTypeName_{cardTypeName}, picture_{picture} {}
 
   private:
-    QString cardTypeName_;
+    std::u16string cardTypeName_;
     const Picture &picture_;
 };

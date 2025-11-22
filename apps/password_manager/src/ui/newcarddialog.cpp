@@ -12,7 +12,7 @@ namespace {
 
 void initTypeComboBox(std::unique_ptr<Ui::NewCardDialog> &ui) {
     for (const RecordType &type : RecordType::values()) {
-        ui->typeComboBox->addItem(type.picture().icon(), type.translation(), type.ordinal());
+        ui->typeComboBox->addItem(type.picture().icon(), QString(type.translation()), type.ordinal());
         if (type == RecordType::PASSWORD) {
             ui->typeComboBox->setCurrentIndex(ui->typeComboBox->count() - 1);
         }
@@ -53,11 +53,10 @@ Card NewCardDialog::card() const {
     fields.reserve(type.fields().size());
 
     for (auto &f : type.fields()) {
-        auto translatedName = QApplication::translate("RecordType", f.name().toStdString().c_str());
-        fields.emplace_back(f.type(), translatedName, f.value());
+        fields.emplace_back(f.type(), f.name(), f.value());
     }
 
-    return Card(picture, ui->titleEdit->text(), TimeUtil::currentTimeMillis(), fields);
+    return Card(picture, ui->titleEdit->text().toStdU16String(), TimeUtil::currentTimeMillis(), fields);
 }
 
 void NewCardDialog::onTypeComboBoxCurrentIndexChanged(int index) {

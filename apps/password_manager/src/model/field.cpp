@@ -2,14 +2,22 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "field.hpp"
-#include "creditcardtype.hpp"
 #include "fieldtype.hpp"
-#include <QDate>
 
-static QDate parseLocalDate(const QString &stringValue);
+namespace {
 
-Field::Field(const FieldType &type, const QString &name, const QVariant &value) noexcept
+constexpr std::size_t VARIANT_STRING = 0;
+constexpr std::size_t VARIANT_DATE = VARIANT_STRING + 1;
+[[maybe_unused]] constexpr std::size_t VARIANT_UINT = VARIANT_DATE + 1;
+
+} // namespace
+
+Field::Field(const FieldType &type, const std::u16string &name, const FieldValue &value) noexcept
     : type_{type}, name_{name}, value_{value}, showContent_{!type.masked()} {
+}
+
+bool Field::operator==(const Field &that) const noexcept {
+    return this->type_.get() == that.type_.get() && this->name_ == that.name_ && this->value_ == that.value_;
 }
 
 void Field::toggleShow() noexcept {
@@ -18,48 +26,22 @@ void Field::toggleShow() noexcept {
     }
 }
 
-QString Field::getValueAsString() const {
-    if (type_ == FieldType::DATE) {
-        auto date = value_.toDate();
-        return date.toString("dd.MM.yyyy");
-    } else if (type_ == FieldType::EXPIRATION_MONTH) {
-        auto date = value_.toDate();
-        return date.toString("MM/yy");
-    } else if (type_ == FieldType::CARD_TYPE) {
-        auto ordinal = value_.toUInt();
-        const CreditCardType &creditCardType = CreditCardType::valueOf(ordinal);
-        return creditCardType.cardTypeName();
-    } else {
-        return value_.toString();
-    }
+bool Field::isEmpty() const {
+    return value_.index() == VARIANT_STRING ? std::get<std::u16string>(value_).empty() : false;
 }
 
-QVariant Field::deserialize(const QString &str, const FieldType &type) {
-    QVariant value;
-    if (type == FieldType::CARD_TYPE) {
-        value = CreditCardType::valueOf(str.toStdString()).ordinal();
-    } else if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
-        value = parseLocalDate(str);
-    } else {
-        value = str;
-    }
-    return value;
+bool Field::isDate() const noexcept {
+    return value_.index() == VARIANT_DATE;
 }
 
-QVariant Field::convertValue(const FieldType &type) const noexcept {
-    if (type == FieldType::DATE || type == FieldType::EXPIRATION_MONTH) {
-        return QDate::currentDate();
-    } else if (type == FieldType::CARD_TYPE) {
-        return CreditCardType::MIR.ordinal();
-    } else {
-        return getValueAsString();
-    }
+const std::chrono::year_month_day &Field::valueAsDate() const {
+    return std::get<std::chrono::year_month_day>(value_);
 }
 
-static QDate parseLocalDate(const QString &stringValue) {
-    if (stringValue.isEmpty()) {
-        return QDate::currentDate();
-    }
-    auto date = QDate::fromString(stringValue, "yyyy-MM-dd");
-    return date.isValid() ? date : QDate::currentDate();
+bool Field::isString() const noexcept {
+    return value_.index() == VARIANT_STRING;
+}
+
+const std::u16string &Field::valueAsString() const {
+    return std::get<std::u16string>(value_);
 }

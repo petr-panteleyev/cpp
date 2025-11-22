@@ -17,3 +17,31 @@ target_sources(qthelpers
 )
 
 target_link_libraries(qthelpers PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+#
+# Tests
+#
+
+add_executable(qthelpers_tests)
+
+find_package(GTest REQUIRED)
+
+FILE(GLOB_RECURSE test_sources "test/*.cpp")
+target_sources(qthelpers_tests PRIVATE
+    ${test_sources}
+    src/qthelpers.cpp
+)
+
+target_include_directories(qthelpers_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    src
+)
+
+target_link_libraries(qthelpers_tests PRIVATE
+    ${GTEST_LIBRARIES}
+    Qt${QT_VERSION_MAJOR}::Widgets
+    gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(qthelpers_tests)

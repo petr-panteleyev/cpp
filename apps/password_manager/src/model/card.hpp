@@ -6,46 +6,42 @@
 #include "cardclass.hpp"
 #include "field.hpp"
 #include "picture.hpp"
-#include <QUuid>
+#include "uuid.hpp"
 #include <vector>
 
 class Card final {
   public:
-    explicit Card(const CardClass &cardClass, const QUuid &uuid, const Picture &picture, const QString &name,
-                  unsigned long modified, const QString &note, bool favorite, bool active,
+    explicit Card(const CardClass &cardClass, const UUID::UUID &uuid, const Picture &picture,
+                  const std::u16string &name, unsigned long modified, const std::u16string &note, bool favorite,
+                  bool active, const std::vector<Field> &fields);
+
+    explicit Card(const UUID::UUID &uuid, const Picture &picture, const std::u16string &name, unsigned long modified,
+                  const std::u16string &note, bool favorite, bool active, const std::vector<Field> &fields);
+
+    explicit Card(const Picture &picture, const std::u16string &name, unsigned long modified,
                   const std::vector<Field> &fields);
 
-    explicit Card(const QUuid &uuid, const Picture &picture, const QString &name, unsigned long modified,
-                  const QString &note, bool favorite, bool active, const std::vector<Field> &fields);
+    explicit Card(const UUID::UUID &uuid, const std::u16string &name, unsigned long modified,
+                  const std::u16string &note, bool favorite, bool active);
 
-    explicit Card(const Picture &picture, const QString &name, unsigned long modified,
-                  const std::vector<Field> &fields);
-
-    explicit Card(const QUuid &uuid, const QString &name, unsigned long modified, const QString &note, bool favorite,
-                  bool active);
-
-    explicit Card(const QString &name, unsigned long modified);
+    explicit Card(const std::u16string &name, unsigned long modified);
 
     explicit Card();
 
     Card(const Card &card) = default;
+    Card(Card &&) = default;
     ~Card() = default;
 
     Card &operator=(const Card &) = default;
 
-    bool operator==(const Card &that) const noexcept {
-        return this->cardClass_.get() == that.cardClass_.get() && this->uuid_ == that.uuid_ &&
-               this->picture_.get() == that.picture_.get() && this->name_ == that.name_ &&
-               this->modified_ == that.modified_ && this->note_ == that.note_ && this->favorite_ == that.favorite_ &&
-               this->active_ == that.active_ && this->fields_ == that.fields_;
-    }
+    bool operator==(const Card &that) const noexcept;
 
   public:
     const CardClass &cardClass() const { return cardClass_; }
-    const QUuid &uuid() const { return uuid_; }
+    const UUID::UUID &uuid() const { return uuid_; }
     const Picture &picture() const { return picture_; }
-    const QString &name() const { return name_; }
-    const QString &note() const { return note_; }
+    const std::u16string &name() const { return name_; }
+    const std::u16string &note() const { return note_; }
     bool favorite() const { return favorite_; }
     bool active() const { return active_; }
     unsigned long modified() const { return modified_; }
@@ -61,11 +57,11 @@ class Card final {
 
   private:
     CardClassRef cardClass_;
-    QUuid uuid_;
+    UUID::UUID uuid_;
     PictureRef picture_;
-    QString name_;
+    std::u16string name_;
     unsigned long modified_;
-    QString note_;
+    std::u16string note_;
     bool favorite_;
     bool active_;
     std::vector<Field> fields_;

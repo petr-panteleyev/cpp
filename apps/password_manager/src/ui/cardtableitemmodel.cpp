@@ -29,7 +29,7 @@ QVariant CardTableItemModel::data(const QModelIndex &index, int role) const {
 
     switch (index.column()) {
         case ICON_COLUMN: return role == Qt::DecorationRole ? card.picture().icon() : QVariant();
-        case NAME_COLUMN: return role == Qt::DisplayRole ? card.name() : QVariant();
+        case NAME_COLUMN: return role == Qt::DisplayRole ? QString(card.name()) : QVariant();
         case AUX_COLUMN: return role == Qt::DecorationRole ? buildAuxIconValue(card) : QVariant();
         default: return QVariant();
     }

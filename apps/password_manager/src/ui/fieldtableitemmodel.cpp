@@ -7,6 +7,7 @@
 #include "fieldtype.hpp"
 #include "picture.hpp"
 #include "settings.hpp"
+#include "ui_tools.hpp"
 
 namespace {
 
@@ -31,7 +32,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
     switch (index.column()) {
         case 0: {
             switch (role) {
-                case Qt::DisplayRole: return field->name();
+                case Qt::DisplayRole: return QString(field->name());
                 case Qt::TextAlignmentRole: return Qt::AlignRight;
                 case Qt::ForegroundRole: return Settings::getColor(Settings::Color::FieldName);
                 default: return QVariant();
@@ -39,7 +40,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
         }
         case 1: {
             switch (role) {
-                case Qt::DisplayRole: return field->showContent() ? field->getValueAsString() : MASK;
+                case Qt::DisplayRole: return field->showContent() ? UiTools::toString(*field) : MASK;
                 case Qt::TextAlignmentRole: return Qt::AlignLeft;
                 case Qt::ForegroundRole: {
                     if (field->type() == FieldType::LINK) {
@@ -50,7 +51,7 @@ QVariant FieldTableItemModel::data(const QModelIndex &index, int role) const {
                 }
                 case Qt::DecorationRole: {
                     if (field->type() == FieldType::CARD_TYPE) {
-                        auto ordinal = field->value().toUInt();
+                        auto ordinal = std::get<unsigned int>(field->value());
                         const auto &cardType = CreditCardType::valueOf(ordinal);
                         return cardType.picture().icon();
                     } else {
