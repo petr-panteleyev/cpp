@@ -1,13 +1,12 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.11.2 LANGUAGES CXX)
+project(sapper VERSION 25.11.3 LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 find_package(GTest REQUIRED)
@@ -16,31 +15,15 @@ find_package(GTest REQUIRED)
 # Executable
 #
 
-FILE(GLOB_RECURSE headers "src/*.hpp")
-FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui")
+FILE(GLOB_RECURSE headers "src/*.hpp" "src/*.h")
+FILE(GLOB_RECURSE sources "src/*.cpp" "src/*.ui" "src/*.c")
 qt_add_executable(sapper ${headers} ${sources})
 
 target_compile_options(sapper PRIVATE -Werror -Wall -pedantic)
 
-file(GLOB SAPPER_RESOURCE_FILES "resources/*.png")
-
 target_compile_definitions(sapper PRIVATE
     "PROJECT_VERSION=${PROJECT_VERSION}"
     "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}"
-)
-
-qt_add_resources(sapper "resources"
-    PREFIX "/images"
-    BASE "resources"
-    FILES ${SAPPER_RESOURCE_FILES}
-)
-
-qt_add_resources(sapper "fonts"
-    PREFIX "/fonts"
-    BASE "resources"
-    FILES
-        resources/mine-sweeper.ttf
-        resources/neat-lcd.ttf
 )
 
 target_link_libraries(sapper PRIVATE

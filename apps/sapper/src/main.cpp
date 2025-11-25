@@ -2,15 +2,19 @@
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.hpp"
+#include "pictures.hpp"
+#include "resources.h"
 #include <QApplication>
 #include <QFontDatabase>
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    a.setWindowIcon(QIcon(":images/icon.png"));
+    a.setWindowIcon(Pictures::icon(Picture::ICON));
 
-    QFontDatabase::addApplicationFont(":/fonts/mine-sweeper.ttf");
-    QFontDatabase::addApplicationFont(":/fonts/neat-lcd.ttf");
+    QFontDatabase::addApplicationFontFromData(
+        QByteArray(reinterpret_cast<const char *>(res::MINE_SWEEPER_FONT.bytes_), res::MINE_SWEEPER_FONT.size_));
+    QFontDatabase::addApplicationFontFromData(
+        QByteArray(reinterpret_cast<const char *>(res::NEAT_LCD_FONT.bytes_), res::NEAT_LCD_FONT.size_));
 
     QApplication::setOrganizationDomain("panteleyev.org");
     QApplication::setApplicationName("Sapper");

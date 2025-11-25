@@ -16,6 +16,6 @@ class QIcon;
 
 namespace Pictures {
 
-QIcon &icon(Picture picture);
+const QIcon &icon(Picture picture);
 
 } // namespace Pictures
