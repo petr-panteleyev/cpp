@@ -1,7 +1,7 @@
 # Copyright © 2024-2025 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
 
-project(sapper VERSION 25.11.3 LANGUAGES CXX C)
+project(sapper VERSION 25.12.1 LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

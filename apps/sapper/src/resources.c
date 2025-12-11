@@ -10,10 +10,10 @@ static const unsigned char mineSweeperFontBytes[] = {
 };
 const struct resource_t MINE_SWEEPER_FONT = {.bytes_ = mineSweeperFontBytes, .size_ = sizeof mineSweeperFontBytes};
 
-static const unsigned char neatLcdFontBytes[] = {
-#embed "../resources/neat-lcd.ttf"
+static const unsigned char pixelLcd7FontBytes[] = {
+#embed "../resources/Pixel-LCD-7.ttf"
 };
-const struct resource_t NEAT_LCD_FONT = {.bytes_ = neatLcdFontBytes, .size_ = sizeof neatLcdFontBytes};
+const struct resource_t PIXEL_LCD_7_FONT = {.bytes_ = pixelLcd7FontBytes, .size_ = sizeof pixelLcd7FontBytes};
 
 // Icons
 

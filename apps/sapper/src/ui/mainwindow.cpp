@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
                 onGameStatusChanged(x, status);
             }},
       eventFilter_{this}, boardSize_{BoardSize::BIG}, buttonFont_{"Mine-Sweeper", 14, QFont::Medium},
-      lcdFont_{"Neat LCD", 20, QFont::Medium}, gameTimer_{[this](auto seconds) {
+      lcdFont_{"Pixel LCD7", 26, QFont::Medium}, gameTimer_{[this](auto seconds) {
           onTimerUpdate(seconds);
       }},
       scoreBoardDialog_{new ScoreBoardDialog{this, scoreBoard_}}, boardSizeDialog_{new BoardSizeDialog{this}} {

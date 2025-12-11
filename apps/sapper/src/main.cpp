@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     QFontDatabase::addApplicationFontFromData(
         QByteArray(reinterpret_cast<const char *>(res::MINE_SWEEPER_FONT.bytes_), res::MINE_SWEEPER_FONT.size_));
     QFontDatabase::addApplicationFontFromData(
-        QByteArray(reinterpret_cast<const char *>(res::NEAT_LCD_FONT.bytes_), res::NEAT_LCD_FONT.size_));
+        QByteArray(reinterpret_cast<const char *>(res::PIXEL_LCD_7_FONT.bytes_), res::PIXEL_LCD_7_FONT.size_));
 
     QApplication::setOrganizationDomain("panteleyev.org");
     QApplication::setApplicationName("Sapper");

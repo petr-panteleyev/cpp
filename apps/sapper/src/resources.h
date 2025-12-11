@@ -15,7 +15,7 @@ struct resource_t {
 
 // Fonts
 extern const struct resource_t MINE_SWEEPER_FONT;
-extern const struct resource_t NEAT_LCD_FONT;
+extern const struct resource_t PIXEL_LCD_7_FONT;
 
 // Images
 extern const struct resource_t BLACK_FLAG_PNG;
