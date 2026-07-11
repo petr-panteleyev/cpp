@@ -1,4 +1,4 @@
-//  Copyright © 2024 Petr Panteleyev
+//  Copyright © 2024-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -10,13 +10,15 @@ class CardTableSortFilterModel : public QSortFilterProxyModel {
     explicit CardTableSortFilterModel(QObject *parent) : QSortFilterProxyModel{parent}, showDeleted_{false} {};
 
     void setShowDeleted(bool show_deleted) {
+        beginFilterChange();
         showDeleted_ = show_deleted;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     void setFilterText(const QString &filterText) {
+        beginFilterChange();
         filterText_ = filterText;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;

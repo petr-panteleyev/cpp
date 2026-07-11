@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev
+//  Copyright © 2025-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "categorywindow.h"
@@ -38,13 +38,15 @@ class CategoryWindow::CategoryFilterModel : public QSortFilterProxyModel {
     ~CategoryFilterModel() {};
 
     void setTypeOrdinal(int ordinal) {
+        beginFilterChange();
         typeOrdinal_ = ordinal;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     void setNameFilter(const QString &filter) {
+        beginFilterChange();
         nameFilter_ = filter;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override { return COLUMN_COUNT; };

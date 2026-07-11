@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev
+//  Copyright © 2025-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "mainwindow.h"
@@ -194,18 +194,21 @@ class MainWindow::TransactionFilterModel final : public QSortFilterProxyModel {
     }
 
     void setDate(QDate date) {
+        beginFilterChange();
         date_ = date;
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     void previousMonth() {
+        beginFilterChange();
         date_ = date_.addMonths(-1);
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
     void nextMonth() {
+        beginFilterChange();
         date_ = date_.addMonths(1);
-        invalidateRowsFilter();
+        endFilterChange(Direction::Rows);
     }
 
   private:

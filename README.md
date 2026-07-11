@@ -23,12 +23,12 @@
 
 Проект собирается на следующем окружении:
 * Alt Linux p11
-* GCC 15.2.0
+* GCC 15.3.0
 * CMake 4.1.2
-* Qt 6.9.2
+* Qt 6.10.3
 * libcrypto 3.3.3
 * libxerces-c 3.2.5
-* GTest 1.13.0
+* GTest 1.17.0
 
 ```sh
 cmake . --preset <debug | release>
