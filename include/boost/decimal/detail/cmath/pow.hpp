@@ -1,5 +1,5 @@
-// Copyright 2023 Matt Borland
-// Copyright 2023 Christopher Kormanyos
+// Copyright 2023 - 2026 Matt Borland
+// Copyright 2023 - 2026 Christopher Kormanyos
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
@@ -114,7 +114,7 @@ constexpr auto pow(const T b, const IntegralType p) noexcept
             // Here, a pure power-of-10 argument (b) gets a pure integral result.
             const int log10_val { exp10val + static_cast<int>(zeros_removal.number_of_removed_zeros) };
 
-            result = T { 1, static_cast<int>(log10_val * static_cast<int>(p)) };
+            result = T { 1, log10_val * static_cast<int>(p) };
         }
         else
         {
@@ -151,27 +151,32 @@ constexpr auto pow(const T x, const T a) noexcept
     BOOST_DECIMAL_REQUIRES(detail::is_decimal_floating_point_v, T)
 {
     constexpr T zero { 0, 0 };
+    constexpr T one  { 1, 0 };
 
     auto result = zero;
 
+    const auto fpc_a = fpclassify(a);
+
     const auto na = static_cast<int>(a);
 
-    if ((na == a) || ((na == 0) && (na == abs(a))))
+    if (fpc_a == FP_ZERO)
+    {
+        // pow(base, +/-0) returns 1 for any base, even when base is NaN.
+
+        result = one;
+    }
+    else if (na == a)
     {
         result = pow(x, na);
     }
     else
     {
-        constexpr T one  { 1, 0 };
-
         const auto fpc_x = fpclassify(x);
-        const auto fpc_a = fpclassify(a);
 
-        if (fpc_a == FP_ZERO)
+        if ((fpc_x == FP_NAN) || (fpc_a == FP_NAN))
         {
-            // pow(base, +/-0) returns 1 for any base, even when base is NaN.
-
-            result = one;
+            // This line is known to be covered by tests.
+            result = std::numeric_limits<T>::quiet_NaN(); // LCOV_EXCL_LINE
         }
         else if (fpc_x == FP_ZERO)
         {
@@ -185,10 +190,6 @@ constexpr auto pow(const T x, const T a) noexcept
                 // pow(+/-0, +infinity) returns +0.
 
                 result = (signbit(a) ? std::numeric_limits<T>::infinity() : zero);
-            }
-            else if (fpc_a == FP_NAN)
-            {
-                result = std::numeric_limits<T>::quiet_NaN();
             }
             #else
             if (fpc_a == FP_NORMAL)
@@ -207,24 +208,12 @@ constexpr auto pow(const T x, const T a) noexcept
 
                 result = (signbit(a) ? zero : std::numeric_limits<T>::infinity());
             }
-            else if (fpc_a == FP_NAN)
-            {
-                result = std::numeric_limits<T>::quiet_NaN();
-            }
-        }
-        else if (fpc_x != FP_NORMAL)
-        {
-            result = x;
         }
         #endif
         else
         {
-            if (fpc_a == FP_ZERO)
-            {
-                result = one;
-            }
             #ifndef BOOST_DECIMAL_FAST_MATH
-            else if (fpc_a == FP_INFINITE)
+            if (fpc_a == FP_INFINITE)
             {
                 result =
                     (
@@ -233,10 +222,10 @@ constexpr auto pow(const T x, const T a) noexcept
                         : one
                     );
             }
-            #endif
             else
+            #endif
             {
-                const T a_log_x { a * log(x) };
+                const T a_log_x { a * ::boost::decimal::log(x) };
 
                 result = exp(a_log_x);
             }

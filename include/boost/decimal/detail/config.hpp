@@ -13,6 +13,18 @@
 #  define BOOST_DECIMAL_DEC_EVAL_METHOD 0
 #endif
 
+// Fundamental CUDACC options
+#if defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA)
+#  define BOOST_DECIMAL_HOST_DEVICE __host__ __device__
+#  define BOOST_DECIMAL_CUDA_CONSTEXPR __host__ __device__ constexpr
+#  define BOOST_DECIMAL_DETAIL_INT128_ENABLE_CUDA
+#  define BOOST_DECIMAL_DISABLE_EXCEPTIONS
+#  define BOOST_DECIMAL_DISABLE_CASSERT
+#else
+#  define BOOST_DECIMAL_HOST_DEVICE
+#  define BOOST_DECIMAL_CUDA_CONSTEXPR constexpr
+#endif
+
 // Determine endianness
 #if defined(_WIN32)
 
@@ -26,7 +38,7 @@
 
 #else
 
-#error Could not determine endian type. Please file an issue at https://github.com/cppalliance/decimal with your architecture
+#error Could not determine endian type. Please file an issue at https://github.com/boostorg/decimal with your architecture
 
 #endif // Determine endianness
 
@@ -85,6 +97,8 @@
 #  endif
 #endif
 
+#if defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA)
+
 // Include intrinsics if available
 #if defined(_MSC_VER)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -97,8 +111,10 @@
 #  endif
 #  if defined(__ADX__) && defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
 #    define BOOST_DECIMAL_ADD_CARRY _addcarryx_u64
+#    define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #  elif defined(BOOST_DECIMAL_HAS_MSVC_64BIT_INTRINSICS)
 #    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
+#    define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #  endif
 #elif defined(__x86_64__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
@@ -107,20 +123,31 @@
 #  define BOOST_DECIMAL_HAS_X64_INTRINSICS
 #  ifdef __ADX__
 #    define BOOST_DECIMAL_ADD_CARRY _addcarryx_u64
+#    define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #  else
 #    define BOOST_DECIMAL_ADD_CARRY _addcarry_u64
+#    define BOOST_DECIMAL_SUB_BORROW _subborrow_u64
 #  endif
 #elif defined(__ARM_NEON__)
 #  ifndef BOOST_DECIMAL_BUILD_MODULE
 #    include <arm_neon.h>
 #  endif
 #  define BOOST_DECIMAL_HAS_ARM_INTRINSICS
+#elif defined(__i386__)
+#  ifndef BOOST_DECIMAL_BUILD_MODULE
+#    include <immintrin.h>
+#  endif
+#  define BOOST_DECIMAL_HAS_x86_INTRINSICS
+#else
+#  define BOOST_DECIMAL_HAS_NO_INTRINSICS
+#endif
+
 #else
 #  define BOOST_DECIMAL_HAS_NO_INTRINSICS
 #endif
 
 // Use 128-bit integers and suppress warnings for using extensions
-#if defined(BOOST_HAS_INT128) || (defined(__SIZEOF_INT128__) && !defined(_MSC_VER))
+#if (defined(BOOST_HAS_INT128) || (defined(__SIZEOF_INT128__) && !defined(_MSC_VER))) && !(defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA))
 
 namespace boost { namespace decimal { namespace detail {
 
@@ -143,7 +170,7 @@ typedef unsigned __int128 builtin_uint128_t;
 #endif
 
 // 128-bit floats
-#if defined(BOOST_HAS_FLOAT128) || defined(__SIZEOF_FLOAT128__)
+#if (defined(BOOST_HAS_FLOAT128) || defined(__SIZEOF_FLOAT128__)) && !(defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA))
 #  define BOOST_DECIMAL_HAS_FLOAT128
 #endif
 
@@ -256,9 +283,9 @@ typedef unsigned __int128 builtin_uint128_t;
 #  define BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 
-#if defined(BOOST_DECIMAL_HAS_IS_CONSTANT_EVALUATED)
+#if defined(BOOST_DECIMAL_HAS_IS_CONSTANT_EVALUATED) && !(defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA))
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) std::is_constant_evaluated()
-#elif defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#elif defined(BOOST_DECIMAL_HAS_BUILTIN_IS_CONSTANT_EVALUATED) && !(defined(__CUDACC__) && defined(BOOST_DECIMAL_ENABLE_CUDA))
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) __builtin_is_constant_evaluated()
 #else
 #  define BOOST_DECIMAL_IS_CONSTANT_EVALUATED(x) false
@@ -314,7 +341,7 @@ typedef unsigned __int128 builtin_uint128_t;
 #  define BOOST_DECIMAL_FAST_MATH
 #endif
 
-#if __cplusplus >= 201703L
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 #  if __has_include(<charconv>)
      // We don't need all of charconv, just: std::to_chars_result, std::from_chars_result, and std::chars_format
      // These compilers and versions give us what we need
@@ -388,7 +415,7 @@ typedef unsigned __int128 builtin_uint128_t;
 #if ((defined(__ppc64__) || defined(__PPC64__) || defined(__ppc64le__) || defined(__PPC64LE__)) && (defined(__LONG_DOUBLE_IEEE128__) || LDBL_MANT_DIG == 113))
 
 #define BOOST_DECIMAL_LDBL_IS_FLOAT128
-static_assert(std::is_same<long double, __float128>::value, "__float128 should be an alias to long double. Please open an issue at: https://github.com/cppalliance/decimal");
+static_assert(std::is_same<long double, __float128>::value, "__float128 should be an alias to long double. Please open an issue at: https://github.com/boostorg/decimal");
 
 #endif
 

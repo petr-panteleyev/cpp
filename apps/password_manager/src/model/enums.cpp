@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev
+//  Copyright © 2024-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "creditcardtype.hpp"
@@ -118,6 +118,7 @@ const FieldType FieldType::LONG_PASSWORD{"LONG_PASSWORD", true};
 const FieldType FieldType::CARD_TYPE{"CARD_TYPE"};
 const FieldType FieldType::DATE{"DATE"};
 const FieldType FieldType::EXPIRATION_MONTH{"EXPIRATION_MONTH"};
+const FieldType FieldType::TOTP_CODE{"TOTP_CODE", true};
 
 template <>
 const std::vector<std::reference_wrapper<const FieldType>> Common::EnumClass<FieldType>::values_{
@@ -127,6 +128,7 @@ const std::vector<std::reference_wrapper<const FieldType>> Common::EnumClass<Fie
     cref(FieldType::UNIX_PASSWORD), cref(FieldType::SHORT_PASSWORD),
     cref(FieldType::LONG_PASSWORD), cref(FieldType::CARD_TYPE),
     cref(FieldType::DATE),          cref(FieldType::EXPIRATION_MONTH),
+    cref(FieldType::TOTP_CODE),
 };
 
 // CreditCardType

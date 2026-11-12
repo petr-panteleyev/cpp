@@ -26,6 +26,7 @@
 #include <boost/decimal/detail/to_decimal.hpp>
 #include <boost/decimal/detail/promotion.hpp>
 #include <boost/decimal/detail/check_non_finite.hpp>
+#include <boost/decimal/detail/quantize_impl.hpp>
 #include <boost/decimal/detail/shrink_significand.hpp>
 #include <boost/decimal/detail/cmath/isfinite.hpp>
 #include <boost/decimal/detail/cmath/fpclassify.hpp>
@@ -41,6 +42,7 @@
 #include <boost/decimal/detail/components.hpp>
 #include <boost/decimal/detail/construction_sign.hpp>
 #include <boost/decimal/detail/from_chars_impl.hpp>
+#include <boost/decimal/detail/mod_impl.hpp>
 
 #ifndef BOOST_DECIMAL_BUILD_MODULE
 
@@ -85,7 +87,12 @@ constexpr auto write_payload(typename TargetDecimalType::significand_type payloa
 #  pragma warning(disable : 4324) // Structure was padded due to alignment specifier
 #endif
 
+// 32-bit MSVC mis-codegens reads of bool members in over-aligned structs; use natural alignment there.
+#if defined(_MSC_VER) && !defined(_M_X64) && !defined(_M_ARM64)
 BOOST_DECIMAL_EXPORT class decimal_fast128_t final
+#else
+BOOST_DECIMAL_EXPORT class alignas(16) decimal_fast128_t final
+#endif
 {
 public:
     using significand_type = int128::uint128_t;
@@ -99,6 +106,7 @@ private:
     significand_type significand_ {};
     exponent_type exponent_ {};
     bool sign_ {};
+    char pad_[11] {};
 
     constexpr auto isneg() const noexcept -> bool
     {
@@ -207,6 +215,25 @@ private:
     #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
     constexpr decimal_fast128_t(const char* str, std::size_t len);
     #endif
+
+    friend constexpr auto nan_conversion(const decimal_fast128_t& value) noexcept -> decimal_fast128_t
+    {
+        constexpr auto convert_nan_mask {detail::d128_fast_qnan ^ detail::d128_fast_snan};
+
+        decimal_fast128_t return_value {value};
+        return_value.significand_ ^= convert_nan_mask;
+
+        return return_value;
+    }
+
+    template <typename Decimal>
+    friend constexpr Decimal detail::check_non_finite(Decimal lhs, Decimal rhs) noexcept;
+
+    template <typename Decimal>
+    friend constexpr Decimal detail::check_non_finite(Decimal x) noexcept;
+
+    template <typename ReturnType, typename T>
+    friend constexpr auto detail::d128_add_impl_new(const T& lhs, const T& rhs) noexcept -> ReturnType;
 
 public:
     constexpr decimal_fast128_t() noexcept = default;
@@ -465,6 +492,9 @@ public:
     template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
     friend constexpr auto frexp10(T num, int* expptr) noexcept -> typename T::significand_type;
 
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend BOOST_DECIMAL_CUDA_CONSTEXPR auto decompose(const T x) noexcept;
+
     friend constexpr auto copysignd128f(decimal_fast128_t mag, decimal_fast128_t sgn) noexcept -> decimal_fast128_t;
     friend constexpr auto scalblnd128f(decimal_fast128_t num, long exp) noexcept -> decimal_fast128_t;
     friend constexpr auto scalbnd128f(decimal_fast128_t num, int exp) noexcept -> decimal_fast128_t;
@@ -478,7 +508,8 @@ public:
     friend constexpr auto quantexpd128f(const decimal_fast128_t& x) noexcept -> int;
 
     // 3.6.6 Quantize
-    friend constexpr auto quantized128f(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t;
+    template <BOOST_DECIMAL_DECIMAL_FLOATING_TYPE T>
+    friend BOOST_DECIMAL_CUDA_CONSTEXPR auto quantize(T lhs, T rhs) noexcept -> T;
 };
 
 #ifdef _MSC_VER
@@ -499,13 +530,42 @@ constexpr decimal_fast128_t::decimal_fast128_t(T1 coeff, T2 exp, const detail::c
     const auto is_negative {static_cast<bool>(resultant_sign)};
     sign_ = is_negative;
 
-    // Normalize the significand in the constructor, so we don't have
-    // to calculate the number of digits for operations
-    detail::normalize<decimal_fast128_t>(min_coeff, exp, is_negative);
+    // IEEE 754-2008 3.5.1: zero has a cohort with one representation per exponent.
+    // Skip normalization for zero (which would otherwise expand the significand and shift the exponent)
+    // and clamp the requested exponent to the representable range.
+    if (min_coeff == minimum_coefficient_size{0})
+    {
+        significand_ = static_cast<significand_type>(0);
+        auto biased_exp {static_cast<int>(exp) + detail::bias_v<decimal_fast128_t>};
+        if (biased_exp < 0)
+        {
+            biased_exp = 0;
+        }
+        else if (biased_exp > detail::max_biased_exp_v<decimal_fast128_t>)
+        {
+            biased_exp = detail::max_biased_exp_v<decimal_fast128_t>;
+        }
+        exponent_ = static_cast<exponent_type>(biased_exp);
+        return;
+    }
+
+    // Fast path: if the coefficient already has exactly precision-many digits,
+    // normalize is a no-op apart from a num_digits call. Skip the call entirely.
+    constexpr minimum_coefficient_size min_normal_significand {
+        detail::pow10(static_cast<minimum_coefficient_size>(detail::precision_v<decimal_fast128_t> - 1))};
+    constexpr minimum_coefficient_size max_normal_significand {
+        static_cast<minimum_coefficient_size>(detail::max_significand_v<decimal_fast128_t>)};
+
+    if (min_coeff < min_normal_significand || min_coeff > max_normal_significand)
+    {
+        // Normalize the significand in the constructor, so we don't have
+        // to calculate the number of digits for operations
+        detail::normalize<decimal_fast128_t>(min_coeff, exp, is_negative);
+    }
 
     significand_ = static_cast<significand_type>(min_coeff);
 
-    const auto biased_exp {significand_ == 0U ? 0 : exp + detail::bias_v<decimal_fast128_t>};
+    const auto biased_exp {static_cast<int>(exp) + detail::bias_v<decimal_fast128_t>};
 
     if (biased_exp > detail::max_biased_exp_v<decimal_fast128_t>)
     {
@@ -517,10 +577,9 @@ constexpr decimal_fast128_t::decimal_fast128_t(T1 coeff, T2 exp, const detail::c
     }
     else
     {
-        // Flush denorms to zero
+        // Flush denorms to zero, preserving sign per IEEE 754-2008 3.5.1
         significand_ = static_cast<significand_type>(0);
-        exponent_ = static_cast<exponent_type>(detail::bias_v<decimal_fast128_t>);
-        sign_ = false;
+        exponent_ = static_cast<exponent_type>(0);
     }
 }
 
@@ -560,9 +619,14 @@ BOOST_DECIMAL_CXX20_CONSTEXPR decimal_fast128_t::decimal_fast128_t(const Float v
     {
         significand_ = detail::d128_fast_qnan;
     }
-    else if (val == std::numeric_limits<Float>::infinity() || val == -std::numeric_limits<Float>::infinity())
+    else if (val == std::numeric_limits<Float>::infinity())
     {
         significand_ = detail::d128_fast_inf;
+    }
+    else if (val == -std::numeric_limits<Float>::infinity())
+    {
+        significand_ = detail::d128_fast_inf;
+        sign_ = true;
     }
     else
     #endif
@@ -589,6 +653,112 @@ constexpr auto direct_init_d128(const decimal_fast128_t::significand_type signif
 
     return val;
 }
+
+namespace detail {
+
+template <bool>
+class numeric_limits_impl128f
+{
+public:
+
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = true;
+    static constexpr bool is_integer = false;
+    static constexpr bool is_exact = false;
+    static constexpr bool has_infinity = true;
+    static constexpr bool has_quiet_NaN = true;
+    static constexpr bool has_signaling_NaN = true;
+
+    // These members were deprecated in C++23
+    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+    static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    static constexpr bool has_denorm_loss = true;
+    #endif
+
+    static constexpr std::float_round_style round_style = std::round_indeterminate;
+    static constexpr bool is_iec559 = false;
+    static constexpr bool is_bounded = true;
+    static constexpr bool is_modulo = false;
+    static constexpr int  digits = 34;
+    static constexpr int  digits10 = digits;
+    static constexpr int  max_digits10 = digits;
+    static constexpr int  radix = 10;
+    static constexpr int  min_exponent = -6143;
+    static constexpr int  min_exponent10 = min_exponent;
+    static constexpr int  max_exponent = 6144;
+    static constexpr int  max_exponent10 = max_exponent;
+    static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
+    static constexpr bool tinyness_before = true;
+
+    // Member functions
+    static constexpr auto (min)        () -> boost::decimal::decimal_fast128_t { return {UINT32_C(1), min_exponent}; }
+    static constexpr auto (max)        () -> boost::decimal::decimal_fast128_t { return {boost::int128::uint128_t{UINT64_C(0x1ED09BEAD87C0), UINT64_C(0x378D8E63FFFFFFFF)}, max_exponent - digits + 1}; }
+    static constexpr auto lowest       () -> boost::decimal::decimal_fast128_t { return {boost::int128::uint128_t{UINT64_C(0x1ED09BEAD87C0), UINT64_C(0x378D8E63FFFFFFFF)}, max_exponent - digits + 1, construction_sign::negative}; }
+    static constexpr auto epsilon      () -> boost::decimal::decimal_fast128_t { return {UINT32_C(1), -digits + 1}; }
+    static constexpr auto round_error  () -> boost::decimal::decimal_fast128_t { return epsilon(); }
+    static constexpr auto infinity     () -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false); }
+    static constexpr auto quiet_NaN    () -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false); }
+    static constexpr auto signaling_NaN() -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_snan, 0, false); }
+    static constexpr auto denorm_min   () -> boost::decimal::decimal_fast128_t { return min(); }
+};
+
+#if !defined(__cpp_inline_variables) || __cpp_inline_variables < 201606L
+
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_specialized;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_signed;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_integer;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_exact;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::has_infinity;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::has_quiet_NaN;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::has_signaling_NaN;
+
+// These members were deprecated in C++23
+#if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
+template <bool b> constexpr std::float_denorm_style numeric_limits_impl128f<b>::has_denorm;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::has_denorm_loss;
+#endif
+
+template <bool b> constexpr std::float_round_style numeric_limits_impl128f<b>::round_style;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_iec559;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_bounded;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::is_modulo;
+template <bool b> constexpr int numeric_limits_impl128f<b>::digits;
+template <bool b> constexpr int numeric_limits_impl128f<b>::digits10;
+template <bool b> constexpr int numeric_limits_impl128f<b>::max_digits10;
+template <bool b> constexpr int numeric_limits_impl128f<b>::radix;
+template <bool b> constexpr int numeric_limits_impl128f<b>::min_exponent;
+template <bool b> constexpr int numeric_limits_impl128f<b>::min_exponent10;
+template <bool b> constexpr int numeric_limits_impl128f<b>::max_exponent;
+template <bool b> constexpr int numeric_limits_impl128f<b>::max_exponent10;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::traps;
+template <bool b> constexpr bool numeric_limits_impl128f<b>::tinyness_before;
+
+#endif // !defined(__cpp_inline_variables) || __cpp_inline_variables < 201606L
+
+} // namespace detail
+
+} // namespace decimal
+} // namespace boost
+
+namespace std {
+
+#ifdef __clang__
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wmismatched-tags"
+#endif
+
+template <>
+class numeric_limits<boost::decimal::decimal_fast128_t> :
+    public boost::decimal::detail::numeric_limits_impl128f<true> {};
+
+#ifdef __clang__
+#  pragma clang diagnostic pop
+#endif
+
+} // namespace std
+
+namespace boost {
+namespace decimal {
 
 constexpr auto signbit(const decimal_fast128_t& val) noexcept -> bool
 {
@@ -909,34 +1079,59 @@ constexpr auto operator+(const decimal_fast128_t& lhs, const decimal_fast128_t& 
     }
     #endif
 
-    return detail::d128_add_impl<decimal_fast128_t>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), rhs.sign_,
-            (abs(lhs) > abs(rhs)));
-};
+    // Dominant-operand short-circuit: for d128 d128_add_impl_new uses u256
+    // promoted type with max_shift = digits10(u256) - precision - 1
+    // = 77 - 34 - 1 = 42. Above that the slow path returns one operand
+    // unchanged anyway. Fast types maintain canonical significands so no
+    // expansion buffer is needed.
+    {
+        const auto lhs_sig {lhs.full_significand()};
+        const auto rhs_sig {rhs.full_significand()};
+        if (BOOST_DECIMAL_LIKELY(lhs_sig != 0U && rhs_sig != 0U))
+        {
+            const auto lhs_exp {lhs.biased_exponent()};
+            const auto rhs_exp {rhs.biased_exponent()};
+            const auto exp_diff {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+            if (exp_diff > 42)
+            {
+                auto round {_boost_decimal_global_rounding_mode};
+                #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+                if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+                {
+                    round = _boost_decimal_global_runtime_rounding_mode;
+                }
+                #endif
+                if (BOOST_DECIMAL_LIKELY(round == rounding_mode::fe_dec_to_nearest))
+                {
+                    return lhs_exp > rhs_exp ? lhs : rhs;
+                }
+            }
+        }
+    }
+
+    return detail::d128_add_impl_new<decimal_fast128_t>(lhs, rhs);
+}
 
 template <typename Integer>
 constexpr auto operator+(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
+    using sig_type = decimal_fast128_t::significand_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
     {
-        return lhs;
+        return detail::check_non_finite(lhs);
     }
     #endif
 
-    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
-    bool abs_lhs_bigger {abs(lhs) > sig_rhs};
-
+    auto sig_rhs {static_cast<sig_type>(detail::make_positive_unsigned(rhs))};
     exp_type exp_rhs {0};
     detail::normalize<decimal_fast128_t>(sig_rhs, exp_rhs);
+    const detail::decimal_fast128_t_components rhs_components {sig_rhs, exp_rhs, rhs < 0};
 
-    return detail::d128_add_impl<decimal_fast128_t>(lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-                                                  sig_rhs, exp_rhs, (rhs < 0),
-                                                  abs_lhs_bigger);
+    return detail::d128_add_impl_new<decimal_fast128_t>(lhs.to_components(), rhs_components);
 }
 
 template <typename Integer>
@@ -955,15 +1150,42 @@ constexpr auto operator-(const decimal_fast128_t& lhs, const decimal_fast128_t& 
         {
             return direct_init_d128(detail::d128_fast_qnan, 0, false);
         }
+        if (isinf(rhs) && !isnan(lhs))
+        {
+            return -rhs;
+        }
 
         return detail::check_non_finite(lhs, rhs);
     }
     #endif
 
-    return detail::d128_add_impl<decimal_fast128_t>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
-            abs(lhs) > abs(rhs));
+    // Dominant-operand short-circuit; see operator+ above.
+    {
+        const auto lhs_sig {lhs.full_significand()};
+        const auto rhs_sig {rhs.full_significand()};
+        if (BOOST_DECIMAL_LIKELY(lhs_sig != 0U && rhs_sig != 0U))
+        {
+            const auto lhs_exp {lhs.biased_exponent()};
+            const auto rhs_exp {rhs.biased_exponent()};
+            const auto exp_diff {lhs_exp > rhs_exp ? lhs_exp - rhs_exp : rhs_exp - lhs_exp};
+            if (exp_diff > 42)
+            {
+                auto round {_boost_decimal_global_rounding_mode};
+                #ifndef BOOST_DECIMAL_NO_CONSTEVAL_DETECTION
+                if (!BOOST_DECIMAL_IS_CONSTANT_EVALUATED(lhs))
+                {
+                    round = _boost_decimal_global_runtime_rounding_mode;
+                }
+                #endif
+                if (BOOST_DECIMAL_LIKELY(round == rounding_mode::fe_dec_to_nearest))
+                {
+                    return lhs_exp > rhs_exp ? lhs : -rhs;
+                }
+            }
+        }
+    }
+
+    return detail::d128_add_impl_new<decimal_fast128_t>(lhs, -rhs);
 }
 
 template <typename Integer>
@@ -971,49 +1193,40 @@ constexpr auto operator-(const decimal_fast128_t& lhs, const Integer rhs) noexce
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
     using exp_type = decimal_fast128_t::biased_exponent_type;
+    using sig_type = decimal_fast128_t::significand_type;
 
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
     {
-        return lhs;
+        return detail::check_non_finite(lhs);
     }
     #endif
 
-    auto sig_rhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(rhs))};
-    const bool abs_lhs_bigger {abs(lhs) > sig_rhs};
-
+    auto sig_rhs {static_cast<sig_type>(detail::make_positive_unsigned(rhs))};
     exp_type exp_rhs {0};
     detail::normalize<decimal_fast128_t>(sig_rhs, exp_rhs);
+    const detail::decimal_fast128_t_components rhs_components {sig_rhs, exp_rhs, !(rhs < 0)};
 
-    return detail::d128_add_impl<decimal_fast128_t>(
-            lhs.significand_, lhs.biased_exponent(), lhs.sign_,
-            sig_rhs, exp_rhs, !(rhs < 0),
-            abs_lhs_bigger);
+    return detail::d128_add_impl_new<decimal_fast128_t>(lhs.to_components(), rhs_components);
 }
 
 template <typename Integer>
 constexpr auto operator-(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
-    using exp_type = decimal_fast128_t::biased_exponent_type;
-
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(rhs))
     {
-        return rhs;
+        if (isinf(rhs))
+        {
+            return -rhs;
+        }
+
+        return detail::check_non_finite(rhs);
     }
     #endif
 
-    auto sig_lhs {static_cast<int128::uint128_t>(detail::make_positive_unsigned(lhs))};
-    const bool abs_lhs_bigger {sig_lhs > abs(rhs)};
-
-    exp_type exp_lhs {0};
-    detail::normalize<decimal_fast128_t>(sig_lhs, exp_lhs);
-
-    return detail::d128_add_impl<decimal_fast128_t>(
-            sig_lhs, exp_lhs, (lhs < 0),
-            rhs.significand_, rhs.biased_exponent(), !rhs.sign_,
-            abs_lhs_bigger);
+    return -rhs + lhs;
 }
 
 constexpr auto operator*(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
@@ -1024,6 +1237,22 @@ constexpr auto operator*(const decimal_fast128_t& lhs, const decimal_fast128_t& 
         if ((isinf(lhs) && rhs == 0) || (isinf(rhs) && lhs == 0))
         {
             return direct_init_d128(detail::d128_fast_qnan, 0, false);
+        }
+        else if (isinf(lhs) && !isnan(rhs) && (signbit(lhs) != signbit(rhs)))
+        {
+            return signbit(lhs) ? lhs : -lhs;
+        }
+        else if (isinf(lhs) && !isnan(rhs) && (signbit(lhs) == signbit(rhs)))
+        {
+            return signbit(lhs) ? -lhs : lhs;
+        }
+        else if (isinf(rhs) && !isnan(lhs) && (signbit(rhs) != signbit(lhs)))
+        {
+            return signbit(rhs) ? rhs : -rhs;
+        }
+        else if (isinf(rhs) && !isnan(lhs) && (signbit(rhs) == signbit(lhs)))
+        {
+            return signbit(rhs) ? -rhs : rhs;
         }
 
         return detail::check_non_finite(lhs, rhs);
@@ -1043,7 +1272,16 @@ constexpr auto operator*(const decimal_fast128_t& lhs, const Integer rhs) noexce
     #ifndef BOOST_DECIMAL_FAST_MATH
     if (not_finite(lhs))
     {
-        return lhs;
+        if (isinf(lhs) && (signbit(lhs) != (rhs < 0)))
+        {
+            return signbit(lhs) ? lhs : -lhs;
+        }
+        else if (isinf(lhs) && (signbit(lhs) == (rhs < 0)))
+        {
+            return signbit(lhs) ? -lhs : lhs;
+        }
+
+        return detail::check_non_finite(lhs);
     }
     #endif
 
@@ -1051,7 +1289,7 @@ constexpr auto operator*(const decimal_fast128_t& lhs, const Integer rhs) noexce
     exp_type rhs_exp {0};
     detail::normalize<decimal_fast128_t>(rhs_sig, rhs_exp);
 
-    return detail::d128_fast_mul_impl<decimal_fast128_t>(
+    return detail::d128_mul_impl<decimal_fast128_t>(
             lhs.significand_, lhs.biased_exponent(), lhs.sign_,
             rhs_sig, rhs_exp, (rhs < 0));
 }
@@ -1076,84 +1314,93 @@ constexpr auto d128f_div_impl(const decimal_fast128_t& lhs, const decimal_fast12
     const auto lhs_fp {fpclassify(lhs)};
     const auto rhs_fp {fpclassify(rhs)};
 
-    // NAN has to come first
-    if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+    if (lhs_fp != FP_NORMAL || rhs_fp != FP_NORMAL)
     {
-        q = nan;
-        r = nan;
-        return;
-    }
-
-    switch (lhs_fp)
-    {
-        case FP_INFINITE:
-            if (rhs_fp == FP_INFINITE)
+        // NAN has to come first
+        if (lhs_fp == FP_NAN || rhs_fp == FP_NAN)
+        {
+            // Operations on an SNAN return a QNAN with the same payload
+            decimal_fast128_t return_nan {};
+            if (lhs_fp == rhs_fp)
             {
-                q = nan;
-                r = nan;
+                // They are both NANs
+                const bool lhs_signaling {issignaling(lhs)};
+                const bool rhs_signaling {issignaling(rhs)};
+
+                if (!lhs_signaling && rhs_signaling)
+                {
+                    return_nan = nan_conversion(rhs);
+                }
+                else
+                {
+                    return_nan = lhs_signaling ? nan_conversion(lhs) : lhs;
+                }
+            }
+            else if (lhs_fp == FP_NAN)
+            {
+                return_nan = issignaling(lhs) ? nan_conversion(lhs) : lhs;
             }
             else
             {
-                q = sign ? -inf : inf;
+                return_nan = issignaling(rhs) ? nan_conversion(rhs) : rhs;
+            }
+
+            q = return_nan;
+            r = return_nan;
+
+            return;
+        }
+
+        switch (lhs_fp)
+        {
+            case FP_INFINITE:
+                if (rhs_fp == FP_INFINITE)
+                {
+                    q = nan;
+                    r = nan;
+                }
+                else
+                {
+                    q = sign ? -inf : inf;
+                    r = zero;
+                }
+                return;
+            case FP_ZERO:
+                if (rhs_fp == FP_ZERO)
+                {
+                    q = nan;
+                    r = nan;
+                }
+                else
+                {
+                    q = sign ? -zero : zero;
+                    r = sign ? -zero : zero;
+                }
+                return;
+            default:
+                static_cast<void>(lhs);
+        }
+
+        switch (rhs_fp)
+        {
+            case FP_ZERO:
+                q = inf;
                 r = zero;
-            }
-            return;
-        case FP_ZERO:
-            if (rhs_fp == FP_ZERO)
-            {
-                q = nan;
-                r = nan;
-            }
-            else
-            {
+                return;
+            case FP_INFINITE:
                 q = sign ? -zero : zero;
-                r = sign ? -zero : zero;
-            }
-            return;
-        default:
-            static_cast<void>(lhs);
-    }
-
-    switch (rhs_fp)
-    {
-        case FP_ZERO:
-            q = inf;
-            r = zero;
-            return;
-        case FP_INFINITE:
-            q = sign ? -zero : zero;
-            r = lhs;
-            return;
-        default:
-            static_cast<void>(rhs);
+                r = lhs;
+                return;
+            default:
+                static_cast<void>(rhs);
+        }
     }
     #else
     static_cast<void>(r);
     #endif
 
-    #ifdef BOOST_DECIMAL_DEBUG
-    std::cerr << "sig lhs: " << sig_lhs
-              << "\nexp lhs: " << exp_lhs
-              << "\nsig rhs: " << sig_rhs
-              << "\nexp rhs: " << exp_rhs << std::endl;
-    #endif
-
-    constexpr auto ten_pow_precision {detail::pow10(int128::uint128_t(detail::precision_v<decimal_fast128_t>))};
-    const auto big_sig_lhs {detail::umul256(lhs.significand_, ten_pow_precision)};
-
-    const auto res_sig {big_sig_lhs / rhs.significand_};
-    const auto res_exp {lhs.biased_exponent() - rhs.biased_exponent() - detail::precision_v<decimal_fast128_t>};
-
-    q = decimal_fast128_t(static_cast<int128::uint128_t>(res_sig), res_exp, sign);
+    q = detail::d128_generic_div_impl<decimal_fast128_t>(lhs.to_components(), rhs.to_components(), sign);
 }
-
-constexpr auto d128f_mod_impl(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs, const decimal_fast128_t& q, decimal_fast128_t& r) -> void
-{
-    constexpr decimal_fast128_t zero {0, 0};
-
-    auto q_trunc {q > zero ? floor(q) : ceil(q)};
-    r = lhs - (decimal_fast128_t(q_trunc) * rhs);
-};
 
 constexpr auto operator/(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
 {
@@ -1162,28 +1409,27 @@ constexpr auto operator/(const decimal_fast128_t& lhs, const decimal_fast128_t& 
     d128f_div_impl(lhs, rhs, q, r);
 
     return q;
-};
+}
 
 template <typename Integer>
 constexpr auto operator/(const decimal_fast128_t& lhs, const Integer rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
+    const bool sign {lhs.isneg() != (rhs < 0)};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast128_t zero {0, 0};
-    constexpr decimal_fast128_t nan {direct_init_d128(detail::d128_fast_qnan, 0, false)};
     constexpr decimal_fast128_t inf {direct_init_d128(detail::d128_fast_inf, 0, false)};
-
-    const bool sign {lhs.isneg() != (rhs < 0)};
 
     const auto lhs_fp {fpclassify(lhs)};
 
     switch (lhs_fp)
     {
         case FP_NAN:
-            return nan;
+            return issignaling(lhs) ? nan_conversion(lhs) : lhs;;
         case FP_INFINITE:
-            return inf;
+            return sign ? -lhs : lhs;
         case FP_ZERO:
             return sign ? -zero : zero;
         default:
@@ -1200,34 +1446,27 @@ constexpr auto operator/(const decimal_fast128_t& lhs, const Integer rhs) noexce
 
     const auto rhs_sig {detail::make_positive_unsigned(rhs)};
     const detail::decimal_fast128_t_components rhs_components {rhs_sig, 0, rhs < 0};
-    detail::decimal_fast128_t_components q_components {};
 
-    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::d128_generic_div_impl<decimal_fast128_t>(lhs_components, rhs_components, sign);
 }
 
 template <typename Integer>
 constexpr auto operator/(const Integer lhs, const decimal_fast128_t& rhs) noexcept
     BOOST_DECIMAL_REQUIRES_RETURN(detail::is_integral_v, Integer, decimal_fast128_t)
 {
+    const bool sign {(lhs < 0) != rhs.isneg()};
+
     #ifndef BOOST_DECIMAL_FAST_MATH
     // Check pre-conditions
     constexpr decimal_fast128_t zero {0, 0};
-    constexpr decimal_fast128_t nan {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false)};
-    constexpr decimal_fast128_t inf {boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false)};
-
-    const bool sign {(lhs < 0) != rhs.isneg()};
+    constexpr decimal_fast128_t inf {direct_init_d128(detail::d128_fast_inf, 0, false)};
 
     const auto rhs_fp {fpclassify(rhs)};
 
-    if (rhs_fp == FP_NAN)
-    {
-        return nan;
-    }
-
     switch (rhs_fp)
     {
+        case FP_NAN:
+            return issignaling(rhs) ? nan_conversion(rhs) : rhs;
         case FP_INFINITE:
             return sign ? -zero : zero;
         case FP_ZERO:
@@ -1239,11 +1478,8 @@ constexpr auto operator/(const Integer lhs, const decimal_fast128_t& rhs) noexce
 
     const detail::decimal_fast128_t_components lhs_components {detail::make_positive_unsigned(lhs), 0, lhs < 0};
     const detail::decimal_fast128_t_components rhs_components {rhs.significand_, rhs.biased_exponent(), rhs.isneg()};
-    detail::decimal_fast128_t_components q_components {};
 
-    detail::d128_generic_div_impl(lhs_components, rhs_components, q_components);
-
-    return {q_components.sig, q_components.exp, q_components.sign};
+    return detail::d128_generic_div_impl<decimal_fast128_t>(lhs_components, rhs_components, sign);
 }
 
 constexpr auto operator%(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
@@ -1251,10 +1487,46 @@ constexpr auto operator%(const decimal_fast128_t& lhs, const decimal_fast128_t& 
     decimal_fast128_t q {};
     decimal_fast128_t r {};
     d128f_div_impl(lhs, rhs, q, r);
-    d128f_mod_impl(lhs, rhs, q, r);
+
+    if (BOOST_DECIMAL_LIKELY(isfinite(lhs) && isfinite(rhs)))
+    {
+        if (rhs == 0 || isinf(q))
+        {
+            r = std::numeric_limits<decimal_fast128_t>::quiet_NaN();
+        }
+        else
+        {
+            detail::generic_mod_impl(lhs, lhs.to_components(), rhs, rhs.to_components(), q, r);
+        }
+    }
+    else if (isinf(lhs) && !isnan(rhs))
+    {
+        // Modulo of inf is undefined
+        r = std::numeric_limits<decimal_fast128_t>::quiet_NaN();
+    }
+    else if (issignaling(lhs))
+    {
+        r = nan_conversion(lhs);
+    }
+    else if (issignaling(rhs))
+    {
+        r = nan_conversion(rhs);
+    }
+    else if (isnan(lhs))
+    {
+        r = lhs;
+    }
+    else if (isnan(rhs))
+    {
+        r = rhs;
+    }
+    else if (isinf(rhs))
+    {
+        r = lhs;
+    }
 
     return r;
-};
+}
 
 constexpr auto decimal_fast128_t::operator+=(const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t&
 {
@@ -1321,7 +1593,9 @@ constexpr auto decimal_fast128_t::operator++() noexcept -> decimal_fast128_t&
 
 constexpr auto decimal_fast128_t::operator++(int) noexcept -> decimal_fast128_t
 {
-    return ++(*this);
+    const auto temp {*this};
+    ++(*this);
+    return temp;
 }
 
 constexpr auto decimal_fast128_t::operator--() noexcept -> decimal_fast128_t&
@@ -1333,7 +1607,9 @@ constexpr auto decimal_fast128_t::operator--() noexcept -> decimal_fast128_t&
 
 constexpr auto decimal_fast128_t::operator--(int) noexcept -> decimal_fast128_t
 {
-    return --(*this);
+    const auto temp {*this};
+    --(*this);
+    return temp;
 }
 
 constexpr decimal_fast128_t::operator bool() const noexcept
@@ -1499,150 +1775,6 @@ constexpr auto quantexpd128f(const decimal_fast128_t& x) noexcept -> int
 
     return static_cast<int>(x.unbiased_exponent());
 }
-
-// 3.6.6
-// Returns: a number that is equal in value (except for any rounding) and sign to x,
-// and which has an exponent set to be equal to the exponent of y.
-// If the exponent is being increased, the value is correctly rounded according to the current rounding mode;
-// if the result does not have the same value as x, the "inexact" floating-point exception is raised.
-// If the exponent is being decreased and the significand of the result has more digits than the type would allow,
-// the "invalid" floating-point exception is raised and the result is NaN.
-// If one or both operands are NaN the result is NaN.
-// Otherwise, if only one operand is infinity, the "invalid" floating-point exception is raised and the result is NaN.
-// If both operands are infinity, the result is DEC_INFINITY, with the same sign as x, converted to the type of x.
-// The quantize functions do not signal underflow.
-constexpr auto quantized128f(const decimal_fast128_t& lhs, const decimal_fast128_t& rhs) noexcept -> decimal_fast128_t
-{
-    #ifndef BOOST_DECIMAL_FAST_MATH
-    // Return the correct type of nan
-    if (isnan(lhs))
-    {
-        return lhs;
-    }
-    else if (isnan(rhs))
-    {
-        return rhs;
-    }
-
-    // If one is infinity then return a signaling NAN
-    if (isinf(lhs) != isinf(rhs))
-    {
-        return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false);
-    }
-    else if (isinf(lhs) && isinf(rhs))
-    {
-        return lhs;
-    }
-    #endif
-
-    return {lhs.full_significand(), rhs.biased_exponent(), lhs.isneg()};
-}
-
-namespace detail {
-
-template <bool>
-class numeric_limits_impl128f
-{
-public:
-
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = true;
-    static constexpr bool is_integer = false;
-    static constexpr bool is_exact = false;
-    static constexpr bool has_infinity = true;
-    static constexpr bool has_quiet_NaN = true;
-    static constexpr bool has_signaling_NaN = true;
-
-    // These members were deprecated in C++23
-    #if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-    static constexpr std::float_denorm_style has_denorm = std::denorm_present;
-    static constexpr bool has_denorm_loss = true;
-    #endif
-
-    static constexpr std::float_round_style round_style = std::round_indeterminate;
-    static constexpr bool is_iec559 = false;
-    static constexpr bool is_bounded = true;
-    static constexpr bool is_modulo = false;
-    static constexpr int  digits = 34;
-    static constexpr int  digits10 = digits;
-    static constexpr int  max_digits10 = digits;
-    static constexpr int  radix = 10;
-    static constexpr int  min_exponent = -6143;
-    static constexpr int  min_exponent10 = min_exponent;
-    static constexpr int  max_exponent = 6144;
-    static constexpr int  max_exponent10 = max_exponent;
-    static constexpr bool traps = std::numeric_limits<std::uint64_t>::traps;
-    static constexpr bool tinyness_before = true;
-
-    // Member functions
-    static constexpr auto (min)        () -> boost::decimal::decimal_fast128_t { return {UINT32_C(1), min_exponent}; }
-    static constexpr auto (max)        () -> boost::decimal::decimal_fast128_t { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1}; }
-    static constexpr auto lowest       () -> boost::decimal::decimal_fast128_t { return {boost::int128::uint128_t{UINT64_C(0b1111011010000100110111110101011011000011111000000), UINT64_C(0b0011011110001101100011100110001111111111111111111111111111111111)}, max_exponent - digits + 1, construction_sign::negative}; }
-    static constexpr auto epsilon      () -> boost::decimal::decimal_fast128_t { return {UINT32_C(1), -digits + 1}; }
-    static constexpr auto round_error  () -> boost::decimal::decimal_fast128_t { return epsilon(); }
-    static constexpr auto infinity     () -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_inf, 0, false); }
-    static constexpr auto quiet_NaN    () -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_qnan, 0, false); }
-    static constexpr auto signaling_NaN() -> boost::decimal::decimal_fast128_t { return boost::decimal::direct_init_d128(boost::decimal::detail::d128_fast_snan, 0, false); }
-    static constexpr auto denorm_min   () -> boost::decimal::decimal_fast128_t { return min(); }
-};
-
-#if !defined(__cpp_inline_variables) || __cpp_inline_variables < 201606L
-
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_specialized;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_signed;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_integer;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_exact;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::has_infinity;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::has_quiet_NaN;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::has_signaling_NaN;
-
-// These members were deprecated in C++23
-#if ((!defined(_MSC_VER) && (__cplusplus <= 202002L)) || (defined(_MSC_VER) && (_MSVC_LANG <= 202002L)))
-template <bool b> constexpr std::float_denorm_style numeric_limits_impl128f<b>::has_denorm;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::has_denorm_loss;
-#endif
-
-template <bool b> constexpr std::float_round_style numeric_limits_impl128f<b>::round_style;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_iec559;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_bounded;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::is_modulo;
-template <bool b> constexpr int numeric_limits_impl128f<b>::digits;
-template <bool b> constexpr int numeric_limits_impl128f<b>::digits10;
-template <bool b> constexpr int numeric_limits_impl128f<b>::max_digits10;
-template <bool b> constexpr int numeric_limits_impl128f<b>::radix;
-template <bool b> constexpr int numeric_limits_impl128f<b>::min_exponent;
-template <bool b> constexpr int numeric_limits_impl128f<b>::min_exponent10;
-template <bool b> constexpr int numeric_limits_impl128f<b>::max_exponent;
-template <bool b> constexpr int numeric_limits_impl128f<b>::max_exponent10;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::traps;
-template <bool b> constexpr bool numeric_limits_impl128f<b>::tinyness_before;
-
-#endif // !defined(__cpp_inline_variables) || __cpp_inline_variables < 201606L
-
-} // namespace detail
-
-} // namespace decimal
-} // namespace boost
-
-namespace std {
-
-#ifdef __clang__
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wmismatched-tags"
-#endif
-
-template <>
-class numeric_limits<boost::decimal::decimal_fast128_t> :
-    public boost::decimal::detail::numeric_limits_impl128f<true> {};
-
-#ifdef __clang__
-#  pragma clang diagnostic pop
-#endif
-
-} // namespace std
-
-namespace boost {
-namespace decimal {
 
 #if !defined(BOOST_DECIMAL_DISABLE_CLIB)
 

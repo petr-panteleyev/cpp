@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev
+//  Copyright © 2024-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -20,6 +20,7 @@ class FieldType final : public Common::EnumClass<FieldType> {
     static const FieldType CARD_TYPE;
     static const FieldType DATE;
     static const FieldType EXPIRATION_MONTH;
+    static const FieldType TOTP_CODE;
 
   public:
     bool masked() const noexcept { return masked_; }

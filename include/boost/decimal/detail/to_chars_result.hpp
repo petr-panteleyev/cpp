@@ -16,23 +16,33 @@
 namespace boost {
 namespace decimal {
 
+// This is how the STL says to implement
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wpadded"
+#endif
+
 BOOST_DECIMAL_EXPORT struct to_chars_result
 {
     char *ptr;
     std::errc ec;
 
-    constexpr friend bool operator==(const to_chars_result &lhs, const to_chars_result &rhs) noexcept
+    BOOST_DECIMAL_CUDA_CONSTEXPR friend bool operator==(const to_chars_result &lhs, const to_chars_result &rhs) noexcept
     {
         return lhs.ptr == rhs.ptr && lhs.ec == rhs.ec;
     }
 
-    constexpr friend bool operator!=(const to_chars_result &lhs, const to_chars_result &rhs) noexcept
+    BOOST_DECIMAL_CUDA_CONSTEXPR friend bool operator!=(const to_chars_result &lhs, const to_chars_result &rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    constexpr explicit operator bool() const noexcept { return ec == std::errc{}; }
+    BOOST_DECIMAL_CUDA_CONSTEXPR explicit operator bool() const noexcept { return ec == std::errc{}; }
 };
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 } // namespace decimal
 } // namespace boost

@@ -49,7 +49,7 @@ constexpr auto sin_impl(const T x) noexcept
     }
     else
     {
-        if(x > static_cast<int>(INT8_C(0)))
+        if(x > 0)
         {
             // Perform argument reduction and subsequent scaling of the result.
 
@@ -62,10 +62,10 @@ constexpr auto sin_impl(const T x) noexcept
             // | 2 | -sin(r) | -cos(r) |  sin(r)/cos(r) |
             // | 3 | -cos(r) |  sin(r) | -cos(r)/sin(r) |
 
-            const T two_x = x * 2;
+            const T two_x { x * 2 };
 
-            const auto k = static_cast<unsigned>(two_x / numbers::pi_v<T>);
-            const auto n = static_cast<unsigned>(k % static_cast<unsigned>(UINT8_C(4)));
+            const unsigned k { static_cast<unsigned>(two_x / numbers::pi_v<T>) };
+            const auto n = k % static_cast<unsigned>(4);
 
             const T two_r { two_x - (numbers::pi_v<T> * k) };
 
@@ -75,7 +75,7 @@ constexpr auto sin_impl(const T x) noexcept
 
             bool do_scaling { two_r > one };
 
-            constexpr T sqrt_epsilon { sqrt(std::numeric_limits<T>::epsilon()) };
+            constexpr T cbrt_epsilon { cbrt(std::numeric_limits<T>::epsilon()) };
 
             switch(n)
             {
@@ -84,7 +84,7 @@ constexpr auto sin_impl(const T x) noexcept
                 {
                     const T d2r { numbers::pi_v<T> - two_r };
 
-                    if (d2r < sqrt_epsilon)
+                    if (d2r < cbrt_epsilon)
                     {
                         result = d2r * (one - (d2r * d2r) / 12) / 2;
 
@@ -107,9 +107,11 @@ constexpr auto sin_impl(const T x) noexcept
                 case static_cast<unsigned>(UINT8_C(2)):
                 default:
                 {
-                    if (two_r < sqrt_epsilon)
+                    if (two_r < cbrt_epsilon)
                     {
                         // Normal[Series[Sin[x/2], {x, 0, 3}]]
+                        // FullSimplify[%]
+                        // HornerForm[%]
 
                         result = (two_r * (one - (two_r * two_r) / 24)) / 2;
                     }
@@ -132,7 +134,10 @@ constexpr auto sin_impl(const T x) noexcept
                 result *= (static_cast<unsigned>(UINT8_C(3)) - ((result * result) * static_cast<unsigned>(UINT8_C(4))));
             }
 
-            if(signbit(result)) { result = -result; }
+            if(signbit(result))
+            {
+              result = -result;
+            }
 
             const auto b_neg = (n > static_cast<unsigned>(UINT8_C(1)));
 

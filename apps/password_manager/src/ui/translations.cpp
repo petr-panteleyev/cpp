@@ -1,4 +1,4 @@
-//  Copyright © 2024-2025 Petr Panteleyev
+//  Copyright © 2024-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #include "translations.hpp"
@@ -27,6 +27,7 @@ void initialize() {
         {FieldType::CARD_TYPE.ordinal(), "Тип карты"},
         {FieldType::DATE.ordinal(), "Дата"},
         {FieldType::EXPIRATION_MONTH.ordinal(), "Месяц окончания"},
+        {FieldType::TOTP_CODE.ordinal(), "Код для TOTP"},
     };
 
     recordTypeTranslated_ = {

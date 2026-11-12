@@ -1,4 +1,4 @@
-//  Copyright © 2025 Petr Panteleyev
+//  Copyright © 2025-2026 Petr Panteleyev
 //  SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -19,7 +19,7 @@ inline std::string toIsoString(const std::chrono::year_month_day &date) {
 
 inline std::chrono::year_month_day fromIsoString(const std::string &str) {
     std::istringstream input{str};
-    std::chrono::year_month_day result;
+    std::chrono::year_month_day result{};
     input >> parse("%F", result);
     return result;
 }

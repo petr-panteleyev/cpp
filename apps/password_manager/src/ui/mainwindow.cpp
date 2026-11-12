@@ -53,7 +53,7 @@ const QString ABOUT_TEXT = R"(
 <tr><td>Версия:<td>%1
 <tr><td>Дата сборки:<td>%2
 </table>
-Copyright &copy; 2024-2025 Petr Panteleyev
+Copyright &copy; 2024-2026 Petr Panteleyev
 )";
 
 } // namespace
